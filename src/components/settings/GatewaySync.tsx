@@ -1,87 +1,162 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, RefreshCw, Check, AlertCircle } from "lucide-react";
-import { gatewaySyncService, GatewayType, GatewayConfig, SyncStatus } from "@/services/gatewaySyncService";
+import { useToast } from "@/components/ui/use-toast";
+import { GatewaySyncService, GatewayConfig, GatewayType } from "@/lib/services/gateway-sync";
+import { Loader2, RefreshCw, Save, TestTube } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface GatewaySyncProps {
   type: GatewayType;
 }
 
 export function GatewaySync({ type }: GatewaySyncProps) {
-  const [config, setConfig] = useState<GatewayConfig>(gatewaySyncService.getConfig(type));
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>(gatewaySyncService.getSyncStatus(type));
-  const [isTestingConnection, setIsTestingConnection] = useState(false);
+  const { toast } = useToast();
+  const [config, setConfig] = useState<GatewayConfig>({
+    url: '',
+    apiKey: '',
+    enabled: false,
+    syncInterval: 5,
+  });
+  const [isTesting, setIsTesting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [syncStatus, setSyncStatus] = useState({
+    inProgress: false,
+    lastSync: null as string | null,
+  });
 
-  const title = type === "tyk" ? "Tyk Gateway" : "Kong Gateway";
+  const gatewaySyncService = GatewaySyncService.getInstance();
 
   useEffect(() => {
-    // Update local state when the sync status changes
-    const interval = setInterval(() => {
-      setSyncStatus(gatewaySyncService.getSyncStatus(type));
-    }, 1000);
+    loadConfig();
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [type]);
+  const loadConfig = async () => {
+    const savedConfig = await gatewaySyncService.getConfig(type);
+    setConfig(savedConfig);
+    if (savedConfig.lastSync) {
+      setSyncStatus(prev => ({ ...prev, lastSync: savedConfig.lastSync || null }));
+    }
+  };
 
-  const handleConfigChange = (field: keyof GatewayConfig, value: any) => {
-    const updatedConfig = { ...config, [field]: value };
-    setConfig(updatedConfig);
-    gatewaySyncService.updateConfig(type, { [field]: value });
+  const handleConfigChange = (key: keyof GatewayConfig, value: any) => {
+    setConfig(prev => ({
+      ...prev,
+      [key]: value
+    }));
   };
 
   const handleTestConnection = async () => {
-    setIsTestingConnection(true);
-    await gatewaySyncService.testConnection(type);
-    setIsTestingConnection(false);
+    setIsTesting(true);
+    try {
+      const success = await gatewaySyncService.testConnection(type, config);
+      if (success) {
+        toast({
+          title: "Connection Successful",
+          description: `Successfully connected to ${type} gateway`,
+        });
+      } else {
+        throw new Error("Connection failed");
+      }
+    } catch (error) {
+      toast({
+        title: "Connection Failed",
+        description: error instanceof Error ? error.message : "Failed to connect to gateway",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTesting(false);
+    }
   };
 
-  const handleSyncNow = () => {
-    gatewaySyncService.syncGateway(type);
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await gatewaySyncService.saveConfig(type, config);
+      toast({
+        title: "Settings Saved",
+        description: `${type} gateway configuration has been saved successfully`,
+      });
+    } catch (error) {
+      toast({
+        title: "Save Failed",
+        description: "Failed to save gateway configuration",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSyncNow = async () => {
+    setSyncStatus(prev => ({ ...prev, inProgress: true }));
+    try {
+      await gatewaySyncService.syncGateway(type);
+      toast({
+        title: "Sync Successful",
+        description: `Successfully synchronized with ${type} gateway`,
+      });
+      await loadConfig(); // Reload config to get updated lastSync
+    } catch (error) {
+      toast({
+        title: "Sync Failed",
+        description: error instanceof Error ? error.message : "Failed to synchronize with gateway",
+        variant: "destructive",
+      });
+    } finally {
+      setSyncStatus(prev => ({ ...prev, inProgress: false }));
+    }
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{title} Synchronization</CardTitle>
-        <CardDescription>Connect and synchronize with your {title}</CardDescription>
+        <CardTitle className="capitalize">{type} Gateway</CardTitle>
+        <CardDescription>
+          Configure synchronization with your {type} gateway
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label>Enable Synchronization</Label>
-            <p className="text-sm text-muted-foreground">Automatically sync with {title}</p>
+            <p className="text-sm text-muted-foreground">
+              Automatically sync with {type} gateway
+            </p>
           </div>
-          <Switch 
-            checked={config.enabled} 
-            onCheckedChange={(checked) => handleConfigChange("enabled", checked)} 
+          <Switch
+            checked={config.enabled}
+            onCheckedChange={(checked) => handleConfigChange('enabled', checked)}
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor={`${type}-url`}>Gateway URL</Label>
-          <Input 
-            id={`${type}-url`} 
-            type="url" 
-            placeholder="https://gateway.example.com" 
+          <Input
+            id={`${type}-url`}
             value={config.url}
-            onChange={(e) => handleConfigChange("url", e.target.value)}
+            onChange={(e) => handleConfigChange('url', e.target.value)}
+            placeholder={`https://${type}-gateway.example.com`}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor={`${type}-api-key`}>API Key / Token</Label>
-          <Input 
-            id={`${type}-api-key`} 
-            type="password" 
-            placeholder="Enter your API key" 
+          <Label htmlFor={`${type}-apiKey`}>API Key</Label>
+          <Input
+            id={`${type}-apiKey`}
+            type="password"
             value={config.apiKey}
-            onChange={(e) => handleConfigChange("apiKey", e.target.value)}
+            onChange={(e) => handleConfigChange('apiKey', e.target.value)}
+            placeholder="Enter your API key"
           />
         </div>
 
@@ -89,7 +164,7 @@ export function GatewaySync({ type }: GatewaySyncProps) {
           <Label htmlFor={`${type}-interval`}>Sync Interval</Label>
           <Select 
             value={config.syncInterval.toString()} 
-            onValueChange={(value) => handleConfigChange("syncInterval", parseInt(value))}
+            onValueChange={(value) => handleConfigChange('syncInterval', parseInt(value))}
           >
             <SelectTrigger id={`${type}-interval`}>
               <SelectValue placeholder="Select interval" />
@@ -108,15 +183,18 @@ export function GatewaySync({ type }: GatewaySyncProps) {
           <Button 
             variant="outline" 
             onClick={handleTestConnection}
-            disabled={isTestingConnection || !config.url || !config.apiKey}
+            disabled={isTesting || !config.url || !config.apiKey}
           >
-            {isTestingConnection ? (
+            {isTesting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Testing...
               </>
             ) : (
-              "Test Connection"
+              <>
+                <TestTube className="mr-2 h-4 w-4" />
+                Test Connection
+              </>
             )}
           </Button>
           
@@ -138,37 +216,26 @@ export function GatewaySync({ type }: GatewaySyncProps) {
           </Button>
         </div>
 
-        {/* Sync Status */}
-        <div className="border rounded-md p-4 bg-muted/30">
-          <div className="flex items-center">
-            <div className="flex-1">
-              <h4 className="font-medium">Sync Status</h4>
-              {syncStatus.lastSynced && (
-                <p className="text-sm text-muted-foreground">
-                  Last synced: {syncStatus.lastSynced.toLocaleString()}
-                </p>
-              )}
-            </div>
-            <div>
-              {syncStatus.error ? (
-                <div className="flex items-center text-destructive">
-                  <AlertCircle className="mr-1 h-4 w-4" />
-                  <span className="text-sm">Error</span>
-                </div>
-              ) : syncStatus.lastSynced ? (
-                <div className="flex items-center text-green-600">
-                  <Check className="mr-1 h-4 w-4" />
-                  <span className="text-sm">Synced</span>
-                </div>
-              ) : (
-                <span className="text-sm text-muted-foreground">Not synced yet</span>
-              )}
-            </div>
+        {syncStatus.lastSync && (
+          <div className="text-sm text-muted-foreground">
+            Last synced: {new Date(syncStatus.lastSync).toLocaleString()}
           </div>
-          
-          {syncStatus.error && (
-            <p className="text-sm text-destructive mt-2">{syncStatus.error}</p>
-          )}
+        )}
+
+        <div className="flex justify-end">
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Save Settings
+              </>
+            )}
+          </Button>
         </div>
       </CardContent>
     </Card>

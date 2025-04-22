@@ -1,154 +1,243 @@
+# Tyk Mirror Dashboard
 
-# ApIDashd API Gateway Dashboard
+A modern, feature-rich dashboard for managing and monitoring Tyk API Gateway instances. Built with React, TypeScript, and a robust backend architecture.
 
-A modern, extensible dashboard to manage API Gateways (currently supports both Tyk and Kong) with full-featured UI for security, analytics, version control, and more.
+## 🚀 Features
 
-## ⭐ Features
+- **Authentication & Authorization**
+  - Secure login system with role-based access control
+  - User management and permissions
+  - Session management
 
-- **Dashboard** with real-time analytics, gateway health, request & error charts
-- **API Management:** create, update, delete API endpoints for multiple gateway types
-- **Version Control:** versioned API deployments, path management, rollbacks, and deployment options
-- **Security:** configure authentication, rate limiting, quotas, CORS, and advanced headers per API
-- **Logs:** detailed request, error, and event logging with filtering
-- **Policy & Key Management:** manage API keys, policies, consumers
-- **Modern UI:** responsive, fast, built with React, TypeScript, Tailwind, and shadcn/ui components
+- **API Management**
+  - API definition management
+  - API key generation and management
+  - Policy configuration
+  - API analytics and monitoring
 
-## 📸 Screenshots
+- **Gateway Integration**
+  - Tyk Gateway synchronization
+  - Kong Gateway integration
+  - Real-time status monitoring
+  - Health checks and alerts
 
-Get a visual overview of the ApIDash Dashboard:
+- **Database Integration**
+  - PostgreSQL database support
+  - Configurable database settings
+  - Data persistence and caching
 
-### Main Dashboard & Analytics
+- **User Interface**
+  - Modern, responsive design
+  - Dark/Light mode support
+  - Real-time updates
+  - Interactive charts and graphs
 
-![Main Dashboard and Analytics](https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=900&q=80)
-*The main dashboard provides quick access to analytics, gateway health, and API activity trends.*
+## 📋 Prerequisites
 
-### API Builder (Visual Flow)
+Before you begin, ensure you have the following installed:
 
-![API Builder Visual Editor](https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=900&q=80)
-*The visual API builder lets you design, edit, and connect endpoints or logic with ease.*
+- Node.js (v18 or higher)
+- PostgreSQL (v14 or higher)
+- npm or yarn package manager
+- Git
 
-### API Key Management/Policy Editor
+## 🛠️ Installation
 
-![API Key Management Interface](https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=900&q=80)
-*API Key management: Easily generate, revoke, or search for keys and assign policies.*
-
-> **Tip:** Want to contribute? [Submit your own screenshots via a pull request!](#contributing)
-
-## 📦 Requirements
-
-- **Node.js** (>= 18.x)
-- **npm** (>= 9.x)
-- (Recommended) **Git** for version control
-- **Vite** (comes preconfigured; no manual install required)
-- **Modern browser** for development/preview
-
-## 🚀 Getting Started
-
-### 1. Clone the repository
-
+1. Clone the repository:
 ```bash
-git clone <YOUR_REPO_URL>
-cd <YOUR_PROJECT_DIRECTORY>
+git clone https://github.com/yourusername/tyk-mirror-dashboard.git
+cd tyk-mirror-dashboard
 ```
 
-### 2. Install dependencies
-
+2. Install dependencies:
 ```bash
 npm install
+# or
+yarn install
 ```
 
-### 3. Run the development server
+3. Configure environment variables:
+Create a `.env` file in the root directory with the following variables:
+```env
+VITE_DB_HOST=localhost
+VITE_DB_PORT=5432
+VITE_DB_NAME=tyk_dashboard
+VITE_DB_USER=postgres
+VITE_DB_PASSWORD=your_password
+VITE_TYK_GATEWAY_URL=http://localhost:8080
+VITE_TYK_GATEWAY_SECRET=your_secret
+```
+
+4. Initialize the database:
+```bash
+npm run db:init
+# or
+yarn db:init
+```
+
+## 🚀 Development
+
+To start the development server:
 
 ```bash
 npm run dev
+# or
+yarn dev
 ```
 
-Visit [http://localhost:8080](http://localhost:8080) in your browser.
+The application will be available at `http://localhost:5173`
 
-### 4. Build for production
+## 🏗️ Building for Production
+
+To build the application for production:
 
 ```bash
 npm run build
+# or
+yarn build
 ```
 
-The static files will be output in the `dist/` directory.
+The build files will be generated in the `dist` directory.
 
-## 🌐 Deployment
+## 🐳 Docker Deployment
 
-You can deploy the application in a few ways:
+1. Build the Docker image:
+```bash
+docker build -t tyk-mirror-dashboard .
+```
 
-### 1. Deploy with ApIDash Hosting
+2. Run the container:
+```bash
+docker run -p 3000:3000 \
+  -e VITE_DB_HOST=your_db_host \
+  -e VITE_DB_PORT=5432 \
+  -e VITE_DB_NAME=tyk_dashboard \
+  -e VITE_DB_USER=postgres \
+  -e VITE_DB_PASSWORD=your_password \
+  tyk-mirror-dashboard
+```
 
-- Open [ApIDash project page](https://ApIDash.dev/projects/e910d3f0-17b5-40c2-b001-ea3bbbbac8cf)
-- Click "Share" > "Publish" to deploy/update your hosted app
-- [Optionally] Connect a [custom domain](https://docs.ApIDash.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 📦 Project Structure
 
-### 2. Deploy on Vercel, Netlify, or any static host
+```
+src/
+├── components/         # React components
+├── lib/               # Core libraries and utilities
+├── pages/             # Page components
+├── services/          # API and service integrations
+├── styles/            # Global styles
+└── types/             # TypeScript type definitions
+```
 
-- Build the app: `npm run build`
-- Deploy the `dist/` directory as a static site
+## 🔧 Configuration
 
-### 3. Self-hosting
+### Database Configuration
+The application uses PostgreSQL for data storage. Configure the database settings in the settings panel or through environment variables.
 
-- Use any web server (e.g., nginx, Apache, Caddy) to serve the contents of the `dist/` folder.
+### Gateway Configuration
+Configure Tyk and Kong gateway connections through the settings panel. Each gateway requires:
+- Gateway URL
+- API Key/Secret
+- Sync interval
 
-> **Note:** For backend/API functionality (e.g., storing data, authentication), connect to Supabase or your own backend server. See [Supabase integration guide](https://docs.ApIDash.dev/integrations/supabase/).
+## 📝 To-Do Features
 
-## 🛠️ Local Development
+- [ ] Multi-tenant support
+- [ ] Advanced analytics dashboard
+- [ ] API documentation generator
+- [ ] Webhook integration
+- [ ] Custom plugin support
+- [ ] API testing tools
+- [ ] Rate limiting visualization
+- [ ] Audit logging
+- [ ] Backup and restore functionality
+- [ ] API versioning support
 
-- Modify components, pages, or logic under the `src/` folder
-- UI components use [shadcn/ui](https://ui.shadcn.com/) and [Tailwind CSS](https://tailwindcss.com/)
-- TypeScript for type safety
+## 🛡️ Security
 
-## 📝 To-Do and Planned Features
-
-- [ ] Live synchronisation with real Tyk/Kong gateways (add config in settings)
-- [ ] User authentication and permissions (multi-user, admin, read-only)
-- [ ] Persistent API & key data via Supabase/postgres integration
-- [ ] Improved policy editor with UI-driven rules management
-- [ ] Export/Import API definitions (JSON/YAML)
-- [ ] Webhook and notification integration (e.g., Slack alerts on errors)
-- [ ] Better mobile/tablet UI (responsive optimizations)
-- [ ] Accessibility improvements
-
-## 🌱 Enhancements & Community Ideas
-
-- Suggest integrations with other API gateways (e.g., AWS API Gateway, Apigee)
-- Add advanced search/filtering on analytics and logs
-- Dashboard widgets/plugins system (allow custom panels)
-- GitOps integration for deployment & API versioning
-- i18n and localization support
+- All passwords are hashed using bcrypt
+- JWT-based authentication
+- Role-based access control
+- CSRF protection
+- Rate limiting
+- Input validation
+- Secure session management
 
 ## 🤝 Contributing
 
-1. Fork this repo and create a new branch for your feature or fix
-2. Follow the project structure and style conventions
-3. Run `npm run dev` to test locally
-4. Open a PR describing your changes
-5. Contributions, feature requests, and bug reports are welcome!
-
-## 🙏 Acknowledgements
-
-ApIDash is built with:
-- [Vite](https://vitejs.dev/)
-- [React](https://react.dev/)
-- [shadcn/ui](https://ui.shadcn.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Lucide](https://lucide.dev/) icons
-- [Supabase](https://supabase.com/) optional
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-MIT License (see [`LICENSE`](LICENSE) file if present).
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📚 Further Documentation
+## 🙏 Acknowledgments
 
-- [ApIDash Documentation](https://docs.ApIDash.dev/)
-- [Supabase Integration](https://docs.ApIDash.dev/integrations/supabase/)
-- [shadcn/ui](https://ui.shadcn.com/docs)
-- [Vite](https://vitejs.dev/guide/)
+- [Tyk API Gateway](https://tyk.io/)
+- [React](https://reactjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Shadcn UI](https://ui.shadcn.com/)
 
----
+## 📞 Support
 
-_This is an open source community dashboard project. See the issues tab or To-Do section above for ways to get involved!_
+For support, please open an issue in the GitHub repository or contact the maintainers.
+
+## 📈 Roadmap
+
+### Phase 1 (Current)
+- [x] Basic authentication
+- [x] API management
+- [x] Gateway integration
+- [x] Database setup
+
+### Phase 2 (In Progress)
+- [ ] Advanced analytics
+- [ ] Multi-gateway support
+- [ ] Plugin system
+- [ ] API documentation
+
+### Phase 3 (Planned)
+- [ ] Multi-tenant architecture
+- [ ] Advanced security features
+- [ ] Performance optimization
+- [ ] Mobile application
+
+## 🧪 Testing
+
+Run the test suite:
+
+```bash
+npm test
+# or
+yarn test
+```
+
+## 📊 Performance
+
+The application is optimized for:
+- Fast initial load times
+- Efficient data fetching
+- Real-time updates
+- Responsive UI
+- Scalable architecture
+
+## 🔄 CI/CD
+
+The project uses GitHub Actions for continuous integration and deployment. Workflows include:
+- Automated testing
+- Code quality checks
+- Build verification
+- Deployment to staging/production
+
+## 📚 Documentation
+
+- [API Documentation](docs/api.md)
+- [Development Guide](docs/development.md)
+- [Deployment Guide](docs/deployment.md)
+- [Contributing Guide](docs/contributing.md)
 
