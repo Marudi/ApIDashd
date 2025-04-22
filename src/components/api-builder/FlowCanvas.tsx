@@ -1,22 +1,34 @@
 
 import { useCallback, useRef } from 'react';
-import { ReactFlow, Background, Controls, Panel, useReactFlow } from 'reactflow';
-import { Node, Edge } from 'reactflow';
+import ReactFlow, { Background, Controls, Panel, useReactFlow, Node, Edge, Connection, NodeTypes } from 'reactflow';
 import { ApiNodeData } from '@/lib/api-builder-types';
 import { createNode } from '@/lib/api-builder-utils';
 import { ActiveCollaborator } from '@/lib/api-builder-types';
-import { nodeTypes } from '@/lib/api-builder-utils';
+import { ApiBuilderNode } from '@/components/api-builder/ApiBuilderNode';
 
 interface FlowCanvasProps {
   nodes: Node<ApiNodeData>[];
   edges: Edge[];
   onNodesChange: (changes: any) => void;
   onEdgesChange: (changes: any) => void;
-  onConnect: (connection: any) => void;
+  onConnect: (connection: Connection) => void;
   setNodes: (nodes: any) => void;
   collaborators: ActiveCollaborator[];
   currentUserId: string;
 }
+
+// Define our custom nodeTypes with the ApiBuilderNode component
+const nodeTypes: NodeTypes = {
+  input: ApiBuilderNode,
+  endpoint: ApiBuilderNode,
+  transform: ApiBuilderNode,
+  auth: ApiBuilderNode,
+  ratelimit: ApiBuilderNode,
+  cache: ApiBuilderNode,
+  mock: ApiBuilderNode,
+  validator: ApiBuilderNode,
+  output: ApiBuilderNode,
+};
 
 export function FlowCanvas({
   nodes,
@@ -51,7 +63,7 @@ export function FlowCanvas({
         y: event.clientY - reactFlowBounds.top,
       });
 
-      const newNode = createNode(type, position);
+      const newNode = createNode(type as any, position);
       setNodes((nds: Node[]) => nds.concat(newNode));
     },
     [reactFlowInstance, setNodes]

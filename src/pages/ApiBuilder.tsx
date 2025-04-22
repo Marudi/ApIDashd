@@ -8,6 +8,7 @@ import { CollaboratorsList } from "@/components/api-builder/CollaboratorsList";
 import { FlowCanvas } from "@/components/api-builder/FlowCanvas";
 import { useApiFlow } from "@/hooks/useApiFlow";
 import { getRandomColor } from "@/lib/api-builder-utils";
+import { useCallback } from 'react';
 
 // Mock current user (in a real app, this would come from auth)
 const currentUser = {
@@ -70,6 +71,21 @@ const ApiBuilderFlow = () => {
     event.dataTransfer.effectAllowed = 'move';
   };
 
+  const handleZoomIn = useCallback(() => {
+    // This would be implemented with reactflow's useReactFlow hook in a real app
+    console.log('Zoom in');
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    // This would be implemented with reactflow's useReactFlow hook in a real app
+    console.log('Zoom out');
+  }, []);
+
+  const handleReset = useCallback(() => {
+    // This would be implemented with reactflow's useReactFlow hook in a real app
+    console.log('Reset view');
+  }, []);
+
   return (
     <div className="h-[calc(100vh-12rem)] w-full">
       <FlowToolbar 
@@ -78,6 +94,9 @@ const ApiBuilderFlow = () => {
         onDelete={deleteFlow}
         onPublish={publishFlow}
         onNameChange={updateFlowName}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onReset={handleReset}
       />
 
       <CollaboratorsList 

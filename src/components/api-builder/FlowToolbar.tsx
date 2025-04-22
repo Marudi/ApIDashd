@@ -17,15 +17,15 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { ApiFlow } from "@/lib/api-builder-types";
 
-interface FlowToolbarProps {
+export interface FlowToolbarProps {
   flow: ApiFlow;
   onSave: () => void;
   onDelete: () => void;
   onPublish: () => void;
   onNameChange: (name: string) => void;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
-  onReset: () => void;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
+  onReset?: () => void;
 }
 
 export function FlowToolbar({ 
@@ -34,9 +34,9 @@ export function FlowToolbar({
   onDelete, 
   onPublish, 
   onNameChange,
-  onZoomIn,
-  onZoomOut,
-  onReset
+  onZoomIn = () => {},
+  onZoomOut = () => {},
+  onReset = () => {}
 }: FlowToolbarProps) {
   const { toast } = useToast();
   const [isPublishing, setIsPublishing] = useState(false);

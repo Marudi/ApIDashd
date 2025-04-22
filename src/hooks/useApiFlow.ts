@@ -1,6 +1,6 @@
 
 import { useCallback, useState } from 'react';
-import { Connection, useEdgesState, useNodesState } from 'reactflow';
+import { Connection, useEdgesState, useNodesState, addEdge } from 'reactflow';
 import { toast } from '@/components/ui/use-toast';
 import { ApiFlow } from '@/lib/api-builder-types';
 import { createEmptyFlow, createNode, isValidConnection } from '@/lib/api-builder-utils';
