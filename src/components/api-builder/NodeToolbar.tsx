@@ -48,6 +48,7 @@ export function NodeToolbar({ onDragStart }: NodeToolbarProps) {
               className="flex flex-col items-center p-2 border rounded-md cursor-move hover:bg-accent/50 transition-colors"
               draggable={true}
               onDragStart={(event) => {
+                // Set the data transfer with the node type
                 event.dataTransfer.setData('application/reactflow', type);
                 event.dataTransfer.effectAllowed = 'move';
                 onDragStart(event, type);

@@ -1,3 +1,4 @@
+
 import { useCallback, useRef, useEffect } from 'react';
 import ReactFlow, { 
   Background, 
@@ -90,19 +91,23 @@ export function FlowCanvas({
 
       const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
       const type = event.dataTransfer.getData('application/reactflow');
-
+      
+      // Check if we have valid data and bounds
       if (!type || !reactFlowBounds || !reactFlowInstance) {
         return;
       }
 
+      // Calculate the correct position in the flow
       const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
 
+      // Create the new node
       const newNode = createNode(type as any, position);
       
-      setNodes((nodes) => [...nodes, newNode]);
+      // Add the new node to the flow
+      setNodes((nds: Node[]) => [...nds, newNode]);
       
       toast({
         title: "Node Added",
