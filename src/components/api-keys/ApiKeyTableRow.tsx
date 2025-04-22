@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,17 +6,12 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { ApiKey } from "@/lib/types";
-import { mockPolicies } from "@/lib/mock-data";
+import { getPolicyName } from "@/lib/api-key-utils";
 
 interface ApiKeyTableRowProps {
   apiKey: ApiKey;
   onRevoke: (id: string) => void;
 }
-
-const getPolicyName = (policyId: string) => {
-  const policy = mockPolicies.find(p => p.id === policyId);
-  return policy ? policy.name : "Unknown Policy";
-};
 
 const formatDate = (dateString: string | undefined) => {
   if (!dateString) return "N/A";
@@ -160,4 +154,3 @@ export const ApiKeyTableRow = ({ apiKey, onRevoke }: ApiKeyTableRowProps) => {
     </>
   );
 };
-

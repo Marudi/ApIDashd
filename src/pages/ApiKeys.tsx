@@ -10,6 +10,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ApiKeySearch } from "@/components/api-keys/ApiKeySearch";
 import { NewKeyDialog } from "@/components/api-keys/NewKeyDialog";
 import { ApiKeysTable } from "@/components/api-keys/ApiKeysTable";
+import { getPolicyName } from "@/lib/api-key-utils";
 
 const ApiKeys = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -85,4 +86,3 @@ const ApiKeys = () => {
 };
 
 export default ApiKeys;
-
