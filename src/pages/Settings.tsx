@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Clock, Database, Globe, Lock, MailCheck, RefreshCw, Save, Server, Shield, User, Sync } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { GatewaySync } from "@/components/settings/GatewaySync";
+import { Settings as SettingsIcon } from "lucide-react";
 
 const Settings = () => {
   return (
@@ -19,7 +20,7 @@ const Settings = () => {
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="gateway">Gateway</TabsTrigger>
             <TabsTrigger value="sync" className="flex items-center">
-              <Sync className="mr-2 h-4 w-4" />
+              <SettingsIcon className="mr-2 h-4 w-4" />
               Live Sync
             </TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
