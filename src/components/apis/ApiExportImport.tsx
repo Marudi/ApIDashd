@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import * as yaml from "js-yaml";
 import { ApiDefinition } from "@/lib/types";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { FileJson, FileXml, FileUp } from "lucide-react";
+import { FileJson, File, FileUp } from "lucide-react";
 import { apiDefsToXml, xmlToApiDefs } from "@/lib/xmlUtils";
 
 interface ApiExportImportProps {
@@ -109,7 +109,7 @@ export default function ApiExportImport({ apis, onImport }: ApiExportImportProps
           onClick={handleExportYaml}
           className={isMobile ? "mb-2 w-full" : ""}
         >
-          <FileDown className="h-4 w-4 mr-2" />
+          <Download className="h-4 w-4 mr-2" />
           Export YAML
         </Button>
         <Button 
@@ -117,7 +117,7 @@ export default function ApiExportImport({ apis, onImport }: ApiExportImportProps
           onClick={handleExportXml}
           className={isMobile ? "mb-2 w-full" : ""}
         >
-          <FileXml className="h-4 w-4 mr-2" />
+          <File className="h-4 w-4 mr-2" />
           Export XML
         </Button>
       </div>
