@@ -12,6 +12,7 @@ import Policies from "./pages/Policies";
 import ApiKeys from "./pages/ApiKeys";
 import GatewayStatus from "./pages/GatewayStatus";
 import Settings from "./pages/Settings";
+import ApiBuilder from "./pages/ApiBuilder";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/keys" element={<ApiKeys />} />
           <Route path="/gateway" element={<GatewayStatus />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/api-builder" element={<ApiBuilder />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

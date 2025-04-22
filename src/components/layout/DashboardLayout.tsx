@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   LineChart,
   LogOut,
+  Puzzle,
   Server,
   Shield,
   Users,
@@ -114,6 +115,14 @@ function NavigationMenu() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={isPathActive("/api-builder")}>
+              <Link to="/api-builder">
+                <Puzzle />
+                <span>API Builder</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={isPathActive("/policies")}>
               <Link to="/policies">
                 <Shield />
@@ -162,6 +171,8 @@ function Header() {
         return "Analytics";
       case "/apis":
         return "API Definitions";
+      case "/api-builder":
+        return "API Builder";
       case "/policies":
         return "Policies";
       case "/keys":
