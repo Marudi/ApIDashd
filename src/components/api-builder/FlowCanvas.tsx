@@ -1,3 +1,4 @@
+
 import { useCallback, useRef, useEffect } from 'react';
 import ReactFlow, { 
   Background, 
@@ -10,7 +11,7 @@ import ReactFlow, {
   ConnectionLineType,
 } from 'reactflow';
 import { ApiNodeData } from '@/lib/api-builder-types';
-import { createNode } from '@/lib/api-builder-utils';
+import { createNode } from '@/lib/api-builder/node-utils';
 import { ActiveCollaborator } from '@/lib/api-builder-types';
 import { ApiBuilderNode } from '@/components/api-builder/ApiBuilderNode';
 import { useIsMobile } from '@/hooks/use-mobile';

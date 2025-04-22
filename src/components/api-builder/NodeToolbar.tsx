@@ -1,7 +1,7 @@
 
 import { useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { nodeTypes } from "@/lib/api-builder-utils";
+import { nodeTypes } from "@/lib/api-builder/node-types";
 import { Check, Code, Database, Play, Repeat, Server, Settings, Shield, Timer } from "lucide-react";
 
 interface NodeToolbarProps {

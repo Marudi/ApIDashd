@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Handle, Position, NodeProps } from "reactflow";
 import { Check, Code, Database, Play, Repeat, Server, Shield, Timer, Copy, Trash, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { nodeTypes } from "@/lib/api-builder-utils";
+import { nodeTypes } from "@/lib/api-builder/node-types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ApiNodeData, ApiNodeType } from "@/lib/api-builder-types";

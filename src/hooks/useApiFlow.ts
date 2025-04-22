@@ -1,9 +1,10 @@
-
 import { useCallback, useState, useEffect } from 'react';
 import { Connection, useEdgesState, useNodesState, addEdge } from 'reactflow';
 import { toast } from '@/components/ui/use-toast';
 import { ApiFlow } from '@/lib/api-builder-types';
-import { createEmptyFlow, createNode, isValidConnection } from '@/lib/api-builder-utils';
+import { createEmptyFlow } from '@/lib/api-builder/flow-utils';
+import { createNode } from '@/lib/api-builder/node-utils';
+import { isValidConnection } from '@/lib/api-builder/node-utils';
 
 export function useApiFlow(initialUserId: string, initialFlowName?: string) {
   const [flow, setFlow] = useState<ApiFlow>(createEmptyFlow(initialUserId, initialFlowName));
@@ -11,7 +12,6 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
   const [edges, setEdges, onEdgesChange] = useEdgesState(flow.edges);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
 
-  // Track unsaved changes when nodes or edges change
   useEffect(() => {
     setUnsavedChanges(true);
   }, [nodes, edges]);
@@ -54,8 +54,6 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
       description: "Your API flow has been saved successfully",
     });
     
-    // In a real app, you would save to a backend here
-    // localStorage can be used as a temporary solution
     try {
       localStorage.setItem(`api-flow-${flow.id}`, JSON.stringify(updatedFlow));
     } catch (error) {
@@ -75,7 +73,6 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
     setEdges(newFlow.edges);
     setUnsavedChanges(false);
     
-    // In a real app, you would delete from a backend here
     try {
       localStorage.removeItem(`api-flow-${flow.id}`);
     } catch (error) {
@@ -91,7 +88,6 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
         lastUpdated: new Date().toISOString(),
       };
       
-      // In a real app, you would publish to a backend here
       try {
         localStorage.setItem(`api-flow-${currentFlow.id}`, JSON.stringify(publishedFlow));
       } catch (error) {
@@ -136,17 +132,12 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
     setUnsavedChanges(true);
   }, [setNodes, setEdges]);
 
-  // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Cmd/Ctrl+S to save
       if ((event.metaKey || event.ctrlKey) && event.key === 's') {
         event.preventDefault();
         saveFlow();
       }
-      
-      // Delete key to delete selected nodes (would need node selection state)
-      // Cmd/Ctrl+D to duplicate selected node (would need node selection state)
     };
     
     window.addEventListener('keydown', handleKeyDown);

@@ -1,6 +1,6 @@
 
 import { ApiFlow } from '../api-builder-types';
-import { createNode } from './node-utils';
+import { createNode, generateId } from './node-utils';
 
 // Convert an API flow to a Tyk API definition
 export const convertFlowToApiDefinition = (flow: ApiFlow) => {
