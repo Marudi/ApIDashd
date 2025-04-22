@@ -1,5 +1,5 @@
 
-# ApIDash API Gateway Dashboard
+# ApIDashd API Gateway Dashboard
 
 A modern, extensible dashboard to manage API Gateways (currently supports both Tyk and Kong) with full-featured UI for security, analytics, version control, and more.
 

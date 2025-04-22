@@ -63,9 +63,9 @@ function TykSidebar() {
       <SidebarHeader className="flex items-center">
         <div className="flex items-center gap-2 px-2 py-4">
           <div className="w-8 h-8 bg-[#0BA5D3] rounded-md flex items-center justify-center text-white font-bold">
-            T
+            A
           </div>
-          <span className="text-lg font-semibold">Tyk Dashboard</span>
+          <span className="text-lg font-semibold">ApIDashd Dashboard</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
