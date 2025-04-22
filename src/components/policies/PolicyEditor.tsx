@@ -1,13 +1,12 @@
 
 import * as React from "react";
 import { Policy } from "@/lib/types";
-import { mockApis } from "@/lib/mock-data";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { PolicyNameInput } from "./PolicyNameInput";
+import { ApiMultiSelect } from "./ApiMultiSelect";
+import { RateLimitSection } from "./RateLimitSection";
+import { QuotaSection } from "./QuotaSection";
+import { PolicyActionButtons } from "./PolicyActionButtons";
 
 interface PolicyEditorProps {
   policy: Policy;
@@ -48,6 +47,14 @@ export function PolicyEditor({ policy, onSave, onCancel }: PolicyEditorProps) {
       },
     }));
   };
+
+  const handleRateLimitChange = (rateLimit: Policy["rateLimit"]) => {
+    setForm(prev => ({
+      ...prev,
+      rateLimit,
+    }));
+  };
+
   const handleQuotaSwitch = (checked: boolean) => {
     setForm(prev => ({
       ...prev,
@@ -60,6 +67,13 @@ export function PolicyEditor({ policy, onSave, onCancel }: PolicyEditorProps) {
     }));
   };
 
+  const handleQuotaChange = (quota: Policy["quota"]) => {
+    setForm(prev => ({
+      ...prev,
+      quota,
+    }));
+  };
+
   // Save handler
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,138 +82,30 @@ export function PolicyEditor({ policy, onSave, onCancel }: PolicyEditorProps) {
 
   return (
     <form onSubmit={handleSubmit} className="w-full space-y-6">
-      <div>
-        <Label>Name</Label>
-        <Input
-          value={form.name}
-          onChange={e => handleChange("name", e.target.value)}
-          placeholder="Policy Name"
-        />
-      </div>
-      <div>
-        <Label>Status</Label>
-        <Switch
-          checked={form.active}
-          onCheckedChange={val => handleChange("active", val)}
-        />
-        <span className="ml-2 text-sm text-muted-foreground">{form.active ? "Active" : "Inactive"}</span>
-      </div>
-      <div>
-        <Label>APIs Covered</Label>
-        <div className="flex flex-wrap gap-2 mt-1">
-          {mockApis.map(api => (
-            <button
-              type="button"
-              key={api.id}
-              className={`px-2 py-1 rounded border text-xs ${
-                form.apis.includes(api.id)
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-muted text-muted-foreground border-input"
-              }`}
-              onClick={() => toggleApi(api.id)}
-            >
-              {api.name}
-            </button>
-          ))}
-        </div>
-        <div className="mt-2 text-xs text-muted-foreground">
-          {form.apis.length === 0 && "No APIs selected"}
-        </div>
-      </div>
-
+      <PolicyNameInput
+        name={form.name}
+        active={form.active}
+        onChange={handleChange}
+      />
+      <ApiMultiSelect
+        selectedApis={form.apis}
+        toggleApi={toggleApi}
+      />
       <Card>
         <CardContent className="space-y-4 pt-4">
-          <div className="flex items-center justify-between">
-            <Label>Rate Limit</Label>
-            <Switch
-              checked={form.rateLimit?.enabled ?? false}
-              onCheckedChange={handleRateLimitSwitch}
-            />
-          </div>
-          {form.rateLimit?.enabled && (
-            <div className="flex gap-2">
-              <div>
-                <Label className="text-xs">Rate</Label>
-                <Input
-                  className="w-24"
-                  type="number"
-                  min={1}
-                  value={form.rateLimit?.rate || ""}
-                  onChange={e =>
-                    handleChange("rateLimit", {
-                      ...form.rateLimit,
-                      rate: Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Per (s)</Label>
-                <Input
-                  className="w-24"
-                  type="number"
-                  min={1}
-                  value={form.rateLimit?.per || ""}
-                  onChange={e =>
-                    handleChange("rateLimit", {
-                      ...form.rateLimit,
-                      per: Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
-            </div>
-          )}
-          <div className="flex items-center justify-between mt-4">
-            <Label>Quota</Label>
-            <Switch
-              checked={form.quota?.enabled ?? false}
-              onCheckedChange={handleQuotaSwitch}
-            />
-          </div>
-          {form.quota?.enabled && (
-            <div className="flex gap-2">
-              <div>
-                <Label className="text-xs">Quota</Label>
-                <Input
-                  className="w-32"
-                  type="number"
-                  min={1}
-                  value={form.quota?.max || ""}
-                  onChange={e =>
-                    handleChange("quota", {
-                      ...form.quota,
-                      max: Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Period (s)</Label>
-                <Input
-                  className="w-32"
-                  type="number"
-                  min={1}
-                  value={form.quota?.per || ""}
-                  onChange={e =>
-                    handleChange("quota", {
-                      ...form.quota,
-                      per: Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
-            </div>
-          )}
+          <RateLimitSection
+            rateLimit={form.rateLimit}
+            onSwitch={handleRateLimitSwitch}
+            onChange={handleRateLimitChange}
+          />
+          <QuotaSection
+            quota={form.quota}
+            onSwitch={handleQuotaSwitch}
+            onChange={handleQuotaChange}
+          />
         </CardContent>
       </Card>
-
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit">Save</Button>
-      </div>
+      <PolicyActionButtons onCancel={onCancel} />
     </form>
   );
 }
