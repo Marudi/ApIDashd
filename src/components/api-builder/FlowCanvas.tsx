@@ -1,7 +1,7 @@
-
 import { useCallback, useRef, useEffect } from 'react';
 import ReactFlow, { 
   Background, 
+  BackgroundVariant,
   Controls, 
   Panel, 
   useReactFlow, 
@@ -32,7 +32,6 @@ interface FlowCanvasProps {
   onSave?: () => void;
 }
 
-// Define our custom nodeTypes with the ApiBuilderNode component
 const nodeTypes: NodeTypes = {
   input: ApiBuilderNode,
   endpoint: ApiBuilderNode,
@@ -60,7 +59,6 @@ export function FlowCanvas({
   const reactFlowInstance = useReactFlow();
   const isMobile = useIsMobile();
 
-  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       if (reactFlowInstance) {
@@ -153,7 +151,7 @@ export function FlowCanvas({
           color="#aaa" 
           gap={16} 
           size={1} 
-          variant="dots"
+          variant={BackgroundVariant.Dots}
         />
         <Controls showInteractive={false}>
           <ControlButton onClick={handleSave} title="Save Flow">
