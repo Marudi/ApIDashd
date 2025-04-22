@@ -1,4 +1,3 @@
-
 // Tyk API Gateway dashboard types
 
 export interface ApiDefinition {
@@ -63,7 +62,7 @@ export interface ApiKey {
   policyId?: string;
   expires?: string;
   lastUsed?: string;
-  status: "active" | "inactive";
+  status: "active" | "inactive" | "revoked";  // Updated to include "revoked"
   createdAt: string;
 }
 
@@ -223,4 +222,3 @@ export interface KongSystemHealth {
   databaseStatus: "connected" | "disconnected";
   activeConnections: number;
 }
-

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Key, Plus, Search } from "lucide-react";
@@ -15,7 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const ApiKeys = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [keys, setKeys] = useState(mockApiKeys);
+  const [keys, setKeys] = useState<ApiKey[]>(mockApiKeys);
   const [showNewKeyDialog, setShowNewKeyDialog] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
   const { toast } = useToast();
@@ -36,14 +35,14 @@ const ApiKeys = () => {
       return;
     }
 
-    const newKey = {
+    const newKey: ApiKey = {
       id: uuidv4(),
       keyHash: uuidv4().replace(/-/g, ""),
       policyId: selectedPolicy,
-      status: "active",
+      status: "active" as const,
       createdAt: new Date().toISOString(),
-      expires: null,
-      lastUsed: null
+      expires: undefined,
+      lastUsed: undefined
     };
 
     setKeys([newKey, ...keys]);
@@ -226,7 +225,6 @@ const ApiKeyTableRow = ({ apiKey, onRevoke }: ApiKeyTableRowProps) => {
                 variant="destructive" 
                 size="sm" 
                 onClick={() => setShowConfirmDialog(true)}
-                disabled={apiKey.status === "revoked"}
               >
                 Revoke
               </Button>
