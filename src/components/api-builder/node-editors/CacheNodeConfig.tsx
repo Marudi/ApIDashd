@@ -35,7 +35,7 @@ export function CacheNodeConfig({ data, onSave, onCancel }: CacheNodeConfigProps
     onSave({
       ...data,
       label: values.label,
-      ttl: values.ttl,
+      ttl: values.ttl, // zod will transform this to a number
       keyTemplate: values.keyTemplate
     });
   };
