@@ -1,4 +1,3 @@
-
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { Clock, Database, Globe, Lock, MailCheck, RefreshCw, Save, Server, Shiel
 import { Separator } from "@/components/ui/separator";
 import { GatewaySync } from "@/components/settings/GatewaySync";
 import { Settings as SettingsIcon } from "lucide-react";
+import { PostgresConfigSection } from "@/components/settings/PostgresConfigSection";
 
 const Settings = () => {
   return (
@@ -28,6 +28,7 @@ const Settings = () => {
           </TabsList>
           
           <TabsContent value="general" className="mt-6">
+            <PostgresConfigSection />
             <Card>
               <CardHeader>
                 <CardTitle>General Settings</CardTitle>
