@@ -1,6 +1,7 @@
 
 import { StatusCard } from "@/components/dashboard/StatusCard";
 import { GatewayCard } from "./GatewayCard";
+import { MetricsCard } from "./MetricsCard";
 import { Activity, Database, Network, Server } from "lucide-react";
 
 const mockKongHealth = {
