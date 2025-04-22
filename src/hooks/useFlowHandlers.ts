@@ -3,7 +3,8 @@ import { useCallback, useEffect } from 'react';
 import { Node, Connection, useReactFlow, XYPosition } from 'reactflow';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiNodeData, ApiNodeType } from '@/lib/api-builder-types';
-import { createNode } from '@/lib/api-builder/node-config-service';
+// Use the canonical node utils for node creation
+import { createNode } from '@/lib/api-builder/node-utils';
 
 export function useFlowHandlers(
   reactFlowWrapper: React.RefObject<HTMLDivElement>,
@@ -40,13 +41,23 @@ export function useFlowHandlers(
         return;
       }
 
-      const position = reactFlowInstance.screenToFlowPosition({
+      // Calculate drop position correctly
+      const position: XYPosition = reactFlowInstance.screenToFlowPosition({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
 
+      // Use the correct node creator which provides the correct structure
       const newNode = createNode(type as ApiNodeType, position);
-      setNodes((nds) => [...nds, newNode as Node<ApiNodeData>]);
+
+      setNodes((nds) => [
+        ...nds,
+        {
+          ...newNode,
+          // explicitly ensure added node is draggable
+          draggable: true
+        }
+      ]);
       
       toast({
         title: "Node Added",
@@ -90,3 +101,4 @@ export function useFlowHandlers(
     handleExport
   };
 }
+
