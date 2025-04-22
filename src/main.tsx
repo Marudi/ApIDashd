@@ -7,7 +7,8 @@ import 'reactflow/dist/style.css';
 
 const rootElement = document.getElementById("root");
 if (rootElement) {
-  createRoot(rootElement).render(
+  const root = createRoot(rootElement);
+  root.render(
     <React.StrictMode>
       <App />
     </React.StrictMode>
