@@ -1,25 +1,16 @@
 
+import { Node, Edge } from 'reactflow';
+
 // API Builder Types
-export interface ApiNode {
-  id: string;
-  type: 'input' | 'endpoint' | 'transform' | 'auth' | 'ratelimit' | 'cache' | 'mock' | 'validator' | 'output';
-  position: {
-    x: number;
-    y: number;
-  };
-  data: {
-    label: string;
-    [key: string]: any;
-  };
+export type ApiNodeType = 'input' | 'endpoint' | 'transform' | 'auth' | 'ratelimit' | 'cache' | 'mock' | 'validator' | 'output';
+
+export interface ApiNodeData {
+  label: string;
+  [key: string]: any;
 }
 
-export interface ApiEdge {
-  id: string;
-  source: string;
-  target: string;
-  animated?: boolean;
-  label?: string;
-}
+export type ApiNode = Node<ApiNodeData, ApiNodeType>;
+export type ApiEdge = Edge;
 
 export interface ApiFlow {
   id: string;
@@ -45,11 +36,18 @@ export interface ActiveCollaborator {
 }
 
 export interface ApiNodeTypeConfig {
-  type: ApiNode['type'];
+  type: ApiNodeType;
   label: string;
   description: string;
   color: string;
   icon: string;
-  allowedConnections: ApiNode['type'][];
-  defaultData: Partial<ApiNode['data']>;
+  allowedConnections: ApiNodeType[];
+  defaultData: Partial<ApiNodeData>;
+}
+
+export interface ApiBuilderNodeProps {
+  data: ApiNodeData;
+  type: ApiNodeType;
+  selected: boolean;
+  isConnectable: boolean;
 }

@@ -12,6 +12,7 @@ import {
   Connection,
   Edge,
   useReactFlow,
+  NodeTypes,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
@@ -19,12 +20,12 @@ import { ApiBuilderNode } from "@/components/api-builder/ApiBuilderNode";
 import { NodeToolbar } from "@/components/api-builder/NodeToolbar";
 import { FlowToolbar } from "@/components/api-builder/FlowToolbar";
 import { CollaboratorsList } from "@/components/api-builder/CollaboratorsList";
-import { ApiFlow, ApiNode, ActiveCollaborator } from "@/lib/api-builder-types";
+import { ApiFlow, ApiNodeType, ApiNodeData } from "@/lib/api-builder-types";
 import { createEmptyFlow, createNode, getRandomColor, isValidConnection } from "@/lib/api-builder-utils";
 import { toast } from "@/components/ui/use-toast";
 
 // Custom node types for our ReactFlow instance
-const nodeTypes = {
+const nodeTypes: NodeTypes = {
   input: ApiBuilderNode,
   endpoint: ApiBuilderNode,
   transform: ApiBuilderNode,
@@ -44,7 +45,7 @@ const currentUser = {
 };
 
 // Mock collaborators (in a real app, this would come from a real-time service)
-const mockCollaborators: ActiveCollaborator[] = [
+const mockCollaborators = [
   {
     id: currentUser.id,
     name: currentUser.name,
@@ -96,7 +97,7 @@ const ApiBuilderFlow = () => {
       
       if (sourceNode && targetNode) {
         // Check if this connection is allowed based on node types
-        if (isValidConnection(sourceNode.type as ApiNode['type'], targetNode.type as ApiNode['type'])) {
+        if (isValidConnection(sourceNode.type as ApiNodeType, targetNode.type as ApiNodeType)) {
           setEdges((eds) => addEdge({
             ...connection,
             animated: true,
@@ -126,7 +127,7 @@ const ApiBuilderFlow = () => {
       event.preventDefault();
 
       const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
-      const type = event.dataTransfer.getData('application/reactflow') as ApiNode['type'];
+      const type = event.dataTransfer.getData('application/reactflow') as ApiNodeType;
 
       if (!type || !reactFlowBounds || !reactFlowInstance) {
         return;
@@ -151,7 +152,7 @@ const ApiBuilderFlow = () => {
 
   // Save the current flow
   const saveFlow = useCallback(() => {
-    const updatedFlow = {
+    const updatedFlow: ApiFlow = {
       ...flow,
       nodes,
       edges,

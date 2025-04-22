@@ -1,26 +1,21 @@
 
 import { useState } from "react";
-import { Handle, Position } from "reactflow";
+import { Handle, Position, NodeProps } from "reactflow";
 import { Check, Code, Database, Play, Repeat, Server, Settings, Shield, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { nodeTypes } from "@/lib/api-builder-utils";
 import { Badge } from "@/components/ui/badge";
-import { ApiNode } from "@/lib/api-builder-types";
+import { ApiNodeData, ApiNodeType } from "@/lib/api-builder-types";
 
-interface ApiBuilderNodeProps {
-  data: ApiNode['data'];
-  type: ApiNode['type'];
-  selected: boolean;
-  isConnectable: boolean;
-}
-
-export function ApiBuilderNode({ data, type, selected, isConnectable }: ApiBuilderNodeProps) {
-  const nodeConfig = nodeTypes[type];
+// This component will handle all node types
+export function ApiBuilderNode({ data, selected, isConnectable, type }: NodeProps<ApiNodeData>) {
+  const nodeType = type as ApiNodeType;
+  const nodeConfig = nodeTypes[nodeType];
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Map node types to their respective icons
   const getNodeIcon = () => {
-    switch (type) {
+    switch (nodeType) {
       case 'input':
         return <Play className="h-4 w-4" />;
       case 'endpoint':
@@ -54,7 +49,7 @@ export function ApiBuilderNode({ data, type, selected, isConnectable }: ApiBuild
       style={{ borderColor: nodeConfig.color }}
     >
       {/* Input handle - only shown if node has incoming connections allowed */}
-      {type !== 'input' && (
+      {nodeType !== 'input' && (
         <Handle
           type="target"
           position={Position.Top}
@@ -83,7 +78,7 @@ export function ApiBuilderNode({ data, type, selected, isConnectable }: ApiBuild
       {/* Node content - shown when expanded */}
       {isExpanded && (
         <div className="p-3 text-xs space-y-2">
-          {type === 'input' && (
+          {nodeType === 'input' && (
             <>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Method:</span>
@@ -96,7 +91,7 @@ export function ApiBuilderNode({ data, type, selected, isConnectable }: ApiBuild
             </>
           )}
 
-          {type === 'endpoint' && (
+          {nodeType === 'endpoint' && (
             <>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">URL:</span>
@@ -109,28 +104,28 @@ export function ApiBuilderNode({ data, type, selected, isConnectable }: ApiBuild
             </>
           )}
 
-          {type === 'auth' && (
+          {nodeType === 'auth' && (
             <div className="flex justify-between">
               <span className="text-muted-foreground">Type:</span>
               <span className="capitalize">{data.authType}</span>
             </div>
           )}
 
-          {type === 'ratelimit' && (
+          {nodeType === 'ratelimit' && (
             <div className="flex justify-between">
               <span className="text-muted-foreground">Limit:</span>
               <span>{data.rate} per {data.per}s</span>
             </div>
           )}
 
-          {type === 'cache' && (
+          {nodeType === 'cache' && (
             <div className="flex justify-between">
               <span className="text-muted-foreground">TTL:</span>
               <span>{data.ttl}s</span>
             </div>
           )}
 
-          {type === 'output' && (
+          {nodeType === 'output' && (
             <div className="flex justify-between">
               <span className="text-muted-foreground">Status:</span>
               <span>{data.statusCode}</span>
@@ -140,7 +135,7 @@ export function ApiBuilderNode({ data, type, selected, isConnectable }: ApiBuild
       )}
 
       {/* Output handle - only shown if node has outgoing connections allowed */}
-      {type !== 'output' && (
+      {nodeType !== 'output' && (
         <Handle
           type="source"
           position={Position.Bottom}

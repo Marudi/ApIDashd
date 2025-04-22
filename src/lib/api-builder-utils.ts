@@ -1,8 +1,9 @@
 
-import { ApiFlow, ApiNode, ApiEdge, ApiNodeTypeConfig } from './api-builder-types';
+import { XYPosition } from 'reactflow';
+import { ApiFlow, ApiNode, ApiEdge, ApiNodeTypeConfig, ApiNodeType, ApiNodeData } from './api-builder-types';
 
 // Node type configurations with their default properties
-export const nodeTypes: Record<string, ApiNodeTypeConfig> = {
+export const nodeTypes: Record<ApiNodeType, ApiNodeTypeConfig> = {
   input: {
     type: 'input',
     label: 'API Trigger',
@@ -139,8 +140,8 @@ export const generateId = () => {
 
 // Create a new node with default properties
 export const createNode = (
-  type: ApiNode['type'], 
-  position: { x: number; y: number },
+  type: ApiNodeType, 
+  position: XYPosition,
   label?: string
 ): ApiNode => {
   const nodeType = nodeTypes[type];
@@ -156,7 +157,7 @@ export const createNode = (
 };
 
 // Check if a connection between nodes is valid
-export const isValidConnection = (sourceType: ApiNode['type'], targetType: ApiNode['type']) => {
+export const isValidConnection = (sourceType: ApiNodeType, targetType: ApiNodeType) => {
   const sourceNodeType = nodeTypes[sourceType];
   return sourceNodeType.allowedConnections.includes(targetType);
 };
