@@ -1,5 +1,5 @@
 
-# Lovable API Gateway Dashboard
+# ApIDash API Gateway Dashboard
 
 A modern, extensible dashboard to manage API Gateways (currently supports both Tyk and Kong) with full-featured UI for security, analytics, version control, and more.
 
@@ -15,7 +15,7 @@ A modern, extensible dashboard to manage API Gateways (currently supports both T
 
 ## 📸 Screenshots
 
-Get a visual overview of the Lovable Dashboard:
+Get a visual overview of the ApIDash Dashboard:
 
 ### Main Dashboard & Analytics
 
@@ -77,11 +77,11 @@ The static files will be output in the `dist/` directory.
 
 You can deploy the application in a few ways:
 
-### 1. Deploy with Lovable Hosting
+### 1. Deploy with ApIDash Hosting
 
-- Open [Lovable project page](https://lovable.dev/projects/e910d3f0-17b5-40c2-b001-ea3bbbbac8cf)
+- Open [ApIDash project page](https://ApIDash.dev/projects/e910d3f0-17b5-40c2-b001-ea3bbbbac8cf)
 - Click "Share" > "Publish" to deploy/update your hosted app
-- [Optionally] Connect a [custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- [Optionally] Connect a [custom domain](https://docs.ApIDash.dev/tips-tricks/custom-domain#step-by-step-guide)
 
 ### 2. Deploy on Vercel, Netlify, or any static host
 
@@ -92,7 +92,7 @@ You can deploy the application in a few ways:
 
 - Use any web server (e.g., nginx, Apache, Caddy) to serve the contents of the `dist/` folder.
 
-> **Note:** For backend/API functionality (e.g., storing data, authentication), connect to Supabase or your own backend server. See [Supabase integration guide](https://docs.lovable.dev/integrations/supabase/).
+> **Note:** For backend/API functionality (e.g., storing data, authentication), connect to Supabase or your own backend server. See [Supabase integration guide](https://docs.ApIDash.dev/integrations/supabase/).
 
 ## 🛠️ Local Development
 
@@ -129,7 +129,7 @@ You can deploy the application in a few ways:
 
 ## 🙏 Acknowledgements
 
-Lovable is built with:
+ApIDash is built with:
 - [Vite](https://vitejs.dev/)
 - [React](https://react.dev/)
 - [shadcn/ui](https://ui.shadcn.com/)
@@ -143,8 +143,8 @@ MIT License (see [`LICENSE`](LICENSE) file if present).
 
 ## 📚 Further Documentation
 
-- [Lovable Documentation](https://docs.lovable.dev/)
-- [Supabase Integration](https://docs.lovable.dev/integrations/supabase/)
+- [ApIDash Documentation](https://docs.ApIDash.dev/)
+- [Supabase Integration](https://docs.ApIDash.dev/integrations/supabase/)
 - [shadcn/ui](https://ui.shadcn.com/docs)
 - [Vite](https://vitejs.dev/guide/)
 
