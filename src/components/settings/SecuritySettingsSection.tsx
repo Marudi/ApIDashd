@@ -5,8 +5,12 @@ import { Save, Shield } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function SecuritySettingsSection() {
+  const isMobile = useIsMobile();
+
   return (
     <Card>
       <CardHeader>
@@ -23,7 +27,7 @@ export function SecuritySettingsSection() {
           </div>
           
           <div className="space-y-4 pl-6 border-l-2 border-muted">
-            <div className="flex items-center justify-between">
+            <div className={`flex ${isMobile ? "flex-col" : "items-center justify-between"} gap-2`}>
               <div className="space-y-0.5">
                 <Label>Two Factor Authentication</Label>
                 <p className="text-sm text-muted-foreground">Require 2FA for all admin accounts</p>
@@ -31,21 +35,26 @@ export function SecuritySettingsSection() {
               <Switch defaultChecked />
             </div>
             
-            <div className="flex items-center justify-between">
+            <div className={`flex ${isMobile ? "flex-col" : "items-center justify-between"} gap-2`}>
               <div className="space-y-0.5">
                 <Label>Session Timeout</Label>
                 <p className="text-sm text-muted-foreground">Automatically log out inactive users</p>
               </div>
-              <select className="w-48 h-9 px-3 py-1 border border-input rounded-md">
-                <option>15 minutes</option>
-                <option>30 minutes</option>
-                <option>1 hour</option>
-                <option>4 hours</option>
-                <option>8 hours</option>
-              </select>
+              <Select defaultValue="30 minutes">
+                <SelectTrigger className={isMobile ? "w-full" : "w-48"}>
+                  <SelectValue placeholder="Select timeout" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="15 minutes">15 minutes</SelectItem>
+                  <SelectItem value="30 minutes">30 minutes</SelectItem>
+                  <SelectItem value="1 hour">1 hour</SelectItem>
+                  <SelectItem value="4 hours">4 hours</SelectItem>
+                  <SelectItem value="8 hours">8 hours</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
-            <div className="flex items-center justify-between">
+            <div className={`flex ${isMobile ? "flex-col" : "items-center justify-between"} gap-2`}>
               <div className="space-y-0.5">
                 <Label>IP Whitelisting</Label>
                 <p className="text-sm text-muted-foreground">Restrict dashboard access to specific IPs</p>

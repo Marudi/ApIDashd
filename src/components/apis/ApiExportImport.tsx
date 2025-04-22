@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import * as yaml from "js-yaml";
 import { ApiDefinition } from "@/lib/types";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ApiExportImportProps {
   apis: ApiDefinition[];
@@ -15,6 +16,7 @@ interface ApiExportImportProps {
 export default function ApiExportImport({ apis, onImport }: ApiExportImportProps) {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const isMobile = useIsMobile();
 
   // Export APIs as JSON
   const handleExportJson = () => {
@@ -80,18 +82,26 @@ export default function ApiExportImport({ apis, onImport }: ApiExportImportProps
   };
 
   return (
-    <Card className="p-4 mb-4 flex flex-col md:flex-row gap-2 md:gap-4 items-start md:items-center">
-      <div className="flex gap-2">
-        <Button variant="outline" onClick={handleExportJson}>
+    <Card className={`p-4 mb-4 ${isMobile ? "flex flex-col gap-2" : "flex flex-row gap-4 items-center"}`}>
+      <div className={`flex ${isMobile ? "flex-col w-full" : "gap-2"}`}>
+        <Button 
+          variant="outline" 
+          onClick={handleExportJson}
+          className={isMobile ? "mb-2 w-full" : ""}
+        >
           <Download className="h-4 w-4 mr-2" />
           Export JSON
         </Button>
-        <Button variant="outline" onClick={handleExportYaml}>
+        <Button 
+          variant="outline" 
+          onClick={handleExportYaml}
+          className={isMobile ? "mb-2 w-full" : ""}
+        >
           <Download className="h-4 w-4 mr-2" />
           Export YAML
         </Button>
       </div>
-      <div>
+      <div className={isMobile ? "w-full" : ""}>
         <input
           ref={fileInputRef}
           type="file"
@@ -102,6 +112,7 @@ export default function ApiExportImport({ apis, onImport }: ApiExportImportProps
         <Button
           variant="outline"
           onClick={() => fileInputRef.current?.click()}
+          className={isMobile ? "w-full" : ""}
         >
           <Upload className="h-4 w-4 mr-2" />
           Import

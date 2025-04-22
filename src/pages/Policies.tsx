@@ -12,12 +12,16 @@ import { Policy } from "@/lib/types";
 // Import PolicyEditor
 import { PolicyEditor } from "@/components/policies/PolicyEditor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useNotifications } from "@/services/notificationService";
 
 const Policies = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [policies, setPolicies] = useState<Policy[]>(mockPolicies);
   const [editingPolicy, setEditingPolicy] = useState<Policy | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const { notify } = useNotifications();
 
   // Filter policies based on search term
   const filteredPolicies = policies.filter(policy =>
@@ -32,11 +36,19 @@ const Policies = () => {
 
   // Handler for policy save
   const handleSavePolicy = (updated: Policy) => {
+    const isNew = !policies.some(p => p.id === updated.id);
     setPolicies(current =>
       current.map(p => (p.id === updated.id ? updated : p))
     );
     setDialogOpen(false);
     setEditingPolicy(null);
+    
+    // Send notification
+    notify({
+      title: isNew ? "New Policy Created" : "Policy Updated",
+      message: `Policy "${updated.name}" has been ${isNew ? "created" : "updated"}.`,
+      type: "api_change"
+    });
   };
 
   // Handler for cancel
@@ -47,8 +59,8 @@ const Policies = () => {
 
   return (
     <DashboardLayout>
-      <div className="mb-6 flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center">
-        <div className="relative w-full sm:w-96">
+      <div className={`mb-6 ${isMobile ? "flex flex-col gap-4" : "flex justify-between items-center gap-4"}`}>
+        <div className={`relative ${isMobile ? "w-full" : "w-96"}`}>
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search policies..."
@@ -57,7 +69,7 @@ const Policies = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button>
+        <Button className={isMobile ? "w-full" : ""}>
           <Plus className="mr-2 h-4 w-4" />
           Create Policy
         </Button>
@@ -65,26 +77,41 @@ const Policies = () => {
 
       <Card>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">Status</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>APIs</TableHead>
-                <TableHead>Rate Limit</TableHead>
-                <TableHead>Quota</TableHead>
-                <TableHead>Last Updated</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          {isMobile ? (
+            // Mobile view - card based layout
+            <div className="p-4 space-y-4">
               {filteredPolicies.map((policy) => (
-                <PolicyTableRow key={policy.id} policy={policy} onEdit={handleEdit} />
+                <PolicyCardView key={policy.id} policy={policy} onEdit={handleEdit} />
               ))}
-            </TableBody>
-          </Table>
+              {filteredPolicies.length === 0 && (
+                <div className="py-12 text-center text-muted-foreground">
+                  No policies found matching your search criteria.
+                </div>
+              )}
+            </div>
+          ) : (
+            // Desktop view - table layout
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">Status</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>APIs</TableHead>
+                  <TableHead>Rate Limit</TableHead>
+                  <TableHead>Quota</TableHead>
+                  <TableHead>Last Updated</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredPolicies.map((policy) => (
+                  <PolicyTableRow key={policy.id} policy={policy} onEdit={handleEdit} />
+                ))}
+              </TableBody>
+            </Table>
+          )}
 
-          {filteredPolicies.length === 0 && (
+          {filteredPolicies.length === 0 && !isMobile && (
             <div className="py-12 text-center text-muted-foreground">
               No policies found matching your search criteria.
             </div>
@@ -106,12 +133,12 @@ const Policies = () => {
   );
 };
 
-interface PolicyTableRowProps {
+interface PolicyViewProps {
   policy: Policy;
   onEdit: (policy: Policy) => void;
 }
 
-const PolicyTableRow = ({ policy, onEdit }: PolicyTableRowProps) => {
+const PolicyTableRow = ({ policy, onEdit }: PolicyViewProps) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
@@ -167,6 +194,86 @@ const PolicyTableRow = ({ policy, onEdit }: PolicyTableRowProps) => {
         </Button>
       </TableCell>
     </TableRow>
+  );
+};
+
+// Card view for mobile display
+const PolicyCardView = ({ policy, onEdit }: PolicyViewProps) => {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
+
+  // Get API names for the policy
+  const apiNames = policy.apis.map(apiId => {
+    const api = mockApis.find(a => a.id === apiId);
+    return api ? api.name : "Unknown API";
+  });
+
+  return (
+    <Card className="p-4">
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="font-medium">{policy.name}</h3>
+        {policy.active ? (
+          <Badge variant="default" className="bg-green-500">
+            <Check className="h-3 w-3 mr-1" /> Active
+          </Badge>
+        ) : (
+          <Badge variant="destructive">
+            <X className="h-3 w-3 mr-1" /> Inactive
+          </Badge>
+        )}
+      </div>
+      
+      <div className="space-y-2 text-sm">
+        <div>
+          <span className="text-muted-foreground">APIs:</span>
+          <div className="flex flex-wrap gap-1 mt-1">
+            {apiNames.map((name, idx) => (
+              <Badge key={idx} variant="outline" className="text-xs">
+                {name}
+              </Badge>
+            ))}
+            {apiNames.length === 0 && (
+              <span className="text-muted-foreground text-xs">None</span>
+            )}
+          </div>
+        </div>
+        
+        <div className="flex justify-between">
+          <div>
+            <span className="text-muted-foreground">Rate Limit:</span>
+            <div>
+              {policy.rateLimit?.enabled ? (
+                <span>{policy.rateLimit.rate} per {policy.rateLimit.per}s</span>
+              ) : (
+                <span className="text-muted-foreground">None</span>
+              )}
+            </div>
+          </div>
+          
+          <div>
+            <span className="text-muted-foreground">Quota:</span>
+            <div>
+              {policy.quota?.enabled ? (
+                <span>{policy.quota.max.toLocaleString()} / {policy.quota.per / 86400}d</span>
+              ) : (
+                <span className="text-muted-foreground">None</span>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex justify-between items-center pt-2">
+          <div className="text-xs text-muted-foreground">
+            Updated: {formatDate(policy.lastUpdated)}
+          </div>
+          <Button variant="outline" size="sm" onClick={() => onEdit(policy)}>
+            View
+          </Button>
+        </div>
+      </div>
+    </Card>
   );
 };
 
