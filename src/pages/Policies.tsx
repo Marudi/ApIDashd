@@ -9,14 +9,41 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { mockPolicies, mockApis } from "@/lib/mock-data";
 import { Policy } from "@/lib/types";
+// Import PolicyEditor
+import { PolicyEditor } from "@/components/policies/PolicyEditor";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Policies = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [policies, setPolicies] = useState<Policy[]>(mockPolicies);
+  const [editingPolicy, setEditingPolicy] = useState<Policy | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   // Filter policies based on search term
-  const filteredPolicies = mockPolicies.filter(policy => 
+  const filteredPolicies = policies.filter(policy =>
     policy.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Handler for opening the dialog
+  const handleEdit = (policy: Policy) => {
+    setEditingPolicy(policy);
+    setDialogOpen(true);
+  };
+
+  // Handler for policy save
+  const handleSavePolicy = (updated: Policy) => {
+    setPolicies(current =>
+      current.map(p => (p.id === updated.id ? updated : p))
+    );
+    setDialogOpen(false);
+    setEditingPolicy(null);
+  };
+
+  // Handler for cancel
+  const handleCancel = () => {
+    setDialogOpen(false);
+    setEditingPolicy(null);
+  };
 
   return (
     <DashboardLayout>
@@ -52,7 +79,7 @@ const Policies = () => {
             </TableHeader>
             <TableBody>
               {filteredPolicies.map((policy) => (
-                <PolicyTableRow key={policy.id} policy={policy} />
+                <PolicyTableRow key={policy.id} policy={policy} onEdit={handleEdit} />
               ))}
             </TableBody>
           </Table>
@@ -64,15 +91,27 @@ const Policies = () => {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Policy</DialogTitle>
+          </DialogHeader>
+          {editingPolicy && (
+            <PolicyEditor policy={editingPolicy} onSave={handleSavePolicy} onCancel={handleCancel} />
+          )}
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };
 
 interface PolicyTableRowProps {
   policy: Policy;
+  onEdit: (policy: Policy) => void;
 }
 
-const PolicyTableRow = ({ policy }: PolicyTableRowProps) => {
+const PolicyTableRow = ({ policy, onEdit }: PolicyTableRowProps) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
@@ -123,7 +162,9 @@ const PolicyTableRow = ({ policy }: PolicyTableRowProps) => {
       </TableCell>
       <TableCell className="text-xs">{formatDate(policy.lastUpdated)}</TableCell>
       <TableCell className="text-right">
-        <Button variant="outline" size="sm">View</Button>
+        <Button variant="outline" size="sm" onClick={() => onEdit(policy)}>
+          View
+        </Button>
       </TableCell>
     </TableRow>
   );
