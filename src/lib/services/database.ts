@@ -106,6 +106,38 @@ export class DatabaseService {
     }
   }
 
+  // Execute SQL queries (renamed from query to avoid TypeScript errors)
+  public async execute<T = any>(text: string, params?: any[]): Promise<T[]> {
+    if (this.isConnected && this.db) {
+      try {
+        const result = await this.db.query(text, params);
+        return result;
+      } catch (error) {
+        console.error('Database query error:', error);
+        throw error;
+      }
+    } else {
+      // Handle in-memory operations for specific queries
+      if (text.includes('SELECT * FROM users')) {
+        // Mock for demo purposes
+        return [] as unknown as T[];
+      }
+      if (text.includes('SELECT * FROM api_definitions')) {
+        return this.inMemoryData.apiDefinitions as unknown as T[];
+      }
+      if (text.includes('SELECT * FROM api_keys')) {
+        return this.inMemoryData.apiKeys as unknown as T[];
+      }
+      // For other operations, just return empty array
+      return [] as unknown as T[];
+    }
+  }
+
+  // Keep the original query method for backward compatibility
+  public async query<T = any>(text: string, params?: any[]): Promise<T[]> {
+    return this.execute<T>(text, params);
+  }
+
   // API Definition Operations
   public async createApiDefinition(api: Omit<ApiDefinition, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiDefinition> {
     const id = crypto.randomUUID();
@@ -119,7 +151,7 @@ export class DatabaseService {
     };
 
     if (this.isConnected) {
-      await this.db?.query(
+      await this.execute(
         `INSERT INTO api_definitions (id, name, description, version, created_at, updated_at, config, status, gateway_type)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
         [
@@ -312,4 +344,4 @@ export class DatabaseService {
   public isDatabaseConnected(): boolean {
     return this.isConnected;
   }
-} 
+}

@@ -43,6 +43,10 @@ export class AuthService {
     return AuthService.instance;
   }
 
+  public isAuthenticated(): boolean {
+    return this.getCurrentUser() !== null;
+  }
+
   public async initialize(): Promise<void> {
     await this.db.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -256,4 +260,4 @@ export class AuthService {
       [role, permissionId]
     );
   }
-} 
+}

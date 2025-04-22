@@ -106,7 +106,33 @@ export class DatabaseService {
     }
   }
 
-  // API Definition Operations
+  public async execute<T = any>(text: string, params?: any[]): Promise<T[]> {
+    if (this.isConnected && this.db) {
+      try {
+        const result = await this.db.query(text, params);
+        return result;
+      } catch (error) {
+        console.error('Database query error:', error);
+        throw error;
+      }
+    } else {
+      if (text.includes('SELECT * FROM users')) {
+        return [] as unknown as T[];
+      }
+      if (text.includes('SELECT * FROM api_definitions')) {
+        return this.inMemoryData.apiDefinitions as unknown as T[];
+      }
+      if (text.includes('SELECT * FROM api_keys')) {
+        return this.inMemoryData.apiKeys as unknown as T[];
+      }
+      return [] as unknown as T[];
+    }
+  }
+
+  public async query<T = any>(text: string, params?: any[]): Promise<T[]> {
+    return this.execute<T>(text, params);
+  }
+
   public async createApiDefinition(api: Omit<ApiDefinition, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiDefinition> {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
@@ -211,7 +237,6 @@ export class DatabaseService {
     }
   }
 
-  // API Key Operations
   public async createApiKey(key: Omit<ApiKey, 'id' | 'createdAt'>): Promise<ApiKey> {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
@@ -312,4 +337,4 @@ export class DatabaseService {
   public isDatabaseConnected(): boolean {
     return this.isConnected;
   }
-} 
+}

@@ -1,3 +1,4 @@
+
 import { DatabaseService } from "./database";
 import { z } from "zod";
 
@@ -43,8 +44,12 @@ export class AuthService {
     return AuthService.instance;
   }
 
+  public isAuthenticated(): boolean {
+    return this.getCurrentUser() !== null;
+  }
+
   public async initialize(): Promise<void> {
-    await this.db.query(`
+    await this.db.execute(`
       CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
@@ -89,7 +94,7 @@ export class AuthService {
 
   public async login(email: string, password: string): Promise<User> {
     // In a real application, you would hash the password and verify it
-    const user = await this.db.query<User>(
+    const user = await this.db.execute<User>(
       'SELECT * FROM users WHERE email = $1 AND is_active = true',
       [email]
     );
@@ -99,7 +104,7 @@ export class AuthService {
     }
 
     // Update last login
-    await this.db.query(
+    await this.db.execute(
       'UPDATE users SET last_login = $1 WHERE id = $2',
       [new Date().toISOString(), user[0].id]
     );
@@ -134,7 +139,7 @@ export class AuthService {
       return true;
     }
 
-    const result = await this.db.query(
+    const result = await this.db.execute(
       `SELECT 1 FROM role_permissions rp
        JOIN permissions p ON rp.permission_id = p.id
        WHERE rp.role = $1 AND p.resource = $2 AND p.action = $3`,
@@ -155,7 +160,7 @@ export class AuthService {
       updatedAt: now,
     };
 
-    await this.db.query(
+    await this.db.execute(
       `INSERT INTO users (id, email, name, role, created_at, updated_at, is_active)
        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [
@@ -174,7 +179,7 @@ export class AuthService {
 
   public async updateUser(id: string, updates: Partial<User>): Promise<User | null> {
     const now = new Date().toISOString();
-    const existing = await this.db.query<User>(
+    const existing = await this.db.execute<User>(
       'SELECT * FROM users WHERE id = $1',
       [id]
     );
@@ -189,7 +194,7 @@ export class AuthService {
       updatedAt: now,
     };
 
-    await this.db.query(
+    await this.db.execute(
       `UPDATE users 
        SET email = $1, name = $2, role = $3, updated_at = $4, is_active = $5
        WHERE id = $6`,
@@ -207,7 +212,7 @@ export class AuthService {
   }
 
   public async deleteUser(id: string): Promise<boolean> {
-    const result = await this.db.query(
+    const result = await this.db.execute(
       'DELETE FROM users WHERE id = $1',
       [id]
     );
@@ -215,7 +220,7 @@ export class AuthService {
   }
 
   public async listUsers(): Promise<User[]> {
-    return this.db.query<User>('SELECT * FROM users ORDER BY created_at DESC');
+    return this.db.execute<User>('SELECT * FROM users ORDER BY created_at DESC');
   }
 
   public async createPermission(permission: Omit<Permission, 'id'>): Promise<Permission> {
@@ -226,7 +231,7 @@ export class AuthService {
       id,
     };
 
-    await this.db.query(
+    await this.db.execute(
       `INSERT INTO permissions (id, name, description, resource, action)
        VALUES ($1, $2, $3, $4, $5)`,
       [
@@ -242,7 +247,7 @@ export class AuthService {
   }
 
   public async assignPermissionToRole(role: UserRole, permissionId: string): Promise<void> {
-    await this.db.query(
+    await this.db.execute(
       `INSERT INTO role_permissions (role, permission_id)
        VALUES ($1, $2)
        ON CONFLICT (role, permission_id) DO NOTHING`,
@@ -251,9 +256,9 @@ export class AuthService {
   }
 
   public async removePermissionFromRole(role: UserRole, permissionId: string): Promise<void> {
-    await this.db.query(
+    await this.db.execute(
       'DELETE FROM role_permissions WHERE role = $1 AND permission_id = $2',
       [role, permissionId]
     );
   }
-} 
+}
