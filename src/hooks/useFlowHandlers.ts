@@ -42,21 +42,30 @@ export function useFlowHandlers(
         return;
       }
 
-      // Calculate drop position correctly
-      const position: XYPosition = reactFlowInstance.screenToFlowPosition({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
-      });
-
-      console.log('Creating new node of type:', type, 'at position:', position);
+      // Calculate center of the visible viewport
+      const { width, height } = reactFlowInstance.getViewport();
+      const { x: viewportX, y: viewportY, zoom } = reactFlowInstance.getViewport();
       
-      // Use the correct node creator which provides the correct structure
+      // Get the center position of the viewport in flow coordinates
+      const centerX = viewportX + width / (2 * zoom);
+      const centerY = viewportY + height / (2 * zoom);
+      
+      // Use the center position for new nodes
+      const position: XYPosition = {
+        x: centerX,
+        y: centerY,
+      };
+      
+      console.log('Creating new node of type:', type, 'at center position:', position);
+      
+      // Create the node with the calculated center position
       const newNode = createNode(type as ApiNodeType, position);
       
       // Ensure the node is explicitly set as draggable
       const nodeWithDraggable = {
         ...newNode,
         draggable: true,
+        selected: true, // Select the node when it's added
       };
       
       console.log('New node created:', nodeWithDraggable);

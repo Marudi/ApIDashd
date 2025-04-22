@@ -122,13 +122,24 @@
 /* Make sure nodes are draggable with visual cues */
 .react-flow__node {
   cursor: grab;
+  transition: box-shadow 0.2s ease;
+}
+
+.react-flow__node.selected {
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.9) !important;
 }
 
 .react-flow__node.dragging {
   cursor: grabbing;
+  opacity: 0.8;
 }
 
 /* Add a subtle hover effect for draggable nodes */
 .react-flow__node:hover {
   box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.3);
+}
+
+/* Ensure nodes aren't too transparent when dragging */
+.react-flow__node.dragging {
+  opacity: 0.8;
 }

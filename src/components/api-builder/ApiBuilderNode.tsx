@@ -63,6 +63,7 @@ function ApiBuilderNodeComponent({ id, type, data, selected }: NodeProps<ApiNode
           className={`nodrag rounded-md shadow-md transition-all ${
             selected ? 'ring-2 ring-primary ring-offset-2' : ''
           }`}
+          data-id={id}
         >
           <div className="min-w-[180px] max-w-[280px]">
             <div className={`${getNodeColor(type)} text-white p-2 rounded-t-md flex justify-between items-center`}>
