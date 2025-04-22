@@ -1,12 +1,13 @@
+
 import { useCallback, useEffect } from 'react';
-import { Node, Connection, useReactFlow } from 'reactflow';
+import { Node, Connection, useReactFlow, XYPosition } from 'reactflow';
 import { useToast } from '@/components/ui/use-toast';
-import { ApiNodeData } from '@/lib/api-builder-types';
+import { ApiNodeData, ApiNodeType } from '@/lib/api-builder-types';
 import { createNode } from '@/lib/api-builder/node-config-service';
 
 export function useFlowHandlers(
   reactFlowWrapper: React.RefObject<HTMLDivElement>,
-  setNodes: (nodes: Node[]) => void,
+  setNodes: React.Dispatch<React.SetStateAction<Node<ApiNodeData>[]>>,
   onSave?: () => void
 ) {
   const reactFlowInstance = useReactFlow();
@@ -44,15 +45,15 @@ export function useFlowHandlers(
         y: event.clientY - reactFlowBounds.top,
       });
 
-      const newNode = createNode(type as any, position);
-      setNodes((nds: Node[]) => [...nds, newNode]);
+      const newNode = createNode(type as ApiNodeType, position);
+      setNodes((nds) => [...nds, newNode as Node<ApiNodeData>]);
       
       toast({
         title: "Node Added",
         description: `Added new ${type} node to the canvas`,
       });
     },
-    [reactFlowInstance, setNodes, toast]
+    [reactFlowInstance, setNodes, toast, reactFlowWrapper]
   );
 
   const handleSave = useCallback(() => {
