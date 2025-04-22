@@ -7,10 +7,10 @@ import { nodeTypes } from "@/lib/api-builder-utils";
 import { Badge } from "@/components/ui/badge";
 import { ApiNodeData, ApiNodeType } from "@/lib/api-builder-types";
 
-// This component will handle all node types
+// Updated to use NodeProps from ReactFlow directly
 export function ApiBuilderNode({ data, selected, isConnectable, type }: NodeProps<ApiNodeData>) {
   const nodeType = type as ApiNodeType;
-  const nodeConfig = nodeTypes[nodeType];
+  const nodeConfig = nodeTypes[nodeType] || nodeTypes['input']; // Fallback to input if type is unknown
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Map node types to their respective icons

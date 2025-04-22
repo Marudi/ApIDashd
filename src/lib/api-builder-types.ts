@@ -9,7 +9,8 @@ export interface ApiNodeData {
   [key: string]: any;
 }
 
-export type ApiNode = Node<ApiNodeData, ApiNodeType>;
+// Updated to use Node type from ReactFlow directly to avoid type conflicts
+export type ApiNode = Node<ApiNodeData>;
 export type ApiEdge = Edge;
 
 export interface ApiFlow {
@@ -45,9 +46,11 @@ export interface ApiNodeTypeConfig {
   defaultData: Partial<ApiNodeData>;
 }
 
+// This is now properly aligned with ReactFlow's NodeProps
 export interface ApiBuilderNodeProps {
   data: ApiNodeData;
-  type: ApiNodeType;
   selected: boolean;
   isConnectable: boolean;
+  id: string;
+  type: string;
 }

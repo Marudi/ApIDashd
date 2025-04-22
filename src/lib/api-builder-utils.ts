@@ -157,9 +157,14 @@ export const createNode = (
 };
 
 // Check if a connection between nodes is valid
-export const isValidConnection = (sourceType: ApiNodeType, targetType: ApiNodeType) => {
-  const sourceNodeType = nodeTypes[sourceType];
-  return sourceNodeType.allowedConnections.includes(targetType);
+export const isValidConnection = (sourceType: string, targetType: string) => {
+  // Check if both types are valid ApiNodeTypes before proceeding
+  if (!nodeTypes[sourceType as ApiNodeType] || !nodeTypes[targetType as ApiNodeType]) {
+    return false;
+  }
+  
+  const sourceNodeType = nodeTypes[sourceType as ApiNodeType];
+  return sourceNodeType.allowedConnections.includes(targetType as ApiNodeType);
 };
 
 // Convert an API flow to a Tyk API definition
