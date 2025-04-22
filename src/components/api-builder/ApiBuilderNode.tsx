@@ -7,7 +7,8 @@ import { nodeTypes } from "@/lib/api-builder-utils";
 import { Badge } from "@/components/ui/badge";
 import { ApiNodeData, ApiNodeType } from "@/lib/api-builder-types";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
+import { useApiNode } from "@/hooks/useApiNode";
 
 // Using NodeProps directly from ReactFlow
 export function ApiBuilderNode({ data, selected, isConnectable, type, id }: NodeProps<ApiNodeData>) {
@@ -15,6 +16,8 @@ export function ApiBuilderNode({ data, selected, isConnectable, type, id }: Node
   const nodeConfig = nodeTypes[nodeType as ApiNodeType] || nodeTypes['input']; // Fallback to input if type is unknown
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const { toast } = useToast();
+  const { duplicateNode, deleteNode } = useApiNode();
 
   // Map node types to their respective icons
   const getNodeIcon = () => {
@@ -43,20 +46,18 @@ export function ApiBuilderNode({ data, selected, isConnectable, type, id }: Node
   };
 
   const handleDuplicate = () => {
-    // In a real app, you would get this from a context or props
-    // For now we just show a toast
+    duplicateNode(id);
     toast({
-      title: "Feature Coming Soon",
-      description: "Node duplication will be available in the next update",
+      title: "Node Duplicated",
+      description: `Duplicated ${data.label} node`,
     });
   };
 
   const handleDelete = () => {
-    // In a real app, you would get this from a context or props
-    // For now we just show a toast
+    deleteNode(id);
     toast({
-      title: "Feature Coming Soon",
-      description: "Node deletion will be available in the next update",
+      title: "Node Deleted",
+      description: `Deleted ${data.label} node`,
     });
   };
 
