@@ -1,76 +1,28 @@
 
 import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Check, Network, Plus, Search, Server, Shield, X } from "lucide-react";
+import { Plus, Search, Server, Network } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { mockApis } from "@/lib/mock-data";
-import { ApiDefinition } from "@/lib/types";
+import { kongApis } from "@/lib/mock-apis";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useNavigate } from "react-router-dom";
+import ApiTableRow from "@/components/apis/ApiTableRow";
 
 const ApisList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   // Filter APIs based on search term
-  const filteredApis = mockApis.filter(api => 
+  const filteredApis = mockApis.filter(api =>
     api.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     api.listenPath.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Mock Kong APIs - Fixed authType to match ApiDefinition
-  const kongApis = [
-    {
-      id: "k1",
-      name: "User Service API",
-      listenPath: "/users",
-      targetUrl: "http://user-service:8080",
-      protocol: "http",
-      active: true,
-      authType: "jwt" as const, // Type assertion to match ApiDefinition
-      lastUpdated: "2025-03-15T10:30:00Z",
-      createdAt: "2025-01-15T10:30:00Z",
-    },
-    {
-      id: "k2",
-      name: "Product Catalog API",
-      listenPath: "/products",
-      targetUrl: "http://product-service:8081",
-      protocol: "http",
-      active: true,
-      authType: "token" as const, // Changed from key-auth to token to match ApiDefinition
-      lastUpdated: "2025-03-14T15:45:00Z",
-      createdAt: "2025-01-14T15:45:00Z",
-    },
-    {
-      id: "k3",
-      name: "Payment Processing API",
-      listenPath: "/payments",
-      targetUrl: "http://payment-service:8082",
-      protocol: "https",
-      active: true,
-      authType: "oauth" as const, // Changed from oauth2 to oauth to match ApiDefinition
-      lastUpdated: "2025-03-10T09:20:00Z",
-      createdAt: "2025-01-10T09:20:00Z",
-    },
-    {
-      id: "k4",
-      name: "Analytics API",
-      listenPath: "/analytics",
-      targetUrl: "http://analytics-service:8083",
-      protocol: "http",
-      active: false,
-      authType: "none" as const, // Type assertion to match ApiDefinition
-      lastUpdated: "2025-02-28T11:15:00Z",
-      createdAt: "2025-01-28T11:15:00Z",
-    }
-  ];
-
-  const filteredKongApis = kongApis.filter(api => 
+  const filteredKongApis = kongApis.filter(api =>
     api.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     api.listenPath.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -178,47 +130,6 @@ const ApisList = () => {
         </TabsContent>
       </Tabs>
     </DashboardLayout>
-  );
-};
-
-interface ApiTableRowProps {
-  api: ApiDefinition;
-}
-
-const ApiTableRow = ({ api }: ApiTableRowProps) => {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
-
-  return (
-    <TableRow>
-      <TableCell className="text-center">
-        {api.active ? (
-          <Badge variant="default" className="w-8 justify-center bg-green-500">
-            <Check className="h-3 w-3" />
-          </Badge>
-        ) : (
-          <Badge variant="destructive" className="w-8 justify-center">
-            <X className="h-3 w-3" />
-          </Badge>
-        )}
-      </TableCell>
-      <TableCell className="font-medium">{api.name}</TableCell>
-      <TableCell className="font-mono text-xs">{api.listenPath}</TableCell>
-      <TableCell className="max-w-44 truncate text-xs">{api.targetUrl}</TableCell>
-      <TableCell>
-        <Badge variant="outline" className="capitalize">
-          {api.authType}
-        </Badge>
-      </TableCell>
-      <TableCell className="text-xs">{formatDate(api.lastUpdated)}</TableCell>
-      <TableCell className="text-right">
-        <Button variant="outline" size="sm" asChild>
-          <Link to={`/apis/${api.id}`}>View</Link>
-        </Button>
-      </TableCell>
-    </TableRow>
   );
 };
 
