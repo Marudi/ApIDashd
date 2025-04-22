@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ApiNodeData, ApiNodeType } from "@/lib/api-builder-types";
 import { InputNodeConfig } from "./InputNodeConfig";
@@ -8,6 +7,8 @@ import { AuthNodeConfig } from "./AuthNodeConfig";
 import { RateLimitNodeConfig } from "./RateLimitNodeConfig";
 import { OutputNodeConfig } from "./OutputNodeConfig";
 import { CacheNodeConfig } from "./CacheNodeConfig";
+import { MockNodeConfig } from "./MockNodeConfig";
+import { ValidatorNodeConfig } from "./ValidatorNodeConfig";
 
 interface NodeConfigDialogProps {
   isOpen: boolean;
@@ -34,6 +35,10 @@ export function NodeConfigDialog({ isOpen, onClose, nodeType, nodeData, onSave }
         return <CacheNodeConfig data={nodeData} onSave={onSave} onCancel={onClose} />;
       case 'output':
         return <OutputNodeConfig data={nodeData} onSave={onSave} onCancel={onClose} />;
+      case 'validator':
+        return <ValidatorNodeConfig data={nodeData} onSave={onSave} onCancel={onClose} />;
+      case 'mock':
+        return <MockNodeConfig data={nodeData} onSave={onSave} onCancel={onClose} />;
       default:
         return <div>Configuration not available for this node type</div>;
     }

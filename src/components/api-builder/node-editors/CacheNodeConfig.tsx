@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -9,7 +8,7 @@ import { z } from "zod";
 
 const cacheConfigSchema = z.object({
   label: z.string().min(1, "Label is required"),
-  ttl: z.string().transform(val => parseInt(val, 10)),
+  ttl: z.coerce.number().min(0, "TTL must be a positive number"),
   keyTemplate: z.string().min(1, "Cache key template is required")
 });
 
@@ -35,7 +34,7 @@ export function CacheNodeConfig({ data, onSave, onCancel }: CacheNodeConfigProps
     onSave({
       ...data,
       label: values.label,
-      ttl: values.ttl, // Zod transform ensures this is a number
+      ttl: values.ttl,
       keyTemplate: values.keyTemplate
     });
   };
@@ -100,4 +99,3 @@ export function CacheNodeConfig({ data, onSave, onCancel }: CacheNodeConfigProps
     </Form>
   );
 }
-
