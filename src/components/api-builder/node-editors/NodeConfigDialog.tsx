@@ -1,9 +1,11 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { InputNodeConfig } from "./InputNodeConfig";
 import { EndpointNodeConfig } from "./EndpointNodeConfig";
 import { TransformNodeConfig } from "./TransformNodeConfig";
 import { AuthNodeConfig } from "./AuthNodeConfig";
 import { RateLimitNodeConfig } from "./RateLimitNodeConfig";
+import { OutputNodeConfig } from "./OutputNodeConfig";
 import { ApiNodeData, ApiNodeType } from "@/lib/api-builder-types";
 
 interface NodeConfigDialogProps {
@@ -27,7 +29,7 @@ export function NodeConfigDialog({ isOpen, onClose, nodeType, nodeData, onSave }
     cache: () => <div>Cache Configuration (Not Implemented)</div>,
     mock: () => <div>Mock Configuration (Not Implemented)</div>,
     validator: () => <div>Validator Configuration (Not Implemented)</div>,
-    output: () => <div>Output Configuration (Not Implemented)</div>,
+    output: OutputNodeConfig,
   };
 
   const ConfigComponent = configComponents[safeNodeType];
