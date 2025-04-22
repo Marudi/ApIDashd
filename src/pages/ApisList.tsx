@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Plus, Search, Server, Network } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -11,13 +12,44 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useNavigate } from "react-router-dom";
 import ApiTableRow from "@/components/apis/ApiTableRow";
 import ApiExportImport from "@/components/apis/ApiExportImport";
+import { usePersistentStorage } from "@/hooks/usePersistentStorage";
+
+const STORAGE_KEY = "api_definitions";
+const KONG_STORAGE_KEY = "kong_api_definitions"; // Optional, if you want to separate Tyk and Kong
 
 const ApisList = () => {
+  const {
+    persistentEnabled,
+    getApiDefs,
+    setApiDefs,
+  } = usePersistentStorage();
+
   const [searchTerm, setSearchTerm] = useState("");
+  // Start with mocks, but will replace from localStorage if enabled
   const [tykApiData, setTykApiData] = useState(mockApis);
   const [kongApiData, setKongApiData] = useState(kongApis);
 
   const navigate = useNavigate();
+
+  // LOAD from persistent storage on mount (if enabled)
+  useEffect(() => {
+    if (persistentEnabled) {
+      const defs = getApiDefs();
+      if (defs && Array.isArray(defs)) {
+        // If user toggled persistence on after already using app, use that data
+        setTykApiData(defs.filter(api => api.protocol && (api.protocol === "http" || api.protocol === "https")));
+        setKongApiData(defs.filter(api => api.protocol && ["grpc", "grpcs", "tcp", "tls", "udp"].includes(api.protocol)));
+      }
+    }
+  // eslint-disable-next-line
+  }, [persistentEnabled]);
+
+  // Whenever APIs change, UPDATE persistent storage if enabled
+  useEffect(() => {
+    if (persistentEnabled) {
+      setApiDefs([...tykApiData, ...kongApiData]);
+    }
+  }, [tykApiData, kongApiData, persistentEnabled, setApiDefs]);
 
   // Filter APIs based on search term
   const filteredApis = tykApiData.filter(api =>
@@ -34,7 +66,7 @@ const ApisList = () => {
   const handleImport = (importedApis: any[]) => {
     // Detect by protocol to split Tyk/Kong APIs (simple mock logic)
     const tyk = importedApis.filter(api => api.protocol && (api.protocol === "http" || api.protocol === "https"));
-    const kong = importedApis.filter(api => api.protocol && (api.protocol === "grpc" || api.protocol === "grpcs" || api.protocol === "tcp" || api.protocol === "tls" || api.protocol === "udp"));
+    const kong = importedApis.filter(api => api.protocol && (["grpc", "grpcs", "tcp", "tls", "udp"].includes(api.protocol)));
     // For this mock, merge/override by id
     setTykApiData((prev) => {
       const ids = new Set(tyk.map(api => api.id));

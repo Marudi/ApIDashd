@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -11,6 +11,7 @@ import { ApiKeySearch } from "@/components/api-keys/ApiKeySearch";
 import { NewKeyDialog } from "@/components/api-keys/NewKeyDialog";
 import { ApiKeysTable } from "@/components/api-keys/ApiKeysTable";
 import { getPolicyName } from "@/lib/api-key-utils";
+import { usePersistentStorage } from "@/hooks/usePersistentStorage";
 
 const ApiKeys = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,6 +19,22 @@ const ApiKeys = () => {
   const [showNewKeyDialog, setShowNewKeyDialog] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
   const { toast } = useToast();
+  const { persistentEnabled, getApiKeys, setApiKeys } = usePersistentStorage();
+
+  // Load keys from persistent local storage (if enabled)
+  useEffect(() => {
+    if (persistentEnabled) {
+      const stored = getApiKeys();
+      if (stored && Array.isArray(stored)) {
+        setKeys(stored);
+      }
+    }
+  }, [persistentEnabled, getApiKeys]);
+
+  // Update persistent storage WHEN keys change and persistence is enabled
+  useEffect(() => {
+    if (persistentEnabled) setApiKeys(keys);
+  }, [keys, persistentEnabled, setApiKeys]);
 
   // Filter API keys based on search term
   const filteredKeys = keys.filter(key => 
