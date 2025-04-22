@@ -52,7 +52,7 @@ export const nodeTypes: Record<ApiNodeType, ApiNodeTypeConfig> = {
     allowedConnections: ['endpoint', 'transform', 'validator'],
     defaultData: {
       label: 'Auth',
-      authType: 'token',
+      authType: 'apikey',  // Changed from 'token' to 'apikey' to match allowed types
       tokenLocation: 'header',
     }
   },
