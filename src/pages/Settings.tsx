@@ -1,3 +1,4 @@
+
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { Clock, Database, Globe, Lock, MailCheck, RefreshCw, Save, Server, Shield, User, Sync } from "lucide-react";
+import { Clock, Database, Globe, Lock, MailCheck, RefreshCw, Save, Server, Shield, User } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { GatewaySync } from "@/components/settings/GatewaySync";
 import { Settings as SettingsIcon } from "lucide-react";
