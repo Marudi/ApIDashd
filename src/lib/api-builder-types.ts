@@ -1,3 +1,4 @@
+
 import { Node, Edge } from 'reactflow';
 
 // API Builder Types
@@ -38,6 +39,8 @@ export interface ApiNodeData {
   };
   headers?: Array<{ key: string; value: string }>;
   statusCode?: number;
+  name?: string;
+  description?: string;
   [key: string]: any;
 }
 
@@ -78,11 +81,11 @@ export interface ApiNodeTypeConfig {
   defaultData: Partial<ApiNodeData>;
 }
 
-// This is now properly aligned with ReactFlow's NodeProps
+// Update this interface to align with ReactFlow's NodeProps
 export interface ApiBuilderNodeProps {
+  id: string;
+  type: string; // Changed from ApiNodeType to string to match ReactFlow's NodeProps
   data: ApiNodeData;
   selected: boolean;
-  isConnectable: boolean;
-  id: string;
-  type: string;
+  isConnectable?: boolean; // Optional prop from ReactFlow
 }

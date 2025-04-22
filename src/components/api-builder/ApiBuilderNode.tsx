@@ -1,6 +1,6 @@
 
 import { memo } from 'react';
-import { Handle, Position } from 'reactflow';
+import { Handle, Position, NodeProps } from 'reactflow';
 import { ApiNodeData, ApiNodeType } from '@/lib/api-builder-types';
 import { 
   ContextMenu,
@@ -13,18 +13,15 @@ import { Copy, Trash, Settings } from 'lucide-react';
 import { SettingsButton } from './node-controls/SettingsButton';
 import { useNodeConfig } from '@/hooks/useNodeConfig';
 
-interface ApiBuilderNodeProps {
-  id: string;
-  type: ApiNodeType;
-  data: ApiNodeData;
-  selected: boolean;
-}
-
-function ApiBuilderNodeComponent({ id, type, data, selected }: ApiBuilderNodeProps) {
+// Use ReactFlow's NodeProps with our ApiNodeData
+function ApiBuilderNodeComponent({ id, type, data, selected }: NodeProps<ApiNodeData>) {
   const { openNodeConfig } = useNodeConfig();
   
-  const getNodeColor = (nodeType: ApiNodeType) => {
-    const colors = {
+  // Cast type to ApiNodeType since we know it's valid
+  const nodeType = type as ApiNodeType;
+  
+  const getNodeColor = (nodeType: string) => {
+    const colors: Record<string, string> = {
       input: 'bg-blue-500',
       endpoint: 'bg-green-500',
       transform: 'bg-purple-500',
@@ -52,7 +49,7 @@ function ApiBuilderNodeComponent({ id, type, data, selected }: ApiBuilderNodePro
   const handleSettings = () => {
     openNodeConfig({
       id,
-      type,
+      type: nodeType,
       data,
       position: { x: 0, y: 0 },
       selected: selected,
@@ -72,7 +69,7 @@ function ApiBuilderNodeComponent({ id, type, data, selected }: ApiBuilderNodePro
               <span className="font-medium capitalize">{type}</span>
               <div>
                 <SettingsButton 
-                  nodeType={type} 
+                  nodeType={nodeType} 
                   onClick={handleSettings} 
                   size="sm" 
                   variant="ghost" 

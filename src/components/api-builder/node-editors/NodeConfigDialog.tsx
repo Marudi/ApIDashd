@@ -9,20 +9,29 @@ import { ApiNodeData, ApiNodeType } from "@/lib/api-builder-types";
 interface NodeConfigDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  nodeType: ApiNodeType;
+  nodeType: ApiNodeType | string;
   nodeData: ApiNodeData;
   onSave: (data: ApiNodeData) => void;
 }
 
 export function NodeConfigDialog({ isOpen, onClose, nodeType, nodeData, onSave }: NodeConfigDialogProps) {
-  const configComponents = {
+  // Ensure nodeType is a valid ApiNodeType
+  const safeNodeType = nodeType as ApiNodeType;
+  
+  const configComponents: Record<ApiNodeType, React.ComponentType<any>> = {
     input: InputNodeConfig,
     endpoint: EndpointNodeConfig,
     transform: TransformNodeConfig,
     auth: AuthNodeConfig,
+    // Add placeholders for other node types
+    ratelimit: () => <div>Rate Limit Configuration (Not Implemented)</div>,
+    cache: () => <div>Cache Configuration (Not Implemented)</div>,
+    mock: () => <div>Mock Configuration (Not Implemented)</div>,
+    validator: () => <div>Validator Configuration (Not Implemented)</div>,
+    output: () => <div>Output Configuration (Not Implemented)</div>,
   };
 
-  const ConfigComponent = configComponents[nodeType as keyof typeof configComponents];
+  const ConfigComponent = configComponents[safeNodeType];
 
   if (!ConfigComponent) {
     return null;
@@ -32,7 +41,7 @@ export function NodeConfigDialog({ isOpen, onClose, nodeType, nodeData, onSave }
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Configure {nodeType} Node</DialogTitle>
+          <DialogTitle>Configure {safeNodeType} Node</DialogTitle>
         </DialogHeader>
         <ConfigComponent data={nodeData} onSave={onSave} onCancel={onClose} />
       </DialogContent>
