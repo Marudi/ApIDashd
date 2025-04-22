@@ -79,7 +79,10 @@ export function FlowCanvas({
         onDragOver={onDragOver}
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
+        draggable={true}
+        defaultEdgeOptions={{ type: 'smoothstep' }}
         fitView
+        proOptions={{ hideAttribution: true }}
         {...flowConfig}
       >
         <Background 

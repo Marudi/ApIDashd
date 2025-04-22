@@ -38,6 +38,7 @@ export function useFlowHandlers(
       const type = event.dataTransfer.getData('application/reactflow');
       
       if (!type || !reactFlowBounds || !reactFlowInstance) {
+        console.log('Missing data for drop operation:', { type, hasBounds: !!reactFlowBounds, hasInstance: !!reactFlowInstance });
         return;
       }
 
@@ -47,17 +48,20 @@ export function useFlowHandlers(
         y: event.clientY - reactFlowBounds.top,
       });
 
+      console.log('Creating new node of type:', type, 'at position:', position);
+      
       // Use the correct node creator which provides the correct structure
       const newNode = createNode(type as ApiNodeType, position);
+      
+      // Ensure the node is explicitly set as draggable
+      const nodeWithDraggable = {
+        ...newNode,
+        draggable: true,
+      };
+      
+      console.log('New node created:', nodeWithDraggable);
 
-      setNodes((nds) => [
-        ...nds,
-        {
-          ...newNode,
-          // explicitly ensure added node is draggable
-          draggable: true
-        }
-      ]);
+      setNodes((nds) => [...nds, nodeWithDraggable]);
       
       toast({
         title: "Node Added",
@@ -101,4 +105,3 @@ export function useFlowHandlers(
     handleExport
   };
 }
-
