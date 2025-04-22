@@ -1,9 +1,9 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { InputNodeConfig } from "./InputNodeConfig";
 import { EndpointNodeConfig } from "./EndpointNodeConfig";
 import { TransformNodeConfig } from "./TransformNodeConfig";
 import { AuthNodeConfig } from "./AuthNodeConfig";
+import { RateLimitNodeConfig } from "./RateLimitNodeConfig";
 import { ApiNodeData, ApiNodeType } from "@/lib/api-builder-types";
 
 interface NodeConfigDialogProps {
@@ -23,8 +23,7 @@ export function NodeConfigDialog({ isOpen, onClose, nodeType, nodeData, onSave }
     endpoint: EndpointNodeConfig,
     transform: TransformNodeConfig,
     auth: AuthNodeConfig,
-    // Add placeholders for other node types
-    ratelimit: () => <div>Rate Limit Configuration (Not Implemented)</div>,
+    ratelimit: RateLimitNodeConfig,
     cache: () => <div>Cache Configuration (Not Implemented)</div>,
     mock: () => <div>Mock Configuration (Not Implemented)</div>,
     validator: () => <div>Validator Configuration (Not Implemented)</div>,
