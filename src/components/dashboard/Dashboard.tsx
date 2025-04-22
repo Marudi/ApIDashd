@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Activity, Api, AlertTriangle } from "lucide-react";
+import { Activity, Server, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { ApiList } from "@/components/dashboard/ApiList";
@@ -24,7 +24,7 @@ export const Dashboard: React.FC = () => {
         <StatusCard 
           title="Active APIs" 
           value="24" 
-          icon={<Api className="h-5 w-5 text-muted-foreground" />} 
+          icon={<Server className="h-5 w-5 text-muted-foreground" />} 
           trend={{ value: 12, positive: true }} 
         />
         <StatusCard 
