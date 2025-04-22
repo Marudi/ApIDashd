@@ -17,6 +17,8 @@ const mockNodeSchema = z.object({
   }),
 });
 
+type MockNodeFormValues = z.infer<typeof mockNodeSchema>;
+
 interface MockNodeConfigProps {
   data: ApiNodeData;
   onSave: (data: ApiNodeData) => void;
@@ -24,7 +26,7 @@ interface MockNodeConfigProps {
 }
 
 export function MockNodeConfig({ data, onSave, onCancel }: MockNodeConfigProps) {
-  const form = useForm({
+  const form = useForm<MockNodeFormValues>({
     resolver: zodResolver(mockNodeSchema),
     defaultValues: {
       label: data.label || "Mock",
@@ -36,10 +38,16 @@ export function MockNodeConfig({ data, onSave, onCancel }: MockNodeConfigProps) 
     },
   });
 
-  const onSubmit = (values: z.infer<typeof mockNodeSchema>) => {
+  const onSubmit = (values: MockNodeFormValues) => {
+    // Explicitly ensure mockResponse matches the required format in ApiNodeData
     onSave({
       ...data,
-      ...values,
+      label: values.label,
+      mockResponse: {
+        statusCode: values.mockResponse.statusCode,
+        body: values.mockResponse.body,
+        headers: values.mockResponse.headers,
+      },
     });
   };
 
@@ -69,7 +77,7 @@ export function MockNodeConfig({ data, onSave, onCancel }: MockNodeConfigProps) 
                 <Input 
                   type="number" 
                   {...field} 
-                  onChange={e => field.onChange(parseInt(e.target.value))}
+                  onChange={e => field.onChange(parseInt(e.target.value) || 200)}
                   min={100}
                   max={599}
                 />
