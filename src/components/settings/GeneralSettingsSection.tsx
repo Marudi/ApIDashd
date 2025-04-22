@@ -7,8 +7,14 @@ import { Separator } from "@/components/ui/separator";
 import { Save } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { PostgresConfigSection } from "./PostgresConfigSection";
+import { usePersistentStorage } from "@/hooks/usePersistentStorage";
 
 export function GeneralSettingsSection() {
+  const {
+    persistentEnabled,
+    setPersistentEnabled,
+  } = usePersistentStorage();
+
   return (
     <>
       <PostgresConfigSection />
@@ -57,6 +63,16 @@ export function GeneralSettingsSection() {
                 <p className="text-sm text-muted-foreground">Automatically refresh data every 5 minutes</p>
               </div>
               <Switch defaultChecked />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Persist API &amp; Key Data locally</Label>
+                <p className="text-sm text-muted-foreground">
+                  Save API and key data in your browser for offline access and session restore.
+                </p>
+              </div>
+              <Switch checked={persistentEnabled} onCheckedChange={setPersistentEnabled} />
             </div>
           </div>
           
