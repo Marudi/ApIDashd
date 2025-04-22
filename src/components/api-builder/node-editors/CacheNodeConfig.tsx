@@ -35,7 +35,7 @@ export function CacheNodeConfig({ data, onSave, onCancel }: CacheNodeConfigProps
     onSave({
       ...data,
       label: values.label,
-      ttl: values.ttl, // zod will transform this to a number
+      ttl: values.ttl, // Zod transform ensures this is a number
       keyTemplate: values.keyTemplate
     });
   };
@@ -100,3 +100,4 @@ export function CacheNodeConfig({ data, onSave, onCancel }: CacheNodeConfigProps
     </Form>
   );
 }
+
