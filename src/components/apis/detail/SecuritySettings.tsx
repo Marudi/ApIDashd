@@ -39,7 +39,7 @@ const SecuritySettings = ({
     max: api.quota?.max || 10000,
     per: api.quota?.per || 86400 // 24 hours in seconds
   });
-  const [tempAuthType, setTempAuthType] = useState(api.authType);
+  const [tempAuthType, setTempAuthType] = useState<"none" | "token" | "jwt" | "oauth">(api.authType);
   const [applyingChanges, setApplyingChanges] = useState(false);
 
   const handleAuthTypeChange = () => {
@@ -323,7 +323,10 @@ const SecuritySettings = ({
           <div className="py-4 space-y-4">
             <div className="space-y-2">
               <Label>Authentication Type</Label>
-              <Select value={tempAuthType} onValueChange={setTempAuthType}>
+              <Select 
+                value={tempAuthType} 
+                onValueChange={(value: "none" | "token" | "jwt" | "oauth") => setTempAuthType(value)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

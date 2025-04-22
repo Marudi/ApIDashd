@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Check, PlusCircle, Versions } from "lucide-react";
+import { Check, GitBranch, PlusCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -83,7 +83,7 @@ const ApiVersions = ({ api, formatDate, onEnableVersioning }: ApiVersionsProps) 
         <CardHeader className="flex flex-row items-start justify-between pb-2">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Versions className="h-5 w-5" />
+              <GitBranch className="h-5 w-5" />
               API Versions
             </CardTitle>
             <CardDescription>
