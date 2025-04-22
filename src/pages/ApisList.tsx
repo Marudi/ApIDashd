@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { mockApis } from "@/lib/mock-data";
 import { ApiDefinition } from "@/lib/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const ApisList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -214,7 +214,9 @@ const ApiTableRow = ({ api }: ApiTableRowProps) => {
       </TableCell>
       <TableCell className="text-xs">{formatDate(api.lastUpdated)}</TableCell>
       <TableCell className="text-right">
-        <Button variant="outline" size="sm">View</Button>
+        <Button variant="outline" size="sm" asChild>
+          <Link to={`/apis/${api.id}`}>View</Link>
+        </Button>
       </TableCell>
     </TableRow>
   );
