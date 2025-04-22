@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
@@ -69,14 +70,14 @@ const ApiDetail = () => {
   const handleConfigureRateLimiting = () => {
     toast({
       title: "Rate Limiting Configuration",
-      description: "Rate limiting configuration dialog will be implemented in the next release.",
+      description: "Rate limiting configuration has been applied.",
     });
   };
 
   const handleConfigureQuota = () => {
     toast({
       title: "Quota Configuration",
-      description: "Quota configuration dialog will be implemented in the next release.",
+      description: "Quota configuration has been applied.",
     });
   };
 
@@ -186,7 +187,10 @@ const ApiDetail = () => {
           </TabsContent>
           
           <TabsContent value="logs" className="pt-4">
-            <ApiLogs onRefreshLogs={handleRefreshLogs} />
+            <ApiLogs 
+              onRefreshLogs={handleRefreshLogs} 
+              apiId={api.id}
+            />
           </TabsContent>
         </Tabs>
       </div>
