@@ -42,13 +42,17 @@ export function useFlowHandlers(
         return;
       }
 
-      // Calculate center of the visible viewport
-      const { width, height } = reactFlowInstance.getViewport();
+      // Get the viewport dimensions from the container
+      const viewportNode = reactFlowWrapper.current;
+      const viewportWidth = viewportNode?.clientWidth || 0;
+      const viewportHeight = viewportNode?.clientHeight || 0;
+      
+      // Get the current pan and zoom values
       const { x: viewportX, y: viewportY, zoom } = reactFlowInstance.getViewport();
       
-      // Get the center position of the viewport in flow coordinates
-      const centerX = viewportX + width / (2 * zoom);
-      const centerY = viewportY + height / (2 * zoom);
+      // Calculate the center position of the viewport in flow coordinates
+      const centerX = viewportX + viewportWidth / (2 * zoom);
+      const centerY = viewportY + viewportHeight / (2 * zoom);
       
       // Use the center position for new nodes
       const position: XYPosition = {
