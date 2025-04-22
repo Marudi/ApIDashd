@@ -1,4 +1,3 @@
-
 import { ReactFlowProvider } from 'reactflow';
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ApiBuilderNode } from "@/components/api-builder/ApiBuilderNode";
@@ -14,14 +13,12 @@ import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-// Mock current user (in a real app, this would come from auth)
 const currentUser = {
   id: "user-1",
   name: "John Smith",
   color: getRandomColor(),
 };
 
-// Mock collaborators (in a real app, this would come from a real-time service)
 const mockCollaborators = [
   {
     id: currentUser.id,
@@ -74,7 +71,6 @@ const ApiBuilderFlow = () => {
     unsavedChanges,
   } = useApiFlow(currentUser.id, "My First API");
 
-  // Warn about unsaved changes when navigating away
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (unsavedChanges) {
@@ -96,22 +92,19 @@ const ApiBuilderFlow = () => {
   };
 
   const handleZoomIn = useCallback(() => {
-    // This would be implemented with reactflow's useReactFlow hook in a real app
     console.log('Zoom in');
   }, []);
 
   const handleZoomOut = useCallback(() => {
-    // This would be implemented with reactflow's useReactFlow hook in a real app
     console.log('Zoom out');
   }, []);
 
   const handleReset = useCallback(() => {
-    // This would be implemented with reactflow's useReactFlow hook in a real app
     console.log('Reset view');
   }, []);
 
   return (
-    <div className="h-[calc(100vh-12rem)] w-full flex flex-col">
+    <div className={`h-[calc(100vh-12rem)] w-full flex flex-col`}>
       <FlowToolbar 
         flow={flow}
         onSave={saveFlow}
@@ -124,43 +117,67 @@ const ApiBuilderFlow = () => {
         hasUnsavedChanges={unsavedChanges}
       />
 
-      <CollaboratorsList 
-        collaborators={mockCollaborators}
-        currentUserId={currentUser.id}
-      />
+      <div className={`${isMobile ? "space-y-2" : ""}`}>
+        <CollaboratorsList 
+          collaborators={mockCollaborators}
+          currentUserId={currentUser.id}
+        />
+      </div>
 
-      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-4'} gap-4 h-full`}>
+      <div
+        className={`grid ${
+          isMobile ? "grid-cols-1" : "grid-cols-4"
+        } gap-2 sm:gap-4 h-full overflow-x-auto pb-2`}
+        style={isMobile ? { minHeight: 0, height: "100%", flex: 1 } : {}}
+      >
         {isMobile ? (
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="mb-2">
-                <Menu className="h-4 w-4 mr-2" />
+              <Button
+                variant="outline"
+                size="sm"
+                className="mb-2 w-full py-4 text-base font-medium"
+                style={{ minHeight: "48px" }}
+              >
+                <Menu className="h-5 w-5 mr-2" />
                 Node Palette
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[250px] sm:w-[350px]">
-              <div className="pt-6">
-                <NodeToolbar onDragStart={onDragStart} />
-              </div>
+            <SheetContent
+              side="left"
+              className="w-[96vw] max-w-[380px] sm:max-w-[350px] px-3 pt-6"
+              style={{
+                paddingTop: "1.5rem",
+                paddingBottom: "1.5rem",
+                maxHeight: "100vh",
+                overflowY: "auto",
+              }}
+            >
+              <NodeToolbar onDragStart={onDragStart} />
             </SheetContent>
           </Sheet>
         ) : (
-          <div className="col-span-1">
+          <div className="col-span-1 min-w-[210px] max-w-xs pb-2">
             <NodeToolbar onDragStart={onDragStart} />
           </div>
         )}
 
-        <FlowCanvas
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          setNodes={setNodes}
-          collaborators={mockCollaborators}
-          currentUserId={currentUser.id}
-          onSave={saveFlow}
-        />
+        <div
+          className={`relative ${isMobile ? "w-full h-[70vh] min-h-[350px]" : "col-span-3"}`}
+          style={isMobile ? { overflow: "hidden", padding: "0 0.25rem" } : {}}
+        >
+          <FlowCanvas
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            setNodes={setNodes}
+            collaborators={mockCollaborators}
+            currentUserId={currentUser.id}
+            onSave={saveFlow}
+          />
+        </div>
       </div>
     </div>
   );
