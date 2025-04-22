@@ -1,26 +1,22 @@
 
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef } from 'react';
 import ReactFlow, { 
   Background, 
   BackgroundVariant,
-  useReactFlow, 
   Node, 
   Edge, 
-  Connection, 
-  NodeTypes,
-  ConnectionLineType,
+  Connection,
 } from 'reactflow';
 import { ApiNodeData } from '@/lib/api-builder-types';
-import { createNode } from '@/lib/api-builder/node-utils';
 import { ActiveCollaborator } from '@/lib/api-builder-types';
-import { ApiBuilderNode } from '@/components/api-builder/ApiBuilderNode';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useToast } from '@/components/ui/use-toast';
 import { FlowControls } from './flow-controls/FlowControls';
 import { InstructionsPanel } from './flow-panels/InstructionsPanel';
 import { CollaboratorsPanel } from './flow-panels/CollaboratorsPanel';
 import { NodeConfigDialog } from './node-editors/NodeConfigDialog';
 import { useNodeConfig } from '@/hooks/useNodeConfig';
+import { useFlowHandlers } from '@/hooks/useFlowHandlers';
+import { nodeTypes, flowConfig } from './flow-canvas/FlowConfig';
 
 interface FlowCanvasProps {
   nodes: Node<ApiNodeData>[];
@@ -34,18 +30,6 @@ interface FlowCanvasProps {
   onSave?: () => void;
 }
 
-const nodeTypes: NodeTypes = {
-  input: ApiBuilderNode,
-  endpoint: ApiBuilderNode,
-  transform: ApiBuilderNode,
-  auth: ApiBuilderNode,
-  ratelimit: ApiBuilderNode,
-  cache: ApiBuilderNode,
-  mock: ApiBuilderNode,
-  validator: ApiBuilderNode,
-  output: ApiBuilderNode,
-};
-
 export function FlowCanvas({
   nodes,
   edges,
@@ -58,9 +42,8 @@ export function FlowCanvas({
   onSave,
 }: FlowCanvasProps) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const reactFlowInstance = useReactFlow();
   const isMobile = useIsMobile();
-  const { toast } = useToast();
+  
   const { 
     selectedNode, 
     isConfigOpen, 
@@ -69,80 +52,12 @@ export function FlowCanvas({
     handleSaveNodeConfig 
   } = useNodeConfig();
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (reactFlowInstance) {
-        reactFlowInstance.fitView();
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [reactFlowInstance]);
-
-  const onDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-  }, []);
-
-  const onDrop = useCallback(
-    (event: React.DragEvent) => {
-      event.preventDefault();
-
-      const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
-      const type = event.dataTransfer.getData('application/reactflow');
-      
-      // Check if we have valid data and bounds
-      if (!type || !reactFlowBounds || !reactFlowInstance) {
-        return;
-      }
-
-      // Calculate the correct position in the flow
-      const position = reactFlowInstance.screenToFlowPosition({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
-      });
-
-      // Create the new node
-      const newNode = createNode(type as any, position);
-      
-      // Add the new node to the flow
-      setNodes((nds: Node[]) => [...nds, newNode]);
-      
-      toast({
-        title: "Node Added",
-        description: `Added new ${type} node to the canvas`,
-      });
-    },
-    [reactFlowInstance, setNodes, toast]
-  );
-
-  const handleSave = useCallback(() => {
-    if (onSave) {
-      onSave();
-    }
-  }, [onSave]);
-
-  const handleExport = useCallback(() => {
-    if (reactFlowInstance) {
-      const flowData = reactFlowInstance.toObject();
-      const jsonString = JSON.stringify(flowData, null, 2);
-      const blob = new Blob([jsonString], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'api-flow.json';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      toast({
-        title: 'Flow Exported',
-        description: 'Your API flow has been exported as JSON',
-      });
-    }
-  }, [reactFlowInstance, toast]);
+  const {
+    onDragOver,
+    onDrop,
+    handleSave,
+    handleExport
+  } = useFlowHandlers(reactFlowWrapper, setNodes, onSave);
 
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node<ApiNodeData>) => {
     openNodeConfig(node);
@@ -165,13 +80,7 @@ export function FlowCanvas({
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         fitView
-        snapToGrid
-        snapGrid={[15, 15]}
-        connectionLineType={ConnectionLineType.SmoothStep}
-        proOptions={{ hideAttribution: true }}
-        deleteKeyCode="Delete"
-        minZoom={0.2}
-        maxZoom={4}
+        {...flowConfig}
       >
         <Background 
           color="#aaa" 
