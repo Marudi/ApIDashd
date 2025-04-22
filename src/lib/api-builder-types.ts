@@ -6,6 +6,22 @@ export type ApiNodeType = 'input' | 'endpoint' | 'transform' | 'auth' | 'ratelim
 
 export interface ApiNodeData {
   label: string;
+  method?: string;
+  path?: string;
+  url?: string;
+  authType?: string;
+  transformType?: string;
+  transformScript?: string;
+  rate?: number;
+  per?: number;
+  ttl?: number;
+  keyTemplate?: string;
+  responseCode?: number;
+  responseBody?: string;
+  validationType?: string;
+  schema?: string;
+  statusCode?: number;
+  headers?: Array<{ key: string; value: string }>;
   [key: string]: any;
 }
 
