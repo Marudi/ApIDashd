@@ -11,10 +11,12 @@ const formSchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
   statusCode: z.number().min(100).max(599).default(200),
-  headers: z.array(z.object({
-    key: z.string(),
-    value: z.string()
-  })).default([]),
+  headers: z.array(
+    z.object({
+      key: z.string().min(1, "Header name is required"),
+      value: z.string().min(1, "Header value is required")
+    })
+  ).default([]),
 });
 
 interface OutputNodeConfigProps {
