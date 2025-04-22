@@ -1,17 +1,20 @@
 
 import { useState } from "react";
 import { Handle, Position, NodeProps } from "reactflow";
-import { Check, Code, Database, Play, Repeat, Server, Settings, Shield, Timer } from "lucide-react";
+import { Check, Code, Database, Play, Repeat, Server, Settings, Shield, Timer, Copy, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { nodeTypes } from "@/lib/api-builder-utils";
 import { Badge } from "@/components/ui/badge";
 import { ApiNodeData, ApiNodeType } from "@/lib/api-builder-types";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
 
 // Using NodeProps directly from ReactFlow
-export function ApiBuilderNode({ data, selected, isConnectable, type }: NodeProps<ApiNodeData>) {
+export function ApiBuilderNode({ data, selected, isConnectable, type, id }: NodeProps<ApiNodeData>) {
   const nodeType = type as string;
   const nodeConfig = nodeTypes[nodeType as ApiNodeType] || nodeTypes['input']; // Fallback to input if type is unknown
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   // Map node types to their respective icons
   const getNodeIcon = () => {
@@ -39,14 +42,34 @@ export function ApiBuilderNode({ data, selected, isConnectable, type }: NodeProp
     }
   };
 
+  const handleDuplicate = () => {
+    // In a real app, you would get this from a context or props
+    // For now we just show a toast
+    toast({
+      title: "Feature Coming Soon",
+      description: "Node duplication will be available in the next update",
+    });
+  };
+
+  const handleDelete = () => {
+    // In a real app, you would get this from a context or props
+    // For now we just show a toast
+    toast({
+      title: "Feature Coming Soon",
+      description: "Node deletion will be available in the next update",
+    });
+  };
+
   return (
     <div
       className={cn(
-        "min-w-[200px] border rounded-md shadow-sm bg-card transition-all",
+        "min-w-[180px] max-w-[250px] border rounded-md shadow-sm bg-card transition-all",
         selected && "ring-2 ring-primary",
         isExpanded && "min-h-[150px]"
       )}
       style={{ borderColor: nodeConfig.color }}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
     >
       {/* Input handle - only shown if node has incoming connections allowed */}
       {nodeType !== 'input' && (
@@ -68,7 +91,9 @@ export function ApiBuilderNode({ data, selected, isConnectable, type }: NodeProp
           <div className="p-1 rounded-md" style={{ backgroundColor: nodeConfig.color }}>
             {getNodeIcon()}
           </div>
-          <div className="font-medium text-sm">{data.label}</div>
+          <div className="font-medium text-sm truncate max-w-[100px]" title={data.label}>
+            {data.label}
+          </div>
         </div>
         <Badge variant="outline" className="text-xs">
           {nodeConfig.label}
@@ -86,7 +111,7 @@ export function ApiBuilderNode({ data, selected, isConnectable, type }: NodeProp
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Path:</span>
-                <span className="font-mono">{data.path}</span>
+                <span className="font-mono truncate max-w-[120px]" title={data.path}>{data.path}</span>
               </div>
             </>
           )}
@@ -95,7 +120,7 @@ export function ApiBuilderNode({ data, selected, isConnectable, type }: NodeProp
             <>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">URL:</span>
-                <span className="font-mono truncate max-w-[120px]">{data.url}</span>
+                <span className="font-mono truncate max-w-[120px]" title={data.url}>{data.url}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Method:</span>
@@ -131,6 +156,15 @@ export function ApiBuilderNode({ data, selected, isConnectable, type }: NodeProp
               <span>{data.statusCode}</span>
             </div>
           )}
+          
+          <div className="flex justify-end gap-1 pt-2">
+            <Button variant="ghost" size="icon" onClick={handleDuplicate} className="h-6 w-6">
+              <Copy className="h-3 w-3" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={handleDelete} className="h-6 w-6 text-destructive">
+              <Trash className="h-3 w-3" />
+            </Button>
+          </div>
         </div>
       )}
 

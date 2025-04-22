@@ -8,7 +8,11 @@ import { CollaboratorsList } from "@/components/api-builder/CollaboratorsList";
 import { FlowCanvas } from "@/components/api-builder/FlowCanvas";
 import { useApiFlow } from "@/hooks/useApiFlow";
 import { getRandomColor } from "@/lib/api-builder-utils";
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Menu } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Mock current user (in a real app, this would come from auth)
 const currentUser = {
@@ -52,6 +56,9 @@ const ApiBuilder = () => {
 };
 
 const ApiBuilderFlow = () => {
+  const isMobile = useIsMobile();
+  const [isUnsavedModalOpen, setIsUnsavedModalOpen] = useState(false);
+  
   const { 
     flow,
     nodes,
@@ -64,7 +71,24 @@ const ApiBuilderFlow = () => {
     publishFlow,
     updateFlowName,
     setNodes,
+    unsavedChanges,
   } = useApiFlow(currentUser.id, "My First API");
+
+  // Warn about unsaved changes when navigating away
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (unsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [unsavedChanges]);
 
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
@@ -87,7 +111,7 @@ const ApiBuilderFlow = () => {
   }, []);
 
   return (
-    <div className="h-[calc(100vh-12rem)] w-full">
+    <div className="h-[calc(100vh-12rem)] w-full flex flex-col">
       <FlowToolbar 
         flow={flow}
         onSave={saveFlow}
@@ -97,6 +121,7 @@ const ApiBuilderFlow = () => {
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         onReset={handleReset}
+        hasUnsavedChanges={unsavedChanges}
       />
 
       <CollaboratorsList 
@@ -104,10 +129,26 @@ const ApiBuilderFlow = () => {
         currentUserId={currentUser.id}
       />
 
-      <div className="grid grid-cols-4 gap-4 h-full">
-        <div className="col-span-1">
-          <NodeToolbar onDragStart={onDragStart} />
-        </div>
+      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-4'} gap-4 h-full`}>
+        {isMobile ? (
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="mb-2">
+                <Menu className="h-4 w-4 mr-2" />
+                Node Palette
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[250px] sm:w-[350px]">
+              <div className="pt-6">
+                <NodeToolbar onDragStart={onDragStart} />
+              </div>
+            </SheetContent>
+          </Sheet>
+        ) : (
+          <div className="col-span-1">
+            <NodeToolbar onDragStart={onDragStart} />
+          </div>
+        )}
 
         <FlowCanvas
           nodes={nodes}
@@ -118,6 +159,7 @@ const ApiBuilderFlow = () => {
           setNodes={setNodes}
           collaborators={mockCollaborators}
           currentUserId={currentUser.id}
+          onSave={saveFlow}
         />
       </div>
     </div>

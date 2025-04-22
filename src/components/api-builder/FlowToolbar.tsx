@@ -9,13 +9,16 @@ import {
   ZoomOut, 
   Play, 
   RotateCcw, 
-  History
+  History,
+  AlertCircle
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { ApiFlow } from "@/lib/api-builder-types";
+import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface FlowToolbarProps {
   flow: ApiFlow;
@@ -26,6 +29,7 @@ export interface FlowToolbarProps {
   onZoomIn?: () => void;
   onZoomOut?: () => void;
   onReset?: () => void;
+  hasUnsavedChanges?: boolean;
 }
 
 export function FlowToolbar({ 
@@ -36,9 +40,11 @@ export function FlowToolbar({
   onNameChange,
   onZoomIn = () => {},
   onZoomOut = () => {},
-  onReset = () => {}
+  onReset = () => {},
+  hasUnsavedChanges = false
 }: FlowToolbarProps) {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [isPublishing, setIsPublishing] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -76,34 +82,48 @@ export function FlowToolbar({
         <Button variant="outline" size="sm" onClick={onSave}>
           <Save className="mr-2 h-4 w-4" />
           Save
+          {hasUnsavedChanges && (
+            <Badge variant="destructive" className="ml-2 h-2 w-2 p-0 rounded-full" />
+          )}
         </Button>
-        <Button variant="outline" size="sm" onClick={() => {}}>
-          <Share className="mr-2 h-4 w-4" />
-          Share
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => {}}>
-          <Download className="mr-2 h-4 w-4" />
-          Export
-        </Button>
+        
+        {!isMobile && (
+          <>
+            <Button variant="outline" size="sm" onClick={() => {}}>
+              <Share className="mr-2 h-4 w-4" />
+              Share
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => {}}>
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+          </>
+        )}
+        
         <Button variant="destructive" size="sm" onClick={onDelete}>
           <Trash className="mr-2 h-4 w-4" />
-          Delete
+          {isMobile ? "" : "Delete"}
         </Button>
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" onClick={onZoomIn}>
-          <ZoomIn className="h-4 w-4" />
-        </Button>
-        <Button variant="outline" size="sm" onClick={onZoomOut}>
-          <ZoomOut className="h-4 w-4" />
-        </Button>
-        <Button variant="outline" size="sm" onClick={onReset}>
-          <RotateCcw className="h-4 w-4" />
-        </Button>
-        <Button variant="outline" size="sm">
-          <History className="h-4 w-4" />
-        </Button>
+        {!isMobile && (
+          <>
+            <Button variant="outline" size="sm" onClick={onZoomIn}>
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={onZoomOut}>
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={onReset}>
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm">
+              <History className="h-4 w-4" />
+            </Button>
+          </>
+        )}
+        
         {flow.published ? (
           <Button variant="default" size="sm" className="bg-green-600">
             Published
@@ -118,6 +138,13 @@ export function FlowToolbar({
             <Play className="mr-2 h-4 w-4" />
             Publish
           </Button>
+        )}
+        
+        {hasUnsavedChanges && !isMobile && (
+          <span className="text-xs flex items-center text-amber-500">
+            <AlertCircle className="h-3 w-3 mr-1" />
+            Unsaved changes
+          </span>
         )}
       </div>
 
