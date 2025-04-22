@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { database } from "lucide-react";
+import { Database } from "lucide-react";
 
 export function PostgresConfigSection() {
   const { toast } = useToast();
@@ -28,7 +28,6 @@ export function PostgresConfigSection() {
     toast({
       title: "PostgreSQL config saved!",
       description: "Your settings have been stored locally.",
-      icon: <database className="h-5 w-5" />,
       duration: 2000,
     });
   };
@@ -41,14 +40,13 @@ export function PostgresConfigSection() {
         toast({
           title: "Connection successful!",
           description: `Connected to ${db} at ${host}:${port} as ${user}`,
-          icon: <database className="h-5 w-5 text-green-600" />,
+          variant: "default",
           duration: 2500,
         });
       } else {
         toast({
           title: "Connection failed",
           description: "Please fill in all fields to test connection.",
-          icon: <database className="h-5 w-5 text-red-600" />,
           variant: "destructive",
         });
       }
@@ -75,7 +73,7 @@ export function PostgresConfigSection() {
     <Card className="mb-6 border-2 border-primary/20 shadow-sm">
       <CardHeader>
         <div className="flex items-center gap-3">
-          <database className="h-5 w-5 text-primary" />
+          <Database className="h-5 w-5 text-primary" />
           <div>
             <CardTitle>Remote PostgreSQL Database</CardTitle>
             <CardDescription>
