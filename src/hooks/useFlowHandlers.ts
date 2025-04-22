@@ -1,8 +1,8 @@
-
 import { useCallback, useEffect } from 'react';
 import { Node, Connection, useReactFlow } from 'reactflow';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiNodeData } from '@/lib/api-builder-types';
+import { createNode } from '@/lib/api-builder/node-config-service';
 
 export function useFlowHandlers(
   reactFlowWrapper: React.RefObject<HTMLDivElement>,

@@ -17,7 +17,7 @@ export const nodeTypes: NodeTypes = {
 
 export const flowConfig = {
   snapToGrid: true,
-  snapGrid: [15, 15],
+  snapGrid: [15, 15] as [number, number], // Fixed type error by explicitly typing as tuple
   connectionLineType: ConnectionLineType.SmoothStep,
   proOptions: { hideAttribution: true },
   deleteKeyCode: "Delete",

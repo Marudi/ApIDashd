@@ -25,7 +25,7 @@ export function CacheNodeConfig({ data, onSave, onCancel }: CacheNodeConfigProps
     resolver: zodResolver(cacheConfigSchema),
     defaultValues: {
       label: data.label || "Cache",
-      ttl: data.ttl?.toString() || "300",
+      ttl: data.ttl || 300,
       keyTemplate: data.keyTemplate || "{{method}}-{{path}}"
     }
   });
