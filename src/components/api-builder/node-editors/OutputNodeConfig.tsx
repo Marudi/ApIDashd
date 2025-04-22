@@ -19,6 +19,8 @@ const formSchema = z.object({
   ).default([]),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 interface OutputNodeConfigProps {
   data: ApiNodeData;
   onSave: (data: ApiNodeData) => void;
@@ -26,7 +28,7 @@ interface OutputNodeConfigProps {
 }
 
 export function OutputNodeConfig({ data, onSave, onCancel }: OutputNodeConfigProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: data.name || "",
@@ -36,10 +38,19 @@ export function OutputNodeConfig({ data, onSave, onCancel }: OutputNodeConfigPro
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: FormValues) => {
+    // Ensure all headers have non-empty key and value before saving
+    const validHeaders = values.headers
+      .filter(header => header.key.trim() !== "" && header.value.trim() !== "")
+      .map(header => ({
+        key: header.key.trim(),
+        value: header.value.trim()
+      }));
+      
     onSave({
       ...data,
       ...values,
+      headers: validHeaders,
     });
   };
 
@@ -120,6 +131,7 @@ export function OutputNodeConfig({ data, onSave, onCancel }: OutputNodeConfigPro
                   headers[index] = { ...headers[index], key: e.target.value };
                   form.setValue("headers", headers);
                 }}
+                className={header.key === "" ? "border-destructive" : ""}
               />
               <Input
                 placeholder="Header value"
@@ -129,6 +141,7 @@ export function OutputNodeConfig({ data, onSave, onCancel }: OutputNodeConfigPro
                   headers[index] = { ...headers[index], value: e.target.value };
                   form.setValue("headers", headers);
                 }}
+                className={header.value === "" ? "border-destructive" : ""}
               />
               <Button 
                 type="button" 
