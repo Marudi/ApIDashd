@@ -1,4 +1,3 @@
-
 import { Node, Edge } from 'reactflow';
 
 // API Builder Types
@@ -9,19 +8,36 @@ export interface ApiNodeData {
   method?: string;
   path?: string;
   url?: string;
-  authType?: string;
-  transformType?: string;
+  authType?: 'none' | 'basic' | 'jwt' | 'apikey' | 'oauth2';
+  authConfig?: {
+    apiKeyName?: string;
+    apiKeyLocation?: 'header' | 'query';
+    username?: string;
+    password?: string;
+    jwtSecret?: string;
+  };
+  transformType?: 'json' | 'xml' | 'text' | 'custom';
   transformScript?: string;
   rate?: number;
   per?: number;
   ttl?: number;
   keyTemplate?: string;
-  responseCode?: number;
-  responseBody?: string;
-  validationType?: string;
+  validationType?: 'json-schema' | 'regex' | 'custom';
   schema?: string;
-  statusCode?: number;
+  pattern?: string;
+  mockResponse?: {
+    statusCode: number;
+    headers?: Record<string, string>;
+    body: string;
+  };
+  cacheConfig?: {
+    ttl: number;
+    keyTemplate: string;
+    allowStale?: boolean;
+    staleTimeout?: number;
+  };
   headers?: Array<{ key: string; value: string }>;
+  statusCode?: number;
   [key: string]: any;
 }
 

@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { InputNodeConfig } from "./InputNodeConfig";
 import { EndpointNodeConfig } from "./EndpointNodeConfig";
 import { TransformNodeConfig } from "./TransformNodeConfig";
+import { AuthNodeConfig } from "./AuthNodeConfig";
 import { ApiNodeData, ApiNodeType } from "@/lib/api-builder-types";
 
 interface NodeConfigDialogProps {
@@ -14,11 +15,11 @@ interface NodeConfigDialogProps {
 }
 
 export function NodeConfigDialog({ isOpen, onClose, nodeType, nodeData, onSave }: NodeConfigDialogProps) {
-  // Map node types to their configuration components
   const configComponents = {
     input: InputNodeConfig,
     endpoint: EndpointNodeConfig,
     transform: TransformNodeConfig,
+    auth: AuthNodeConfig,
   };
 
   const ConfigComponent = configComponents[nodeType as keyof typeof configComponents];
