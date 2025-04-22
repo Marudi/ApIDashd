@@ -13,6 +13,27 @@ A modern, extensible dashboard to manage API Gateways (currently supports both T
 - **Policy & Key Management:** manage API keys, policies, consumers
 - **Modern UI:** responsive, fast, built with React, TypeScript, Tailwind, and shadcn/ui components
 
+## 📸 Screenshots
+
+Get a visual overview of the Lovable Dashboard:
+
+### Main Dashboard & Analytics
+
+![Main Dashboard and Analytics](https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=900&q=80)
+*The main dashboard provides quick access to analytics, gateway health, and API activity trends.*
+
+### API Builder (Visual Flow)
+
+![API Builder Visual Editor](https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=900&q=80)
+*The visual API builder lets you design, edit, and connect endpoints or logic with ease.*
+
+### API Key Management/Policy Editor
+
+![API Key Management Interface](https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=900&q=80)
+*API Key management: Easily generate, revoke, or search for keys and assign policies.*
+
+> **Tip:** Want to contribute? [Submit your own screenshots via a pull request!](#contributing)
+
 ## 📦 Requirements
 
 - **Node.js** (>= 18.x)
