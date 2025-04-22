@@ -11,8 +11,8 @@ import { ApiNodeData } from "@/lib/api-builder-types";
 const mockNodeSchema = z.object({
   label: z.string().min(1, "Label is required"),
   mockResponse: z.object({
-    statusCode: z.number().min(100).max(599),
-    body: z.string(),
+    statusCode: z.coerce.number().min(100).max(599),
+    body: z.string().min(1, "Response body is required"),
     headers: z.record(z.string()).optional(),
   }),
 });
