@@ -1,4 +1,3 @@
-
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Save } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { PostgresConfigSection } from "./PostgresConfigSection";
 import { usePersistentStorage } from "@/hooks/usePersistentStorage";
+import { StorageUsageCard } from "./StorageUsageCard";
 
 export function GeneralSettingsSection() {
   const {
@@ -18,6 +18,9 @@ export function GeneralSettingsSection() {
   return (
     <>
       <PostgresConfigSection />
+      <div className="my-6">
+        <StorageUsageCard />
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>General Settings</CardTitle>
