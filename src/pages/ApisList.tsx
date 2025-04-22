@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Plus, Search, Server, Network } from "lucide-react";
@@ -11,21 +10,47 @@ import { kongApis } from "@/lib/mock-apis";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useNavigate } from "react-router-dom";
 import ApiTableRow from "@/components/apis/ApiTableRow";
+import ApiExportImport from "@/components/apis/ApiExportImport";
 
 const ApisList = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [tykApiData, setTykApiData] = useState(mockApis);
+  const [kongApiData, setKongApiData] = useState(kongApis);
+
   const navigate = useNavigate();
 
   // Filter APIs based on search term
-  const filteredApis = mockApis.filter(api =>
+  const filteredApis = tykApiData.filter(api =>
     api.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     api.listenPath.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredKongApis = kongApis.filter(api =>
+  const filteredKongApis = kongApiData.filter(api =>
     api.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     api.listenPath.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Handle import for active tab (for simplicity we import to both)
+  const handleImport = (importedApis: any[]) => {
+    // Detect by protocol to split Tyk/Kong APIs (simple mock logic)
+    const tyk = importedApis.filter(api => api.protocol && (api.protocol === "http" || api.protocol === "https"));
+    const kong = importedApis.filter(api => api.protocol && (api.protocol === "grpc" || api.protocol === "grpcs" || api.protocol === "tcp" || api.protocol === "tls" || api.protocol === "udp"));
+    // For this mock, merge/override by id
+    setTykApiData((prev) => {
+      const ids = new Set(tyk.map(api => api.id));
+      return [
+        ...prev.filter(api => !ids.has(api.id)),
+        ...tyk,
+      ];
+    });
+    setKongApiData((prev) => {
+      const ids = new Set(kong.map(api => api.id));
+      return [
+        ...prev.filter(api => !ids.has(api.id)),
+        ...kong,
+      ];
+    });
+  };
 
   return (
     <DashboardLayout>
@@ -54,6 +79,8 @@ const ApisList = () => {
           </Button>
         </div>
       </div>
+
+      <ApiExportImport apis={[...tykApiData, ...kongApiData]} onImport={handleImport} />
 
       <Tabs defaultValue="tyk">
         <TabsList className="mb-4">
