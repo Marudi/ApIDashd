@@ -1,73 +1,133 @@
-# Welcome to your Lovable project
 
-## Project info
+# Lovable API Gateway Dashboard
 
-**URL**: https://lovable.dev/projects/e910d3f0-17b5-40c2-b001-ea3bbbbac8cf
+A modern, extensible dashboard to manage API Gateways (currently supports both Tyk and Kong) with full-featured UI for security, analytics, version control, and more.
 
-## How can I edit this code?
+## ⭐ Features
 
-There are several ways of editing your application.
+- **Dashboard** with real-time analytics, gateway health, request & error charts
+- **API Management:** create, update, delete API endpoints for multiple gateway types
+- **Version Control:** versioned API deployments, path management, rollbacks, and deployment options
+- **Security:** configure authentication, rate limiting, quotas, CORS, and advanced headers per API
+- **Logs:** detailed request, error, and event logging with filtering
+- **Policy & Key Management:** manage API keys, policies, consumers
+- **Modern UI:** responsive, fast, built with React, TypeScript, Tailwind, and shadcn/ui components
 
-**Use Lovable**
+## 📦 Requirements
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e910d3f0-17b5-40c2-b001-ea3bbbbac8cf) and start prompting.
+- **Node.js** (>= 18.x)
+- **npm** (>= 9.x)
+- (Recommended) **Git** for version control
+- **Vite** (comes preconfigured; no manual install required)
+- **Modern browser** for development/preview
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Getting Started
 
-**Use your preferred IDE**
+### 1. Clone the repository
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```bash
+git clone <YOUR_REPO_URL>
+cd <YOUR_PROJECT_DIRECTORY>
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 2. Install dependencies
 
-Follow these steps:
+```bash
+npm install
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 3. Run the development server
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Visit [http://localhost:8080](http://localhost:8080) in your browser.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### 4. Build for production
 
-**Use GitHub Codespaces**
+```bash
+npm run build
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The static files will be output in the `dist/` directory.
 
-## What technologies are used for this project?
+## 🌐 Deployment
 
-This project is built with:
+You can deploy the application in a few ways:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### 1. Deploy with Lovable Hosting
 
-## How can I deploy this project?
+- Open [Lovable project page](https://lovable.dev/projects/e910d3f0-17b5-40c2-b001-ea3bbbbac8cf)
+- Click "Share" > "Publish" to deploy/update your hosted app
+- [Optionally] Connect a [custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
 
-Simply open [Lovable](https://lovable.dev/projects/e910d3f0-17b5-40c2-b001-ea3bbbbac8cf) and click on Share -> Publish.
+### 2. Deploy on Vercel, Netlify, or any static host
 
-## Can I connect a custom domain to my Lovable project?
+- Build the app: `npm run build`
+- Deploy the `dist/` directory as a static site
 
-Yes, you can!
+### 3. Self-hosting
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- Use any web server (e.g., nginx, Apache, Caddy) to serve the contents of the `dist/` folder.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+> **Note:** For backend/API functionality (e.g., storing data, authentication), connect to Supabase or your own backend server. See [Supabase integration guide](https://docs.lovable.dev/integrations/supabase/).
+
+## 🛠️ Local Development
+
+- Modify components, pages, or logic under the `src/` folder
+- UI components use [shadcn/ui](https://ui.shadcn.com/) and [Tailwind CSS](https://tailwindcss.com/)
+- TypeScript for type safety
+
+## 📝 To-Do and Planned Features
+
+- [ ] Live synchronisation with real Tyk/Kong gateways (add config in settings)
+- [ ] User authentication and permissions (multi-user, admin, read-only)
+- [ ] Persistent API & key data via Supabase/postgres integration
+- [ ] Improved policy editor with UI-driven rules management
+- [ ] Export/Import API definitions (JSON/YAML)
+- [ ] Webhook and notification integration (e.g., Slack alerts on errors)
+- [ ] Better mobile/tablet UI (responsive optimizations)
+- [ ] Accessibility improvements
+
+## 🌱 Enhancements & Community Ideas
+
+- Suggest integrations with other API gateways (e.g., AWS API Gateway, Apigee)
+- Add advanced search/filtering on analytics and logs
+- Dashboard widgets/plugins system (allow custom panels)
+- GitOps integration for deployment & API versioning
+- i18n and localization support
+
+## 🤝 Contributing
+
+1. Fork this repo and create a new branch for your feature or fix
+2. Follow the project structure and style conventions
+3. Run `npm run dev` to test locally
+4. Open a PR describing your changes
+5. Contributions, feature requests, and bug reports are welcome!
+
+## 🙏 Acknowledgements
+
+Lovable is built with:
+- [Vite](https://vitejs.dev/)
+- [React](https://react.dev/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Lucide](https://lucide.dev/) icons
+- [Supabase](https://supabase.com/) optional
+
+## 📄 License
+
+MIT License (see [`LICENSE`](LICENSE) file if present).
+
+## 📚 Further Documentation
+
+- [Lovable Documentation](https://docs.lovable.dev/)
+- [Supabase Integration](https://docs.lovable.dev/integrations/supabase/)
+- [shadcn/ui](https://ui.shadcn.com/docs)
+- [Vite](https://vitejs.dev/guide/)
+
+---
+
+_This is an open source community dashboard project. See the issues tab or To-Do section above for ways to get involved!_
+
