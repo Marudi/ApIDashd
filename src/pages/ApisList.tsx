@@ -33,6 +33,7 @@ const ApisList = () => {
       active: true,
       authType: "jwt",
       lastUpdated: "2025-03-15T10:30:00Z",
+      createdAt: "2025-01-15T10:30:00Z",
     },
     {
       id: "k2",
@@ -43,6 +44,7 @@ const ApisList = () => {
       active: true,
       authType: "key-auth",
       lastUpdated: "2025-03-14T15:45:00Z",
+      createdAt: "2025-01-14T15:45:00Z",
     },
     {
       id: "k3",
@@ -53,6 +55,7 @@ const ApisList = () => {
       active: true,
       authType: "oauth2",
       lastUpdated: "2025-03-10T09:20:00Z",
+      createdAt: "2025-01-10T09:20:00Z",
     },
     {
       id: "k4",
@@ -63,6 +66,7 @@ const ApisList = () => {
       active: false,
       authType: "none",
       lastUpdated: "2025-02-28T11:15:00Z",
+      createdAt: "2025-01-28T11:15:00Z",
     }
   ];
 

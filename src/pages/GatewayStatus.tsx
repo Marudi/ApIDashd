@@ -1,4 +1,3 @@
-
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusCard } from "@/components/dashboard/StatusCard";
@@ -11,7 +10,6 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const GatewayStatus = () => {
-  // Format uptime from seconds to days, hours, minutes
   const formatUptime = (seconds: number) => {
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
@@ -262,7 +260,7 @@ const GatewayStatus = () => {
               title="Active Nodes"
               value="3"
               icon={<Server className="h-4 w-4 text-muted-foreground" />}
-              variant="success"
+              variant="default"
             />
           </div>
 
@@ -329,7 +327,7 @@ const GatewayStatus = () => {
                         <h4 className="font-medium">{plugin.name}</h4>
                         <p className="text-xs text-muted-foreground">Scope: {plugin.scope}</p>
                       </div>
-                      <Badge variant={plugin.status === "active" ? "success" : "outline"}>
+                      <Badge variant={plugin.status === "active" ? "default" : "outline"}>
                         {plugin.status}
                       </Badge>
                     </div>

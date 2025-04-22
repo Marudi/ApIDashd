@@ -92,7 +92,7 @@ const KongGatewayStatus = () => {
           title="Database Status"
           value={mockKongHealth.databaseStatus}
           icon={<Database className="h-4 w-4 text-muted-foreground" />}
-          variant={mockKongHealth.databaseStatus === "connected" ? "success" : "error"}
+          variant={mockKongHealth.databaseStatus === "connected" ? "default" : "destructive"}
         />
       </div>
 
@@ -171,7 +171,7 @@ const KongGatewayStatus = () => {
                       <h4 className="font-medium">{plugin.name}</h4>
                       <p className="text-xs text-muted-foreground">Scope: {plugin.scope}</p>
                     </div>
-                    <Badge variant={plugin.status === "active" ? "success" : "outline"}>
+                    <Badge variant={plugin.status === "active" ? "default" : "outline"}>
                       {plugin.status}
                     </Badge>
                   </div>
@@ -199,7 +199,7 @@ const KongGatewayStatus = () => {
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-medium">{service.name}</h3>
                       <Badge 
-                        variant={service.success > 99 ? "success" : service.success > 95 ? "default" : "destructive"}
+                        variant={service.success > 99 ? "default" : service.success > 95 ? "secondary" : "destructive"}
                       >
                         {service.success}% success
                       </Badge>
