@@ -1,8 +1,9 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -16,16 +17,10 @@ import KongGatewayStatus from "./pages/KongGatewayStatus";
 import Settings from "./pages/Settings";
 import ApiBuilder from "./pages/ApiBuilder";
 import { gatewaySyncService } from "./services/gatewaySyncService";
-import { Login } from '@/components/auth/Login';
-import { Dashboard } from '@/components/dashboard/Dashboard';
-import { AuthService } from '@/lib/services/auth';
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  const authService = AuthService.getInstance();
-  const isAuthenticated = authService.isAuthenticated();
-
   // Initialize gateway sync service
   useEffect(() => {
     // Access the service to ensure it's initialized
@@ -43,14 +38,9 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <Router>
+        <BrowserRouter>
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/dashboard"
-              element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-            />
-            <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route path="/" element={<Index />} />
             <Route path="/apis" element={<ApisList />} />
             <Route path="/apis/:id" element={<ApiDetail />} />
             <Route path="/analytics" element={<Analytics />} />
@@ -63,7 +53,7 @@ const App = () => {
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </Router>
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );
