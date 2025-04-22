@@ -14,17 +14,30 @@ import { DatabaseSettings } from "@/components/settings/DatabaseSettings";
 const Settings = () => {
   return (
     <DashboardLayout>
-      <div className="mb-6">
+      <div className="container mx-auto py-6">
+        <h1 className="text-3xl font-bold mb-6">Settings</h1>
         <Tabs defaultValue="general" className="w-full">
-          <TabsList>
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="gateway">Gateway</TabsTrigger>
-            <TabsTrigger value="sync" className="flex items-center">
-              <SettingsIcon className="mr-2 h-4 w-4" />
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="general" className="flex items-center gap-2">
+              <SettingsIcon className="h-4 w-4" />
+              General
+            </TabsTrigger>
+            <TabsTrigger value="security" className="flex items-center gap-2">
+              <Lock className="h-4 w-4" />
+              Security
+            </TabsTrigger>
+            <TabsTrigger value="gateway" className="flex items-center gap-2">
+              <Server className="h-4 w-4" />
+              Gateway
+            </TabsTrigger>
+            <TabsTrigger value="sync" className="flex items-center gap-2">
+              <RefreshCw className="h-4 w-4" />
               Live Sync
             </TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-2">
+              <MailCheck className="h-4 w-4" />
+              Notifications
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="general" className="mt-6">
@@ -89,7 +102,18 @@ const Settings = () => {
                 </CardContent>
               </Card>
 
-              <DatabaseSettings />
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Database className="h-5 w-5" />
+                    Database Settings
+                  </CardTitle>
+                  <CardDescription>Configure your PostgreSQL database connection</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <DatabaseSettings />
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
           

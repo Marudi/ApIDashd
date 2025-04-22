@@ -1,4 +1,4 @@
-# A Tyk Mirror Dashboard
+# Tyk Mirror Dashboard
 
 A modern, feature-rich dashboard for managing and monitoring Tyk API Gateway instances. Built with React, TypeScript, and a robust backend architecture.
 
