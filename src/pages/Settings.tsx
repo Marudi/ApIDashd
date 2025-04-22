@@ -1,4 +1,3 @@
-
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,9 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { Clock, Database, Globe, Lock, MailCheck, RefreshCw, Save, Server, Shield, User } from "lucide-react";
-import { mockSystemHealth } from "@/lib/mock-data";
+import { Clock, Database, Globe, Lock, MailCheck, RefreshCw, Save, Server, Shield, User, Sync } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { GatewaySync } from "@/components/settings/GatewaySync";
 
 const Settings = () => {
   return (
@@ -19,6 +18,10 @@ const Settings = () => {
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="gateway">Gateway</TabsTrigger>
+            <TabsTrigger value="sync" className="flex items-center">
+              <Sync className="mr-2 h-4 w-4" />
+              Live Sync
+            </TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
           </TabsList>
           
@@ -251,6 +254,13 @@ const Settings = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="sync" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <GatewaySync type="tyk" />
+              <GatewaySync type="kong" />
+            </div>
           </TabsContent>
           
           <TabsContent value="notifications" className="mt-6">

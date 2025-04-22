@@ -7,6 +7,7 @@ import { mockSystemHealth } from "@/lib/mock-data";
 import { Link } from "react-router-dom";
 import { TykGatewayTab } from "@/components/gateway/TykGatewayTab";
 import { KongGatewayTab } from "@/components/gateway/KongGatewayTab";
+import { SyncStatusIndicator } from "@/components/gateway/SyncStatus";
 
 const GatewayStatus = () => {
   const formatUptime = (seconds: number) => {
@@ -46,10 +47,16 @@ const GatewayStatus = () => {
           <TabsTrigger value="tyk" className="flex items-center">
             <Server className="mr-2 h-4 w-4" />
             Tyk Gateway Status
+            <div className="ml-2">
+              <SyncStatusIndicator type="tyk" />
+            </div>
           </TabsTrigger>
           <TabsTrigger value="kong" className="flex items-center">
             <Network className="mr-2 h-4 w-4" />
             Kong Gateway Status
+            <div className="ml-2">
+              <SyncStatusIndicator type="kong" />
+            </div>
           </TabsTrigger>
         </TabsList>
 
