@@ -11,6 +11,7 @@ import Analytics from "./pages/Analytics";
 import Policies from "./pages/Policies";
 import ApiKeys from "./pages/ApiKeys";
 import GatewayStatus from "./pages/GatewayStatus";
+import KongGatewayStatus from "./pages/KongGatewayStatus";
 import Settings from "./pages/Settings";
 import ApiBuilder from "./pages/ApiBuilder";
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/policies" element={<Policies />} />
           <Route path="/keys" element={<ApiKeys />} />
           <Route path="/gateway" element={<GatewayStatus />} />
+          <Route path="/kong-gateway" element={<KongGatewayStatus />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/api-builder" element={<ApiBuilder />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
