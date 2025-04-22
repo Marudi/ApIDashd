@@ -1,4 +1,3 @@
-
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusCard } from "@/components/dashboard/StatusCard";
@@ -92,7 +91,7 @@ const KongGatewayStatus = () => {
           title="Database Status"
           value={mockKongHealth.databaseStatus}
           icon={<Database className="h-4 w-4 text-muted-foreground" />}
-          variant={mockKongHealth.databaseStatus === "connected" ? "default" : "destructive"}
+          variant={mockKongHealth.databaseStatus === "connected" ? "default" : "warning"}
         />
       </div>
 

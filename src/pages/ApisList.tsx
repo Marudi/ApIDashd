@@ -22,7 +22,7 @@ const ApisList = () => {
     api.listenPath.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Mock Kong APIs
+  // Mock Kong APIs - Fixed authType to match ApiDefinition
   const kongApis = [
     {
       id: "k1",
@@ -31,7 +31,7 @@ const ApisList = () => {
       targetUrl: "http://user-service:8080",
       protocol: "http",
       active: true,
-      authType: "jwt",
+      authType: "jwt" as const, // Type assertion to match ApiDefinition
       lastUpdated: "2025-03-15T10:30:00Z",
       createdAt: "2025-01-15T10:30:00Z",
     },
@@ -42,7 +42,7 @@ const ApisList = () => {
       targetUrl: "http://product-service:8081",
       protocol: "http",
       active: true,
-      authType: "key-auth",
+      authType: "token" as const, // Changed from key-auth to token to match ApiDefinition
       lastUpdated: "2025-03-14T15:45:00Z",
       createdAt: "2025-01-14T15:45:00Z",
     },
@@ -53,7 +53,7 @@ const ApisList = () => {
       targetUrl: "http://payment-service:8082",
       protocol: "https",
       active: true,
-      authType: "oauth2",
+      authType: "oauth" as const, // Changed from oauth2 to oauth to match ApiDefinition
       lastUpdated: "2025-03-10T09:20:00Z",
       createdAt: "2025-01-10T09:20:00Z",
     },
@@ -64,7 +64,7 @@ const ApisList = () => {
       targetUrl: "http://analytics-service:8083",
       protocol: "http",
       active: false,
-      authType: "none",
+      authType: "none" as const, // Type assertion to match ApiDefinition
       lastUpdated: "2025-02-28T11:15:00Z",
       createdAt: "2025-01-28T11:15:00Z",
     }
