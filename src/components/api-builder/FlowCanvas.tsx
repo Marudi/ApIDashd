@@ -2,23 +2,22 @@ import { useCallback, useRef, useEffect } from 'react';
 import ReactFlow, { 
   Background, 
   BackgroundVariant,
-  Controls, 
-  Panel, 
   useReactFlow, 
   Node, 
   Edge, 
   Connection, 
   NodeTypes,
   ConnectionLineType,
-  ControlButton,
 } from 'reactflow';
 import { ApiNodeData } from '@/lib/api-builder-types';
 import { createNode } from '@/lib/api-builder-utils';
 import { ActiveCollaborator } from '@/lib/api-builder-types';
 import { ApiBuilderNode } from '@/components/api-builder/ApiBuilderNode';
-import { Download, Save, ZoomIn, ZoomOut } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
+import { FlowControls } from './flow-controls/FlowControls';
+import { InstructionsPanel } from './flow-panels/InstructionsPanel';
+import { CollaboratorsPanel } from './flow-panels/CollaboratorsPanel';
 
 interface FlowCanvasProps {
   nodes: Node<ApiNodeData>[];
@@ -153,55 +152,12 @@ export function FlowCanvas({
           size={1} 
           variant={BackgroundVariant.Dots}
         />
-        <Controls showInteractive={false}>
-          <ControlButton onClick={handleSave} title="Save Flow">
-            <Save className="h-4 w-4" />
-          </ControlButton>
-          <ControlButton onClick={handleExport} title="Export Flow">
-            <Download className="h-4 w-4" />
-          </ControlButton>
-        </Controls>
-        
-        <Panel position="top-left" className="bg-background/80 p-2 rounded-md backdrop-blur-sm">
-          {isMobile ? (
-            <div className="text-xs text-muted-foreground">
-              Drag nodes from sidebar to build your API
-            </div>
-          ) : (
-            <div className="text-xs text-muted-foreground">
-              Drag nodes onto the canvas • Use Ctrl/Cmd+S to save
-            </div>
-          )}
-        </Panel>
-        
-        <Panel position="top-right">
-          {collaborators
-            .filter(user => user.id !== currentUserId && user.cursorPosition)
-            .map(user => (
-              <div
-                key={user.id}
-                className="absolute pointer-events-none"
-                style={{
-                  left: user.cursorPosition?.x,
-                  top: user.cursorPosition?.y,
-                  zIndex: 10,
-                }}
-              >
-                <div className="flex flex-col items-start">
-                  <div 
-                    className="h-5 w-5 transform rotate-45"
-                    style={{ backgroundColor: user.color }}
-                  />
-                  <span 
-                    className="text-xs px-1 rounded text-white -mt-1"
-                    style={{ backgroundColor: user.color }}
-                  >
-                    {user.name}
-                  </span>
-                </div>
-              </div>
-            ))}
-        </Panel>
+        <FlowControls onSave={handleSave} onExport={handleExport} />
+        <InstructionsPanel isMobile={isMobile} />
+        <CollaboratorsPanel 
+          collaborators={collaborators}
+          currentUserId={currentUserId}
+        />
       </ReactFlow>
     </div>
   );
