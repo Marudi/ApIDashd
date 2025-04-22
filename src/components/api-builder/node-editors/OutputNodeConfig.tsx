@@ -114,8 +114,8 @@ export function OutputNodeConfig({ data, onSave, onCancel }: OutputNodeConfigPro
                 placeholder="Header name"
                 value={header.key}
                 onChange={(e) => {
-                  const headers = form.getValues("headers");
-                  headers[index].key = e.target.value;
+                  const headers = [...form.getValues("headers")];
+                  headers[index] = { ...headers[index], key: e.target.value };
                   form.setValue("headers", headers);
                 }}
               />
@@ -123,8 +123,8 @@ export function OutputNodeConfig({ data, onSave, onCancel }: OutputNodeConfigPro
                 placeholder="Header value"
                 value={header.value}
                 onChange={(e) => {
-                  const headers = form.getValues("headers");
-                  headers[index].value = e.target.value;
+                  const headers = [...form.getValues("headers")];
+                  headers[index] = { ...headers[index], value: e.target.value };
                   form.setValue("headers", headers);
                 }}
               />
