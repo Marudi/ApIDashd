@@ -1,4 +1,3 @@
-
 import { ReactFlowProvider } from 'reactflow';
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ApiBuilderNode } from "@/components/api-builder/ApiBuilderNode";
@@ -7,7 +6,7 @@ import { FlowToolbar } from "@/components/api-builder/FlowToolbar";
 import { CollaboratorsList } from "@/components/api-builder/CollaboratorsList";
 import { FlowCanvas } from "@/components/api-builder/FlowCanvas";
 import { useApiFlow } from "@/hooks/useApiFlow";
-import { getRandomColor } from "@/lib/api-builder-utils";
+import { getRandomColor } from '@/lib/api-builder/collaboration-utils';
 import { useCallback, useEffect, useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';

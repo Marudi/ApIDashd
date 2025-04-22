@@ -1,6 +1,5 @@
 
-import { XYPosition } from 'reactflow';
-import { ApiFlow, ApiNode, ApiEdge, ApiNodeTypeConfig, ApiNodeType, ApiNodeData } from './api-builder-types';
+import { ApiNodeType, ApiNodeTypeConfig } from '../api-builder-types';
 
 // Node type configurations with their default properties
 export const nodeTypes: Record<ApiNodeType, ApiNodeTypeConfig> = {
@@ -122,92 +121,4 @@ export const nodeTypes: Record<ApiNodeType, ApiNodeTypeConfig> = {
       headers: [],
     }
   },
-};
-
-// Generate a random color for user collaboration
-export const getRandomColor = () => {
-  const colors = [
-    '#ef4444', '#f97316', '#f59e0b', '#16a34a', 
-    '#0ea5e9', '#8b5cf6', '#c026d3', '#ec4899'
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
-};
-
-// Generate a unique ID for nodes and edges
-export const generateId = () => {
-  return Math.random().toString(36).substr(2, 9);
-};
-
-// Create a new node with default properties
-export const createNode = (
-  type: ApiNodeType, 
-  position: XYPosition,
-  label?: string
-): ApiNode => {
-  const nodeType = nodeTypes[type];
-  return {
-    id: generateId(),
-    type,
-    position,
-    data: {
-      ...nodeType.defaultData,
-      label: label || nodeType.defaultData.label || nodeType.label,
-    }
-  };
-};
-
-// Check if a connection between nodes is valid
-export const isValidConnection = (sourceType: string, targetType: string) => {
-  // Check if both types are valid ApiNodeTypes before proceeding
-  if (!nodeTypes[sourceType as ApiNodeType] || !nodeTypes[targetType as ApiNodeType]) {
-    return false;
-  }
-  
-  const sourceNodeType = nodeTypes[sourceType as ApiNodeType];
-  return sourceNodeType.allowedConnections.includes(targetType as ApiNodeType);
-};
-
-// Convert an API flow to a Tyk API definition
-export const convertFlowToApiDefinition = (flow: ApiFlow) => {
-  // This would implement the logic to convert the visual flow to a Tyk API definition
-  // For now, we're returning a placeholder structure
-  return {
-    id: flow.id,
-    name: flow.name,
-    listenPath: flow.nodes.find(node => node.type === 'input')?.data.path || '/api/v1',
-    targetUrl: flow.nodes.find(node => node.type === 'endpoint')?.data.url || 'https://api.example.com',
-    protocol: 'http',
-    active: false,
-    authType: flow.nodes.find(node => node.type === 'auth')?.data.authType || 'none',
-    rateLimit: flow.nodes.find(node => node.type === 'ratelimit')?.data ? {
-      rate: flow.nodes.find(node => node.type === 'ratelimit')?.data.rate || 100,
-      per: flow.nodes.find(node => node.type === 'ratelimit')?.data.per || 60,
-      enabled: true,
-    } : undefined,
-    lastUpdated: new Date().toISOString(),
-    createdAt: flow.createdAt,
-  };
-};
-
-// Create an empty API flow template
-export const createEmptyFlow = (userId: string, name = 'New API Flow'): ApiFlow => {
-  const now = new Date().toISOString();
-  const startNode = createNode('input', { x: 250, y: 100 });
-  const endNode = createNode('output', { x: 250, y: 300 });
-
-  return {
-    id: generateId(),
-    name,
-    nodes: [startNode, endNode],
-    edges: [{
-      id: generateId(),
-      source: startNode.id,
-      target: endNode.id,
-      animated: true,
-    }],
-    createdBy: userId,
-    createdAt: now,
-    lastUpdated: now,
-    published: false,
-  };
 };
