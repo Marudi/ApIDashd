@@ -15,10 +15,12 @@ import { createNode } from '@/lib/api-builder/node-utils';
 import { ActiveCollaborator } from '@/lib/api-builder-types';
 import { ApiBuilderNode } from '@/components/api-builder/ApiBuilderNode';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { FlowControls } from './flow-controls/FlowControls';
 import { InstructionsPanel } from './flow-panels/InstructionsPanel';
 import { CollaboratorsPanel } from './flow-panels/CollaboratorsPanel';
+import { NodeConfigDialog } from './node-editors/NodeConfigDialog';
+import { useNodeConfig } from '@/hooks/useNodeConfig';
 
 interface FlowCanvasProps {
   nodes: Node<ApiNodeData>[];
@@ -58,6 +60,14 @@ export function FlowCanvas({
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useReactFlow();
   const isMobile = useIsMobile();
+  const { toast } = useToast();
+  const { 
+    selectedNode, 
+    isConfigOpen, 
+    openNodeConfig, 
+    closeNodeConfig, 
+    handleSaveNodeConfig 
+  } = useNodeConfig();
 
   useEffect(() => {
     const handleResize = () => {
@@ -85,7 +95,8 @@ export function FlowCanvas({
         return;
       }
 
-      const position = reactFlowInstance.project({
+      // Use screenToFlowPosition instead of deprecated project method
+      const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
@@ -98,7 +109,7 @@ export function FlowCanvas({
         description: `Added new ${type} node to your flow`,
       });
     },
-    [reactFlowInstance, setNodes]
+    [reactFlowInstance, setNodes, toast]
   );
 
   const handleSave = useCallback(() => {
@@ -126,7 +137,16 @@ export function FlowCanvas({
         description: 'Your API flow has been exported as JSON',
       });
     }
-  }, [reactFlowInstance]);
+  }, [reactFlowInstance, toast]);
+
+  // Node click handler to open configuration
+  const onNodeClick = useCallback((_: React.MouseEvent, node: Node<ApiNodeData>) => {
+    openNodeConfig(node);
+  }, [openNodeConfig]);
+
+  const handleSaveNodeData = useCallback((updatedData: ApiNodeData) => {
+    handleSaveNodeConfig(updatedData, nodes, setNodes);
+  }, [handleSaveNodeConfig, nodes, setNodes]);
 
   return (
     <div className="col-span-3 h-full border rounded-md bg-accent/5 relative" ref={reactFlowWrapper}>
@@ -138,6 +158,7 @@ export function FlowCanvas({
         onConnect={onConnect}
         onDrop={onDrop}
         onDragOver={onDragOver}
+        onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         fitView
         snapToGrid
@@ -160,6 +181,16 @@ export function FlowCanvas({
           currentUserId={currentUserId}
         />
       </ReactFlow>
+
+      {selectedNode && (
+        <NodeConfigDialog
+          isOpen={isConfigOpen}
+          onClose={closeNodeConfig}
+          nodeType={selectedNode.type as any}
+          nodeData={selectedNode.data}
+          onSave={handleSaveNodeData}
+        />
+      )}
     </div>
   );
 }

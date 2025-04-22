@@ -1,189 +1,137 @@
 
-import { useState } from "react";
-import { Handle, Position, NodeProps } from "reactflow";
-import { Check, Code, Database, Play, Repeat, Server, Shield, Timer, Copy, Trash, Settings } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { nodeTypes } from "@/lib/api-builder/node-types";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ApiNodeData, ApiNodeType } from "@/lib/api-builder-types";
-import { useToast } from "@/components/ui/use-toast";
-import { useApiNode } from "@/hooks/useApiNode";
-import { NodeConfigDialog } from "./node-editors/NodeConfigDialog";
+import { memo } from 'react';
+import { Handle, Position } from 'reactflow';
+import { ApiNodeData, ApiNodeType } from '@/lib/api-builder-types';
+import { 
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuSeparator 
+} from "@/components/ui/context-menu";
+import { Copy, Trash, Settings } from 'lucide-react';
+import { SettingsButton } from './node-controls/SettingsButton';
+import { useNodeConfig } from '@/hooks/useNodeConfig';
 
-export function ApiBuilderNode({ data, selected, isConnectable, type, id }: NodeProps<ApiNodeData>) {
-  const nodeType = type as string;
-  const nodeConfig = nodeTypes[nodeType as ApiNodeType] || nodeTypes['input'];
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const { toast } = useToast();
-  const { duplicateNode, deleteNode, updateNodeData } = useApiNode();
+interface ApiBuilderNodeProps {
+  id: string;
+  type: ApiNodeType;
+  data: ApiNodeData;
+  selected: boolean;
+}
 
-  const getNodeIcon = () => {
-    switch (nodeType) {
-      case 'input':
-        return <Play className="h-4 w-4" />;
-      case 'endpoint':
-        return <Server className="h-4 w-4" />;
-      case 'transform':
-        return <Repeat className="h-4 w-4" />;
-      case 'auth':
-        return <Shield className="h-4 w-4" />;
-      case 'ratelimit':
-        return <Timer className="h-4 w-4" />;
-      case 'cache':
-        return <Database className="h-4 w-4" />;
-      case 'mock':
-        return <Code className="h-4 w-4" />;
-      case 'validator':
-        return <Check className="h-4 w-4" />;
-      case 'output':
-        return <Settings className="h-4 w-4" />;
-      default:
-        return <Settings className="h-4 w-4" />;
-    }
+function ApiBuilderNodeComponent({ id, type, data, selected }: ApiBuilderNodeProps) {
+  const { openNodeConfig } = useNodeConfig();
+  
+  const getNodeColor = (nodeType: ApiNodeType) => {
+    const colors = {
+      input: 'bg-blue-500',
+      endpoint: 'bg-green-500',
+      transform: 'bg-purple-500',
+      auth: 'bg-amber-500',
+      ratelimit: 'bg-rose-500',
+      cache: 'bg-cyan-500',
+      mock: 'bg-indigo-500',
+      validator: 'bg-orange-500',
+      output: 'bg-emerald-500',
+    };
+    
+    return colors[nodeType] || 'bg-gray-500';
   };
 
-  const handleEdit = () => {
-    setIsEditing(true);
+  const handleDelete = () => {
+    // This would be implemented in a real application
+    console.log('Delete node:', id);
   };
 
-  const handleSave = (updatedData: ApiNodeData) => {
-    updateNodeData(id, updatedData);
-    setIsEditing(false);
-    toast({
-      title: "Node Updated",
-      description: `Updated ${data.label} node configuration`,
+  const handleDuplicate = () => {
+    // This would be implemented in a real application
+    console.log('Duplicate node:', id);
+  };
+
+  const handleSettings = () => {
+    openNodeConfig({
+      id,
+      type,
+      data,
+      position: { x: 0, y: 0 },
+      selected: selected,
     });
   };
 
   return (
-    <>
-      <div
-        className={cn(
-          "min-w-[180px] max-w-[250px] border rounded-md shadow-sm bg-card transition-all",
-          selected && "ring-2 ring-primary",
-          isExpanded && "min-h-[150px]"
-        )}
-        style={{ borderColor: nodeConfig.color }}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
-      >
-        {nodeType !== 'input' && (
-          <Handle
-            type="target"
-            position={Position.Top}
-            isConnectable={isConnectable}
-            className="!bg-primary !h-3 !w-3 !border-2"
-          />
-        )}
-
+    <ContextMenu>
+      <ContextMenuTrigger>
         <div 
-          className="flex items-center justify-between p-3 border-b cursor-pointer"
-          style={{ backgroundColor: `${nodeConfig.color}20` }}
-          onClick={() => setIsExpanded(!isExpanded)}
+          className={`nodrag rounded-md shadow-md transition-all ${
+            selected ? 'ring-2 ring-primary ring-offset-2' : ''
+          }`}
         >
-          <div className="flex items-center gap-2">
-            <div className="p-1 rounded-md" style={{ backgroundColor: nodeConfig.color }}>
-              {getNodeIcon()}
+          <div className="min-w-[180px] max-w-[280px]">
+            <div className={`${getNodeColor(type)} text-white p-2 rounded-t-md flex justify-between items-center`}>
+              <span className="font-medium capitalize">{type}</span>
+              <div>
+                <SettingsButton 
+                  nodeType={type} 
+                  onClick={handleSettings} 
+                  size="sm" 
+                  variant="ghost" 
+                />
+              </div>
             </div>
-            <div className="font-medium text-sm truncate max-w-[100px]" title={data.label}>
-              {data.label}
+            <div className="bg-card p-3 rounded-b-md">
+              <div className="text-sm">
+                {data.name || `${type} Node`}
+              </div>
+              {data.description && (
+                <div className="text-xs text-muted-foreground mt-1">
+                  {data.description}
+                </div>
+              )}
             </div>
           </div>
-          <Badge variant="outline" className="text-xs">
-            {nodeConfig.label}
-          </Badge>
+
+          {/* Input handle (not for input nodes) */}
+          {type !== 'input' && (
+            <Handle
+              type="target"
+              position={Position.Left}
+              style={{ background: '#555', width: 10, height: 10 }}
+              className="!border-2 !border-background"
+            />
+          )}
+
+          {/* Output handle (not for output nodes) */}
+          {type !== 'output' && (
+            <Handle
+              type="source"
+              position={Position.Right}
+              style={{ background: '#555', width: 10, height: 10 }}
+              className="!border-2 !border-background"
+            />
+          )}
         </div>
-
-        {isExpanded && (
-          <div className="p-3 text-xs space-y-2">
-            {nodeType === 'input' && (
-              <>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Method:</span>
-                  <span>{data.method}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Path:</span>
-                  <span className="font-mono truncate max-w-[120px]" title={data.path}>{data.path}</span>
-                </div>
-              </>
-            )}
-
-            {nodeType === 'endpoint' && (
-              <>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">URL:</span>
-                  <span className="font-mono truncate max-w-[120px]" title={data.url}>{data.url}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Method:</span>
-                  <span>{data.method}</span>
-                </div>
-              </>
-            )}
-
-            {nodeType === 'auth' && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Type:</span>
-                <span className="capitalize">{data.authType}</span>
-              </div>
-            )}
-
-            {nodeType === 'ratelimit' && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Limit:</span>
-                <span>{data.rate} per {data.per}s</span>
-              </div>
-            )}
-
-            {nodeType === 'cache' && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">TTL:</span>
-                <span>{data.ttl}s</span>
-              </div>
-            )}
-
-            {nodeType === 'output' && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Status:</span>
-                <span>{data.statusCode}</span>
-              </div>
-            )}
-            
-            <div className="flex justify-end gap-1 pt-2">
-              <Button variant="ghost" size="icon" onClick={handleEdit} className="h-6 w-6">
-                <Settings className="h-3 w-3" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={() => duplicateNode(id)} className="h-6 w-6">
-                <Copy className="h-3 w-3" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={() => deleteNode(id)} className="h-6 w-6 text-destructive">
-                <Trash className="h-3 w-3" />
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {nodeType !== 'output' && (
-          <Handle
-            type="source"
-            position={Position.Bottom}
-            isConnectable={isConnectable}
-            className="!bg-primary !h-3 !w-3 !border-2"
-          />
-        )}
-      </div>
-
-      <NodeConfigDialog
-        isOpen={isEditing}
-        onClose={() => setIsEditing(false)}
-        nodeType={nodeType as ApiNodeType}
-        nodeData={data}
-        onSave={handleSave}
-      />
-    </>
+      </ContextMenuTrigger>
+      
+      <ContextMenuContent className="w-48">
+        <ContextMenuItem onClick={handleSettings}>
+          <Settings className="mr-2 h-4 w-4" />
+          Settings
+        </ContextMenuItem>
+        <ContextMenuItem onClick={handleDuplicate}>
+          <Copy className="mr-2 h-4 w-4" />
+          Duplicate
+        </ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem onClick={handleDelete} className="text-destructive">
+          <Trash className="mr-2 h-4 w-4" />
+          Delete
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+const ApiBuilderNode = memo(ApiBuilderNodeComponent);
+export { ApiBuilderNode };
