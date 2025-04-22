@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -100,4 +99,21 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.react-flow__handle.custom-handle {
+  background-color: #0EA5E9; /* Ocean Blue from the color palette */
+  border-radius: 1px;
+  width: 8px;
+  height: 4px;
+  border: none;
+  min-width: 2px;
+  min-height: 2px;
+}
+
+.react-flow__handle.custom-handle:hover,
+.react-flow__handle.custom-handle.connectionindicator:focus,
+.react-flow__handle.custom-handle.connectingfrom,
+.react-flow__handle.custom-handle.connectingto {
+  background-color: #33C3F0; /* Slightly lighter blue for hover state */
 }
