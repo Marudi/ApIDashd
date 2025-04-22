@@ -1,5 +1,4 @@
 
-import { useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { nodeTypes } from "@/lib/api-builder/node-types";
 import { Check, Code, Database, Play, Repeat, Server, Settings, Shield, Timer } from "lucide-react";
@@ -46,9 +45,13 @@ export function NodeToolbar({ onDragStart }: NodeToolbarProps) {
           {Object.entries(nodeTypes).map(([type, config]) => (
             <div
               key={type}
-              className="flex flex-col items-center p-2 border rounded-md cursor-move hover:bg-accent transition-colors"
-              draggable
-              onDragStart={(event) => onDragStart(event, type)}
+              className="flex flex-col items-center p-2 border rounded-md cursor-move hover:bg-accent/50 transition-colors"
+              draggable={true}
+              onDragStart={(event) => {
+                event.dataTransfer.setData('application/reactflow', type);
+                event.dataTransfer.effectAllowed = 'move';
+                onDragStart(event, type);
+              }}
             >
               <div className="p-2 rounded-full mb-2" style={{ backgroundColor: config.color }}>
                 {getNodeIcon(type)}

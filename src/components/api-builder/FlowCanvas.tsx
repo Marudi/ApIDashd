@@ -1,4 +1,3 @@
-
 import { useCallback, useRef, useEffect } from 'react';
 import ReactFlow, { 
   Background, 
@@ -88,6 +87,7 @@ export function FlowCanvas({
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
+
       const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
       const type = event.dataTransfer.getData('application/reactflow');
 
@@ -95,18 +95,18 @@ export function FlowCanvas({
         return;
       }
 
-      // Use screenToFlowPosition instead of deprecated project method
       const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
 
       const newNode = createNode(type as any, position);
-      setNodes((nds: Node[]) => nds.concat(newNode));
+      
+      setNodes((nodes) => [...nodes, newNode]);
       
       toast({
-        title: 'Node Added',
-        description: `Added new ${type} node to your flow`,
+        title: "Node Added",
+        description: `Added new ${type} node to the canvas`,
       });
     },
     [reactFlowInstance, setNodes, toast]
@@ -139,7 +139,6 @@ export function FlowCanvas({
     }
   }, [reactFlowInstance, toast]);
 
-  // Node click handler to open configuration
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node<ApiNodeData>) => {
     openNodeConfig(node);
   }, [openNodeConfig]);
@@ -165,6 +164,7 @@ export function FlowCanvas({
         snapGrid={[15, 15]}
         connectionLineType={ConnectionLineType.SmoothStep}
         proOptions={{ hideAttribution: true }}
+        deleteKeyCode="Delete"
         minZoom={0.2}
         maxZoom={4}
       >
