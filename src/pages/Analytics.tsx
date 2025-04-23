@@ -10,9 +10,11 @@ import { StatusCard } from "@/components/dashboard/StatusCard";
 import { mockAnalytics } from "@/lib/mock-data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { useDemoData } from "@/contexts/DemoDataContext";
 
 const Analytics = () => {
   const [timeframe, setTimeframe] = useState("24h");
+  const { showDemoData } = useDemoData();
 
   // Format the hourly data for the chart
   const hourlyData = mockAnalytics.hourlyStats.map(stat => ({
@@ -62,6 +64,16 @@ const Analytics = () => {
             </div>
           </div>
 
+          {!showDemoData ? (
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 text-center text-muted-foreground">
+              <BarChart3 className="h-10 w-10 text-muted-foreground" />
+              <div className="text-lg font-semibold">Demo Data Disabled</div>
+              <div className="max-w-md mx-auto">
+                Demo/sample analytics data is currently disabled in your dashboard settings. To view demo analytics, enable "Show demo data in dashboard" in the <span className="font-medium">Settings</span> page.
+              </div>
+            </div>
+          ) : (
+          <>
           <TabsContent value="overview" className="mt-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
               <StatusCard
@@ -235,6 +247,8 @@ const Analytics = () => {
               </CardContent>
             </Card>
           </TabsContent>
+          </>
+          )}
         </Tabs>
       </div>
     </DashboardLayout>
@@ -242,3 +256,4 @@ const Analytics = () => {
 };
 
 export default Analytics;
+
