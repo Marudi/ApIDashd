@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { 
   Download, 
@@ -68,12 +67,59 @@ export function FlowToolbar({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [historyList, setHistoryList] = useState<any[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
+  const loadHistory = () => {
+    setHistoryLoading(true);
+    const versionKey = `api-flow-${flow.id}-history`;
+    const versionsRaw = localStorage.getItem(versionKey);
+    if (versionsRaw) {
+      try {
+        const versions = JSON.parse(versionsRaw);
+        setHistoryList(versions.slice(-10).reverse());
+      } catch (e) {
+        setHistoryList([]);
+      }
+    } else {
+      setHistoryList([]);
+    }
+    setHistoryLoading(false);
+  };
+
+  const handleRestoreVersion = (version: any) => {
+    if (!version) return;
+    localStorage.setItem(`api-flow-${flow.id}`, JSON.stringify(version));
+    toast({
+      title: "Version Restored",
+      description: "This version of the flow has been restored.",
+    });
+    setShowHistoryDialog(false);
+    window.location.reload();
+  };
+
+  const handleResetView = () => {
+    const saved = localStorage.getItem(`api-flow-${flow.id}`);
+    if (saved) {
+      toast({
+        title: "Flow Refreshed",
+        description: "Reloaded from last saved version.",
+      });
+      setTimeout(() => window.location.reload(), 500);
+    } else {
+      toast({
+        title: "No Saved Flow Found",
+        description: "No previous version found in localStorage.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handlePublish = () => {
     setIsPublishing(true);
     setProgress(0);
 
-    // Simulate a publishing process
     const interval = setInterval(() => {
       setProgress((prev) => {
         const newProgress = prev + 10;
@@ -113,7 +159,6 @@ export function FlowToolbar({
   };
 
   const handleShare = () => {
-    // Generate a shareable URL (in a real app, this would create a unique URL)
     const baseUrl = window.location.origin;
     setShareUrl(`${baseUrl}/api-builder/shared/${flow.id}`);
     setShowShareDialog(true);
@@ -128,7 +173,6 @@ export function FlowToolbar({
   };
 
   const handleExport = () => {
-    // In a real application, this would generate and download a JSON file
     const flowData = JSON.stringify(flow, null, 2);
     const blob = new Blob([flowData], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -162,7 +206,14 @@ export function FlowToolbar({
               <Badge variant="destructive" className="ml-2 h-2 w-2 p-0 rounded-full" />
             )}
           </Button>
-          
+
+          <Button variant="outline" size="sm" onClick={() => { loadHistory(); setShowHistoryDialog(true); }}>
+            <span className="flex items-center">
+              <History className="mr-2 h-4 w-4" />
+              {isMobile ? "" : "History"}
+            </span>
+          </Button>
+
           {!isMobile && (
             <>
               <Button variant="outline" size="sm" onClick={handleShare}>
@@ -191,16 +242,8 @@ export function FlowToolbar({
               <Button variant="outline" size="sm" onClick={onZoomOut}>
                 <ZoomOut className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm" onClick={onReset}>
+              <Button variant="outline" size="sm" onClick={handleResetView}>
                 <RotateCcw className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => {
-                toast({
-                  title: "History Feature",
-                  description: "Flow history will be available in the next update",
-                });
-              }}>
-                <History className="h-4 w-4" />
               </Button>
             </>
           )}
@@ -240,7 +283,6 @@ export function FlowToolbar({
         )}
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -258,7 +300,6 @@ export function FlowToolbar({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Share Dialog */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
         <DialogContent>
           <DialogHeader>
@@ -277,6 +318,38 @@ export function FlowToolbar({
             <Button onClick={() => setShowShareDialog(false)}>
               Close
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Flow History</DialogTitle>
+            <DialogDescription>
+              Previous 10 versions of this API flow (auto-saved on Save or Publish).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-2 max-h-60 overflow-y-auto mt-2">
+            {historyLoading && <div className="text-muted-foreground text-xs">Loading...</div>}
+            {(!historyLoading && historyList.length === 0) && (
+              <div className="text-muted-foreground text-xs">No history found.</div>
+            )}
+            {historyList.map((v, idx) => (
+              <div key={v.lastUpdated} className="flex items-center justify-between bg-accent p-2 rounded">
+                <div>
+                  <span className="font-semibold">{new Date(v.lastUpdated).toLocaleString()}</span>
+                  <span className="block text-xs text-muted-foreground">{v.name}</span>
+                </div>
+                <Button variant="secondary" size="sm"
+                  onClick={() => handleRestoreVersion(v)}>
+                  Restore
+                </Button>
+              </div>
+            ))}
+          </div>
+          <DialogFooter className="mt-4">
+            <Button onClick={() => setShowHistoryDialog(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

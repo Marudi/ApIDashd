@@ -6,6 +6,21 @@ import { createEmptyFlow } from '@/lib/api-builder/flow-utils';
 import { createNode } from '@/lib/api-builder/node-utils';
 import { isValidConnection } from '@/lib/api-builder/node-utils';
 
+// Utility: Save flow version history to localStorage
+function pushFlowToHistory(flow: ApiFlow) {
+  try {
+    const key = `api-flow-${flow.id}-history`;
+    const prevRaw = localStorage.getItem(key);
+    let prev: any[] = [];
+    if (prevRaw) prev = JSON.parse(prevRaw);
+    if (!Array.isArray(prev)) prev = [];
+    // Only keep 10 max, add most recent to end
+    prev.push({ ...flow });
+    if (prev.length > 10) prev = prev.slice(-10);
+    localStorage.setItem(key, JSON.stringify(prev));
+  } catch (e) { /* silent */ }
+}
+
 export function useApiFlow(initialUserId: string, initialFlowName?: string) {
   const [flow, setFlow] = useState<ApiFlow>(createEmptyFlow(initialUserId, initialFlowName));
   const [nodes, setNodes, onNodesChange] = useNodesState(flow.nodes);
@@ -53,9 +68,9 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
       title: "Flow Saved",
       description: "Your API flow has been saved successfully",
     });
-    
     try {
       localStorage.setItem(`api-flow-${flow.id}`, JSON.stringify(updatedFlow));
+      pushFlowToHistory(updatedFlow);
     } catch (error) {
       console.error("Failed to save flow to localStorage", error);
     }
@@ -67,17 +82,18 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
       description: "Your API flow has been deleted",
       variant: "destructive",
     });
+    try {
+      const prev = localStorage.getItem(`api-flow-${flow.id}`);
+      if (prev) pushFlowToHistory(JSON.parse(prev));
+      localStorage.removeItem(`api-flow-${flow.id}`);
+    } catch (error) {
+      console.error("Failed to delete flow from localStorage", error);
+    }
     const newFlow = createEmptyFlow(initialUserId);
     setFlow(newFlow);
     setNodes(newFlow.nodes);
     setEdges(newFlow.edges);
     setUnsavedChanges(false);
-    
-    try {
-      localStorage.removeItem(`api-flow-${flow.id}`);
-    } catch (error) {
-      console.error("Failed to delete flow from localStorage", error);
-    }
   }, [initialUserId, setNodes, setEdges, flow.id]);
 
   const publishFlow = useCallback(() => {
