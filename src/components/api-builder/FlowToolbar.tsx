@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { ApiFlow } from "@/lib/api-builder-types";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Check } from "lucide-react";
 import { ToolbarActions } from "./FlowToolbar/ToolbarActions";
 import { ToolbarViewControls } from "./FlowToolbar/ToolbarViewControls";
 import { ToolbarPublishButton } from "./FlowToolbar/ToolbarPublishButton";
@@ -90,10 +90,15 @@ export function FlowToolbar({
             hasUnsavedChanges={hasUnsavedChanges}
             isMobile={isMobile}
           />
-          {hasUnsavedChanges && !isMobile && (
+          {hasUnsavedChanges ? (
             <span className="text-xs flex items-center text-amber-500">
               <AlertCircle className="h-3 w-3 mr-1" />
               Unsaved changes
+            </span>
+          ) : (
+            <span className="text-xs flex items-center text-green-500">
+              <Check className="h-3 w-3 mr-1" />
+              Saved
             </span>
           )}
         </div>
