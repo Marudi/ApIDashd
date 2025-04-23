@@ -11,7 +11,7 @@ import { ApiNodeType } from "@/lib/api-builder-types";
 
 interface SettingsButtonProps {
   nodeType: ApiNodeType;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent) => void;  // Updated to accept a MouseEvent parameter
   size?: "default" | "sm" | "lg" | "icon";
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
 }
