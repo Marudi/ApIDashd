@@ -1,9 +1,13 @@
 
+import { ApiDefinition } from '../types';
 import { ApiFlow } from '../api-builder-types';
 import { createNode, generateId } from './node-utils';
 
 // Convert an API flow to a Tyk API definition
-export const convertFlowToApiDefinition = (flow: ApiFlow) => {
+export const convertFlowToApiDefinition = (flow: ApiFlow): ApiDefinition => {
+  const authNode = flow.nodes.find(node => node.type === 'auth');
+  const authType = authNode?.data.authType || 'none';
+
   return {
     id: flow.id,
     name: flow.name,
@@ -11,7 +15,7 @@ export const convertFlowToApiDefinition = (flow: ApiFlow) => {
     targetUrl: flow.nodes.find(node => node.type === 'endpoint')?.data.url || 'https://api.example.com',
     protocol: 'http',
     active: false,
-    authType: flow.nodes.find(node => node.type === 'auth')?.data.authType || 'none',
+    authType: authType,
     rateLimit: flow.nodes.find(node => node.type === 'ratelimit')?.data ? {
       rate: flow.nodes.find(node => node.type === 'ratelimit')?.data.rate || 100,
       per: flow.nodes.find(node => node.type === 'ratelimit')?.data.per || 60,

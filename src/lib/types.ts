@@ -11,7 +11,7 @@ export interface ApiDefinition {
     enabled: boolean;
     versions: ApiVersion[];
   };
-  authType: "none" | "token" | "jwt" | "oauth";
+  authType: "none" | "token" | "jwt" | "oauth" | "basic" | "apikey" | "oauth2";
   rateLimit?: {
     rate: number;
     per: number;
