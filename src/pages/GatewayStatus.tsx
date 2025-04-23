@@ -8,15 +8,19 @@ import { Link } from "react-router-dom";
 import { TykGatewayTab } from "@/components/gateway/TykGatewayTab";
 import { KongGatewayTab } from "@/components/gateway/KongGatewayTab";
 import { SyncStatusIndicator } from "@/components/gateway/SyncStatus";
+import { useDemoData } from "@/contexts/DemoDataContext";
+import { Card } from "@/components/ui/card";
 
 const GatewayStatus = () => {
   const formatUptime = (seconds: number) => {
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    
+
     return `${days}d ${hours}h ${minutes}m`;
   };
+
+  const { showDemoData } = useDemoData();
 
   return (
     <DashboardLayout>
@@ -41,7 +45,15 @@ const GatewayStatus = () => {
           </Button>
         </div>
       </div>
-
+      {!showDemoData ? (
+        <Card className="my-10 py-16 flex flex-col items-center gap-4 text-muted-foreground">
+          <Server className="w-10 h-10" />
+          <div className="text-lg font-semibold">Demo Data Disabled</div>
+          <div className="max-w-md mx-auto text-center">
+            Demo/sample gateway status data is currently disabled in your dashboard settings. To see example gateway status, enable <b>"Show demo data in dashboard"</b> in the <span className="font-medium">Settings</span> page.
+          </div>
+        </Card>
+      ) : (
       <Tabs defaultValue="tyk">
         <TabsList className="mb-4">
           <TabsTrigger value="tyk" className="flex items-center">
@@ -68,6 +80,7 @@ const GatewayStatus = () => {
           <KongGatewayTab />
         </TabsContent>
       </Tabs>
+      )}
     </DashboardLayout>
   );
 };

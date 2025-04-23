@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Plus, Search, Server, Network } from "lucide-react";
+import { Plus, Search, Server, Network, Database } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import { Link, useNavigate } from "react-router-dom";
 import ApiTableRow from "@/components/apis/ApiTableRow";
 import ApiExportImport from "@/components/apis/ApiExportImport";
 import { usePersistentStorage } from "@/hooks/usePersistentStorage";
+import { useDemoData } from "@/contexts/DemoDataContext";
 
 const STORAGE_KEY = "api_definitions";
 const KONG_STORAGE_KEY = "kong_api_definitions"; // Optional, if you want to separate Tyk and Kong
@@ -29,6 +30,7 @@ const ApisList = () => {
   const [tykApiData, setTykApiData] = useState(mockApis);
   const [kongApiData, setKongApiData] = useState(kongApis);
 
+  const { showDemoData } = useDemoData();
   const navigate = useNavigate();
 
   // LOAD from persistent storage on mount (if enabled)
@@ -111,83 +113,95 @@ const ApisList = () => {
           </Button>
         </div>
       </div>
+      {!showDemoData ? (
+        <Card className="my-10 py-16 flex flex-col items-center gap-4 text-muted-foreground">
+          <Database className="w-10 h-10" />
+          <div className="text-lg font-semibold">Demo Data Disabled</div>
+          <div className="max-w-md mx-auto text-center">
+            Demo/sample API data is currently disabled in your dashboard settings. To see example APIs, enable {" "}
+            <b>"Show demo data in dashboard"</b> in the <span className="font-medium">Settings</span> page.
+          </div>
+        </Card>
+      ) : (
+      <>
+        <ApiExportImport apis={[...tykApiData, ...kongApiData]} onImport={handleImport} />
 
-      <ApiExportImport apis={[...tykApiData, ...kongApiData]} onImport={handleImport} />
+        <Tabs defaultValue="tyk">
+          <TabsList className="mb-4">
+            <TabsTrigger value="tyk" className="flex items-center">
+              <Server className="mr-2 h-4 w-4" />
+              Tyk Gateway APIs
+            </TabsTrigger>
+            <TabsTrigger value="kong" className="flex items-center">
+              <Network className="mr-2 h-4 w-4" />
+              Kong Gateway APIs
+            </TabsTrigger>
+          </TabsList>
 
-      <Tabs defaultValue="tyk">
-        <TabsList className="mb-4">
-          <TabsTrigger value="tyk" className="flex items-center">
-            <Server className="mr-2 h-4 w-4" />
-            Tyk Gateway APIs
-          </TabsTrigger>
-          <TabsTrigger value="kong" className="flex items-center">
-            <Network className="mr-2 h-4 w-4" />
-            Kong Gateway APIs
-          </TabsTrigger>
-        </TabsList>
+          <TabsContent value="tyk">
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">Status</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Listen Path</TableHead>
+                      <TableHead>Target URL</TableHead>
+                      <TableHead>Auth Type</TableHead>
+                      <TableHead>Last Updated</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredApis.map((api) => (
+                      <ApiTableRow key={api.id} api={api} />
+                    ))}
+                  </TableBody>
+                </Table>
 
-        <TabsContent value="tyk">
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">Status</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Listen Path</TableHead>
-                    <TableHead>Target URL</TableHead>
-                    <TableHead>Auth Type</TableHead>
-                    <TableHead>Last Updated</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredApis.map((api) => (
-                    <ApiTableRow key={api.id} api={api} />
-                  ))}
-                </TableBody>
-              </Table>
+                {filteredApis.length === 0 && (
+                  <div className="py-12 text-center text-muted-foreground">
+                    No APIs found matching your search criteria.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-              {filteredApis.length === 0 && (
-                <div className="py-12 text-center text-muted-foreground">
-                  No APIs found matching your search criteria.
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent value="kong">
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">Status</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Listen Path</TableHead>
+                      <TableHead>Target URL</TableHead>
+                      <TableHead>Auth Type</TableHead>
+                      <TableHead>Last Updated</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredKongApis.map((api) => (
+                      <ApiTableRow key={api.id} api={api} />
+                    ))}
+                  </TableBody>
+                </Table>
 
-        <TabsContent value="kong">
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">Status</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Listen Path</TableHead>
-                    <TableHead>Target URL</TableHead>
-                    <TableHead>Auth Type</TableHead>
-                    <TableHead>Last Updated</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredKongApis.map((api) => (
-                    <ApiTableRow key={api.id} api={api} />
-                  ))}
-                </TableBody>
-              </Table>
-
-              {filteredKongApis.length === 0 && (
-                <div className="py-12 text-center text-muted-foreground">
-                  No Kong APIs found matching your search criteria.
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                {filteredKongApis.length === 0 && (
+                  <div className="py-12 text-center text-muted-foreground">
+                    No Kong APIs found matching your search criteria.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </>
+      )}
     </DashboardLayout>
   );
 };

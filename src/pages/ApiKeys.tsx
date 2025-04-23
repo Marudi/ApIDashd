@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { mockApiKeys } from "@/lib/mock-data";
@@ -12,6 +12,8 @@ import { NewKeyDialog } from "@/components/api-keys/NewKeyDialog";
 import { ApiKeysTable } from "@/components/api-keys/ApiKeysTable";
 import { getPolicyName } from "@/lib/api-key-utils";
 import { usePersistentStorage } from "@/hooks/usePersistentStorage";
+import { useDemoData } from "@/contexts/DemoDataContext";
+import { Card } from "@/components/ui/card";
 
 const ApiKeys = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,6 +22,7 @@ const ApiKeys = () => {
   const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
   const { toast } = useToast();
   const { persistentEnabled, getApiKeys, setApiKeys } = usePersistentStorage();
+  const { showDemoData } = useDemoData();
 
   // Load keys from persistent local storage (if enabled)
   useEffect(() => {
@@ -88,16 +91,27 @@ const ApiKeys = () => {
           Generate New Key
         </Button>
       </div>
+      {!showDemoData ? (
+        <Card className="my-10 py-16 flex flex-col items-center gap-4 text-muted-foreground">
+          <Key className="w-10 h-10" />
+          <div className="text-lg font-semibold">Demo Data Disabled</div>
+          <div className="max-w-md mx-auto text-center">
+            Demo/sample API keys are currently disabled in your dashboard settings. To see example API keys, enable <b>"Show demo data in dashboard"</b> in the <span className="font-medium">Settings</span> page.
+          </div>
+        </Card>
+      ) : (
+      <>
+        <ApiKeysTable keys={filteredKeys} onRevoke={handleRevokeKey} />
 
-      <ApiKeysTable keys={filteredKeys} onRevoke={handleRevokeKey} />
-
-      <NewKeyDialog
-        open={showNewKeyDialog}
-        onOpenChange={setShowNewKeyDialog}
-        selectedPolicy={selectedPolicy}
-        onPolicySelect={setSelectedPolicy}
-        onGenerate={generateNewKey}
-      />
+        <NewKeyDialog
+          open={showNewKeyDialog}
+          onOpenChange={setShowNewKeyDialog}
+          selectedPolicy={selectedPolicy}
+          onPolicySelect={setSelectedPolicy}
+          onGenerate={generateNewKey}
+        />
+      </>
+      )}
     </DashboardLayout>
   );
 };

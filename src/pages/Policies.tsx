@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Check, Plus, Search, X } from "lucide-react";
+import { Check, Plus, Search, X, Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import { PolicyEditor } from "@/components/policies/PolicyEditor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useNotifications } from "@/services/notificationService";
+import { useDemoData } from "@/contexts/DemoDataContext";
 
 const Policies = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,6 +23,7 @@ const Policies = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const isMobile = useIsMobile();
   const { notify } = useNotifications();
+  const { showDemoData } = useDemoData();
 
   // Filter policies based on search term
   const filteredPolicies = policies.filter(policy =>
@@ -42,7 +44,7 @@ const Policies = () => {
     );
     setDialogOpen(false);
     setEditingPolicy(null);
-    
+
     // Send notification
     notify({
       title: isNew ? "New Policy Created" : "Policy Updated",
@@ -75,6 +77,16 @@ const Policies = () => {
         </Button>
       </div>
 
+      {!showDemoData ? (
+        <Card className="my-10 py-16 flex flex-col items-center gap-4 text-muted-foreground">
+          <Shield className="w-10 h-10" />
+          <div className="text-lg font-semibold">Demo Data Disabled</div>
+          <div className="max-w-md mx-auto text-center">
+            Demo/sample policies are currently disabled in your dashboard settings. To see example policies, enable <b>"Show demo data in dashboard"</b> in the <span className="font-medium">Settings</span> page.
+          </div>
+        </Card>
+      ) : (
+      <>
       <Card>
         <CardContent className="p-0">
           {isMobile ? (
@@ -129,6 +141,8 @@ const Policies = () => {
           )}
         </DialogContent>
       </Dialog>
+      </>
+      )}
     </DashboardLayout>
   );
 };
