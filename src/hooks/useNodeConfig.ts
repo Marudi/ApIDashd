@@ -10,16 +10,25 @@ export function useNodeConfig() {
   const { toast } = useToast();
 
   const openNodeConfig = (node: Node<ApiNodeData>) => {
+    console.log("Opening node config for:", node.id, node.type);
     setSelectedNode(node);
     setIsConfigOpen(true);
   };
 
   const closeNodeConfig = () => {
+    console.log("Closing node config dialog");
     setIsConfigOpen(false);
+    // Don't clear selectedNode immediately to allow for animations
+    setTimeout(() => setSelectedNode(null), 300);
   };
 
   const handleSaveNodeConfig = (updatedData: ApiNodeData, nodes: Node[], setNodes: (nodes: Node[]) => void) => {
-    if (!selectedNode) return;
+    if (!selectedNode) {
+      console.log("Cannot save node config: no node selected");
+      return;
+    }
+    
+    console.log("Saving node config for:", selectedNode.id, "with data:", updatedData);
     
     const updatedNodes = nodes.map(node => {
       if (node.id === selectedNode.id) {

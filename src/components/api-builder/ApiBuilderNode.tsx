@@ -1,6 +1,6 @@
 
 import { memo, useCallback } from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { NodeProps } from 'reactflow';
 import { ApiNodeData, ApiNodeType } from '@/lib/api-builder-types';
 import { 
   ContextMenu,
@@ -10,11 +10,10 @@ import {
   ContextMenuSeparator 
 } from "@/components/ui/context-menu";
 import { Copy, Trash, Settings } from 'lucide-react';
-import { SettingsButton } from './node-controls/SettingsButton';
-import { useNodeConfig } from '@/hooks/useNodeConfig';
 import { NodeHeader } from './node-components/NodeHeader';
 import { NodeBody } from './node-components/NodeBody';
 import { NodeHandles } from './node-components/NodeHandles';
+import { useNodeConfig } from '@/hooks/useNodeConfig';
 
 interface ApiBuilderNodeComponentProps extends NodeProps<ApiNodeData> {
   onDuplicate?: (nodeId: string) => void;
@@ -40,6 +39,9 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
 
   const handleSettings = useCallback((e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent the event from bubbling to the node
+    console.log("Settings clicked for node:", id);
+    
+    // Open node config dialog using the hook
     openNodeConfig({
       id,
       type: nodeType,
@@ -47,7 +49,7 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
       position: { x: 0, y: 0 },
       selected,
     });
-  }, [id, nodeType, data, openNodeConfig, selected]);
+  }, [id, nodeType, data, selected, openNodeConfig]);
 
   return (
     <ContextMenu>
@@ -57,6 +59,7 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
             selected ? 'ring-2 ring-primary ring-offset-2' : ''
           }`}
           data-id={id}
+          onClick={(e) => e.stopPropagation()}
         >
           <div className="min-w-[180px] max-w-[280px]">
             <NodeHeader 

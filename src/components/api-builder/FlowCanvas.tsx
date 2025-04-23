@@ -1,5 +1,5 @@
 
-import { useCallback, useImperativeHandle, useRef, forwardRef, useMemo } from 'react';
+import { useCallback, useImperativeHandle, useRef, forwardRef } from 'react';
 import ReactFlow, { 
   Background, 
   BackgroundVariant,
@@ -74,15 +74,9 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
 
   // Fixed onNodeClick handler to properly open node config dialog
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node<ApiNodeData>) => {
-    // Prevent click event from bubbling to canvas
-    event.stopPropagation();
-    openNodeConfig(node);
-    toast({
-      title: "Editing node",
-      description: `Editing ${node.type} node settings`,
-      duration: 1500,
-    });
-  }, [openNodeConfig, toast]);
+    // We don't need to do anything here since the click is handled by the node itself
+    console.log("Node clicked:", node.id);
+  }, []);
 
   const handleSaveNodeData = useCallback((updatedData: ApiNodeData) => {
     handleSaveNodeConfig(updatedData, nodes, setNodes);
@@ -111,6 +105,8 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
         onNodeClick={onNodeClick}
         nodeTypes={customNodeTypes}
         draggable={true}
+        deleteKeyCode={['Backspace', 'Delete']}
+        proOptions={{ hideAttribution: true }}
         {...flowConfig}
         onInit={(instance) => { reactFlowInstanceRef.current = instance; }}
       >

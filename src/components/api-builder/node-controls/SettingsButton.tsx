@@ -25,6 +25,13 @@ export const SettingsButton = memo(function SettingsButton({
   variant = "outline",
   label = true
 }: SettingsButtonProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    // Prevent event from propagating to parent elements
+    e.stopPropagation();
+    // Call the onClick handler
+    onClick(e);
+  };
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -32,7 +39,7 @@ export const SettingsButton = memo(function SettingsButton({
           <Button
             variant={variant}
             size={size}
-            onClick={onClick}
+            onClick={handleClick}
             aria-label={`Configure ${nodeType} node`}
             className="flex items-center"
           >

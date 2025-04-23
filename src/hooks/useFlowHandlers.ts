@@ -3,7 +3,6 @@ import { useCallback, useEffect } from 'react';
 import { Node, Connection, useReactFlow, XYPosition } from 'reactflow';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiNodeData, ApiNodeType } from '@/lib/api-builder-types';
-// Use the canonical node utils for node creation
 import { createNode } from '@/lib/api-builder/node-utils';
 
 export function useFlowHandlers(
@@ -35,53 +34,49 @@ export function useFlowHandlers(
       event.preventDefault();
 
       const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
-      const type = event.dataTransfer.getData('application/reactflow');
+      const nodeType = event.dataTransfer.getData('application/reactflow');
       
-      if (!type || !reactFlowBounds || !reactFlowInstance) {
-        console.log('Missing data for drop operation:', { type, hasBounds: !!reactFlowBounds, hasInstance: !!reactFlowInstance });
+      console.log('Drop event triggered with type:', nodeType);
+      console.log('React Flow Bounds:', !!reactFlowBounds);
+      console.log('React Flow Instance:', !!reactFlowInstance);
+      
+      if (!nodeType || !reactFlowBounds || !reactFlowInstance) {
+        console.log('Missing data for drop operation:', { 
+          type: nodeType, 
+          hasBounds: !!reactFlowBounds, 
+          hasInstance: !!reactFlowInstance 
+        });
         return;
       }
 
-      // Get the viewport dimensions from the container
-      const viewportNode = reactFlowWrapper.current;
-      const viewportWidth = viewportNode?.clientWidth || 0;
-      const viewportHeight = viewportNode?.clientHeight || 0;
+      // Calculate the position where the node should be dropped
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX - reactFlowBounds.left,
+        y: event.clientY - reactFlowBounds.top,
+      });
       
-      // Get the current pan and zoom values
-      const { x: viewportX, y: viewportY, zoom } = reactFlowInstance.getViewport();
+      console.log('Creating node at position:', position);
       
-      // Calculate the center position of the viewport in flow coordinates
-      const centerX = viewportX + viewportWidth / (2 * zoom);
-      const centerY = viewportY + viewportHeight / (2 * zoom);
-      
-      // Use the center position for new nodes
-      const position: XYPosition = {
-        x: centerX,
-        y: centerY,
-      };
-      
-      console.log('Creating new node of type:', type, 'at center position:', position);
-      
-      // Create the node with the calculated center position
-      const newNode = createNode(type as ApiNodeType, position);
+      // Create the node with the calculated position
+      const newNode = createNode(nodeType as ApiNodeType, position);
       
       // Ensure the node is explicitly set as draggable
       const nodeWithDraggable = {
         ...newNode,
         draggable: true,
-        selected: true, // Select the node when it's added
+        selected: true,
       };
       
       console.log('New node created:', nodeWithDraggable);
-
-      setNodes((nds) => [...nds, nodeWithDraggable]);
+      
+      setNodes((nds) => nds.concat(nodeWithDraggable));
       
       toast({
         title: "Node Added",
-        description: `Added new ${type} node to the canvas`,
+        description: `Added new ${nodeType} node to the canvas`,
       });
     },
-    [reactFlowInstance, setNodes, toast, reactFlowWrapper]
+    [reactFlowInstance, reactFlowWrapper, setNodes, toast]
   );
 
   const handleSave = useCallback(() => {

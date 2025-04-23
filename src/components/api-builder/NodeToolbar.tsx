@@ -34,6 +34,20 @@ export function NodeToolbar({ onDragStart }: NodeToolbarProps) {
     }
   };
 
+  const handleDragStart = (event: React.DragEvent, type: string) => {
+    // Clear any previous data transfer
+    event.dataTransfer.clearData();
+    
+    // Set the data transfer with the node type
+    event.dataTransfer.setData('application/reactflow', type);
+    event.dataTransfer.effectAllowed = 'move';
+    
+    // Call the parent handler
+    onDragStart(event, type);
+    
+    console.log("Drag started with type:", type);
+  };
+
   return (
     <Card className="mb-4">
       <CardHeader className="pb-3">
@@ -47,12 +61,7 @@ export function NodeToolbar({ onDragStart }: NodeToolbarProps) {
               key={type}
               className="flex flex-col items-center p-2 border rounded-md cursor-move hover:bg-accent/50 transition-colors"
               draggable={true}
-              onDragStart={(event) => {
-                // Set the data transfer with the node type
-                event.dataTransfer.setData('application/reactflow', type);
-                event.dataTransfer.effectAllowed = 'move';
-                onDragStart(event, type);
-              }}
+              onDragStart={(event) => handleDragStart(event, type)}
             >
               <div className="p-2 rounded-full mb-2" style={{ backgroundColor: config.color }}>
                 {getNodeIcon(type)}
