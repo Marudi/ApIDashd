@@ -9,7 +9,7 @@ import { memo } from "react";
 export const DragHandle = memo(function DragHandle() {
   return (
     <div
-      className="drag-handle nodrag absolute z-10 flex items-center justify-center bg-white/80 dark:bg-background rounded shadow border border-border hover:scale-110 transition-transform"
+      className="drag-handle absolute z-10 flex items-center justify-center bg-white/80 dark:bg-background rounded shadow border border-border hover:scale-110 transition-transform"
       style={{ 
         width: 26, 
         height: 26,

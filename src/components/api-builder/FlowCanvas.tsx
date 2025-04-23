@@ -106,7 +106,6 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
         nodeTypes={nodeTypes}
         deleteKeyCode={['Backspace', 'Delete']}
         proOptions={{ hideAttribution: true }}
-        noDragClassName="nodrag"
         {...flowConfig}
         onInit={(instance) => { reactFlowInstanceRef.current = instance; }}
       >
