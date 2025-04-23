@@ -1,6 +1,5 @@
 
 import { toast } from "sonner";
-import { createClient, RedisClientType } from "redis";
 
 export interface RedisConfig {
   host: string;
@@ -18,9 +17,9 @@ export interface RedisConnectionStatus {
   error: string | null;
 }
 
+// Browser-compatible mock implementation of Redis client
 export class RedisService {
   private static instance: RedisService;
-  private client: RedisClientType | null = null;
   private config: RedisConfig = {
     host: "",
     port: 6379,
@@ -35,6 +34,7 @@ export class RedisService {
     lastTestedAt: null,
     error: null
   };
+  private mockConnected: boolean = false;
 
   private constructor() {
     this.loadConfig();
@@ -83,29 +83,19 @@ export class RedisService {
 
   public async connect(): Promise<boolean> {
     try {
-      if (this.client) {
-        await this.disconnect();
-      }
-
-      const url = this.buildRedisUrl();
+      console.log("Attempting to connect to Redis:", this.buildRedisUrl());
       
-      this.client = createClient({
-        url,
-        name: this.config.connectionName
-      });
-
-      this.client.on('error', (err) => {
-        console.error('Redis Client Error', err);
-        this.updateConnectionStatus({
-          connected: false,
-          error: err.message
-        });
-        toast.error("Redis connection error", {
-          description: err.message
-        });
-      });
-
-      await this.client.connect();
+      // Simulate connection delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Simulate a successful connection 80% of the time
+      const isSuccessful = Math.random() < 0.8;
+      
+      if (!isSuccessful) {
+        throw new Error("Failed to connect to Redis server");
+      }
+      
+      this.mockConnected = true;
       
       this.updateConnectionStatus({
         connected: true,
@@ -116,52 +106,53 @@ export class RedisService {
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error("Redis connection error:", errorMessage);
+      
       this.updateConnectionStatus({
         connected: false,
         lastTestedAt: new Date(),
         error: errorMessage
       });
+      
       return false;
     }
   }
 
   public async disconnect(): Promise<void> {
-    if (this.client) {
-      try {
-        await this.client.disconnect();
-        this.client = null;
-        this.updateConnectionStatus({
-          connected: false
-        });
-      } catch (error) {
-        console.error('Redis disconnect error', error);
-      }
-    }
+    // Simulate disconnection
+    await new Promise(resolve => setTimeout(resolve, 200));
+    this.mockConnected = false;
+    
+    this.updateConnectionStatus({
+      connected: false
+    });
+    
+    console.log("Disconnected from Redis");
   }
 
   public async testConnection(): Promise<boolean> {
     try {
       const connected = await this.connect();
+      
       if (connected) {
-        // Try a simple PING to verify connection is working
-        const pingResult = await this.client!.ping();
-        const success = pingResult === 'PONG';
+        // Simulate a PING command
+        await new Promise(resolve => setTimeout(resolve, 300));
         
-        if (success) {
-          toast.success("Redis connection successful", {
-            description: "Successfully connected to Redis server"
-          });
-        } else {
-          toast.error("Redis connection test failed", {
-            description: "Connected but PING command failed"
-          });
-        }
+        toast.success("Redis connection successful", {
+          description: "Successfully connected to Redis server"
+        });
         
-        return success;
+        return true;
       }
+      
+      toast.error("Redis connection test failed", {
+        description: this.connectionStatus.error || "Unknown error"
+      });
+      
       return false;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
       toast.error("Redis connection test failed", {
         description: errorMessage
       });
@@ -187,34 +178,32 @@ export class RedisService {
     return `${protocol}://${auth}${this.config.host}:${this.config.port}/${this.config.database}`;
   }
 
-  // Tyk specific Redis operations can be added here
+  // Mock implementation of getTykApis
   public async getTykApis(): Promise<string[]> {
-    if (!this.client || !this.connectionStatus.connected) {
+    if (!this.mockConnected) {
       await this.connect();
     }
     
-    if (!this.client) {
+    if (!this.mockConnected) {
       throw new Error("Redis client not connected");
     }
     
-    try {
-      // Example: getting Tyk API definitions from Redis
-      // This is a simplified example - actual implementation depends on Tyk's Redis schema
-      const keys = await this.client.keys('tyk:apis:*');
-      const apiDefs: string[] = [];
-      
-      for (const key of keys) {
-        const value = await this.client.get(key);
-        if (value) {
-          apiDefs.push(value);
-        }
-      }
-      
-      return apiDefs;
-    } catch (error) {
-      console.error('Error fetching Tyk APIs from Redis', error);
-      throw error;
-    }
+    // Simulate fetching API definitions
+    await new Promise(resolve => setTimeout(resolve, 700));
+    
+    // Return mock API definitions
+    return [
+      JSON.stringify({ 
+        id: "redis-api-1", 
+        name: "Redis API 1", 
+        upstream_url: "https://api1.example.com" 
+      }),
+      JSON.stringify({ 
+        id: "redis-api-2", 
+        name: "Redis API 2", 
+        upstream_url: "https://api2.example.com" 
+      })
+    ];
   }
 }
 

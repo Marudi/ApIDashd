@@ -16,6 +16,7 @@ export class GatewayApiService {
   }
 
   private async fetchGatewayDataDirect(type: GatewayType, config: ExtendedGatewayConfig) {
+    console.log(`Fetching ${type} gateway data directly`);
     // Simulated direct API call to the gateway
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -30,16 +31,19 @@ export class GatewayApiService {
 
   private async fetchGatewayDataFromRedis(type: GatewayType, config: ExtendedGatewayConfig) {
     try {
+      console.log(`Fetching ${type} gateway data from Redis`);
       // Ensure Redis is connected
       if (!redisService.getConnectionStatus().connected) {
         await redisService.connect();
       }
 
-      // Use the Redis service to fetch Tyk APIs
+      // Use the Redis service to fetch APIs
       const apiDefs = await redisService.getTykApis();
+      console.log(`Retrieved ${apiDefs.length} API definitions from Redis`);
       return { apis: apiDefs, status: "success" };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`Redis error: ${errorMessage}`);
       throw new Error(`Redis error: ${errorMessage}`);
     }
   }
@@ -55,6 +59,7 @@ export class GatewayApiService {
     try {
       // If Redis integration is enabled, test Redis connection first
       if (config.useRedis) {
+        console.log("Testing Redis connection");
         const redisConnected = await redisService.testConnection();
         if (!redisConnected) {
           toast.error("Redis Connection Failed", {
