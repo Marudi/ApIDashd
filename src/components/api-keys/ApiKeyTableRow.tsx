@@ -105,7 +105,7 @@ export const ApiKeyTableRow = ({
         <TableCell className="text-xs">
           <div className="flex items-center gap-1">
             {formatDate(apiKey.expires)}
-            {!apiKey.status !== "revoked" && (
+            {apiKey.status !== "revoked" && (
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -126,7 +126,7 @@ export const ApiKeyTableRow = ({
               <Label htmlFor={`active-toggle-${apiKey.id}`} className="text-xs mr-1">Active</Label>
               <Switch
                 id={`active-toggle-${apiKey.id}`}
-                checked={apiKey.status === "active" && !isExpired}
+                checked={apiKey.status === "active"}
                 onCheckedChange={() => handleToggle()}
                 disabled={apiKey.status === "revoked" || switchLoading || isExpired}
               />
