@@ -8,7 +8,19 @@ export class GatewayApiService {
   public async fetchGatewayData(type: GatewayType, config: ExtendedGatewayConfig) {
     // Check if Redis integration is enabled
     if (config.useRedis) {
-      return this.fetchGatewayDataFromRedis(type, config);
+      try {
+        return await this.fetchGatewayDataFromRedis(type, config);
+      } catch (error) {
+        console.error(`Redis error when fetching ${type} gateway data:`, error);
+        
+        // Notify the user of Redis failure and fallback
+        toast.warning(`Redis connection failed for ${type.toUpperCase()} gateway`, {
+          description: "Falling back to direct API connection"
+        });
+        
+        // Fall back to direct API call if Redis fails
+        return this.fetchGatewayDataDirect(type, config);
+      }
     }
     
     // Fall back to direct API call if Redis isn't enabled
@@ -17,13 +29,23 @@ export class GatewayApiService {
 
   private async fetchGatewayDataDirect(type: GatewayType, config: ExtendedGatewayConfig) {
     console.log(`Fetching ${type} gateway data directly`);
+    
+    // Validate configuration
+    if (!config.url || !config.apiKey) {
+      throw new Error(`${type.toUpperCase()} gateway URL and API Key must be provided`);
+    }
+    
     // Simulated direct API call to the gateway
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (Math.random() > 0.2) {
-          resolve({ apis: [], status: "success" });
+          resolve({ 
+            apis: [], 
+            status: "success",
+            source: "direct" 
+          });
         } else {
-          reject(new Error("Gateway connection failed"));
+          reject(new Error(`${type.toUpperCase()} gateway connection failed`));
         }
       }, 2000);
     });
@@ -32,18 +54,28 @@ export class GatewayApiService {
   private async fetchGatewayDataFromRedis(type: GatewayType, config: ExtendedGatewayConfig) {
     try {
       console.log(`Fetching ${type} gateway data from Redis`);
+      
       // Ensure Redis is connected
-      if (!redisService.getConnectionStatus().connected) {
-        await redisService.connect();
+      const connectionStatus = redisService.getConnectionStatus();
+      if (!connectionStatus.connected) {
+        const connected = await redisService.connect();
+        if (!connected) {
+          throw new Error(connectionStatus.error || "Failed to establish Redis connection");
+        }
       }
 
       // Use the Redis service to fetch APIs
       const apiDefs = await redisService.getTykApis();
       console.log(`Retrieved ${apiDefs.length} API definitions from Redis`);
-      return { apis: apiDefs, status: "success" };
+      
+      return { 
+        apis: apiDefs, 
+        status: "success", 
+        source: "redis" 
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`Redis error: ${errorMessage}`);
+      console.error(`Redis error for ${type} gateway: ${errorMessage}`);
       throw new Error(`Redis error: ${errorMessage}`);
     }
   }
@@ -62,9 +94,7 @@ export class GatewayApiService {
         console.log("Testing Redis connection");
         const redisConnected = await redisService.testConnection();
         if (!redisConnected) {
-          toast.error("Redis Connection Failed", {
-            description: "Cannot connect to Redis. Please check Redis configuration."
-          });
+          // Redis connection already shows toast, no need to duplicate
           return false;
         }
       }
@@ -101,14 +131,16 @@ export class GatewayApiService {
     });
 
     try {
-      await this.fetchGatewayData(type, config);
-
+      const result = await this.fetchGatewayData(type, config);
+      
       setStatus({
         lastSynced: new Date(),
         inProgress: false,
         error: null
       });
-      toast.success(`Successfully synchronized with ${type.toUpperCase()} gateway${config.useRedis ? " via Redis" : ""}`);
+      
+      const dataSource = result.source === "redis" ? " via Redis" : "";
+      toast.success(`Successfully synchronized with ${type.toUpperCase()} gateway${dataSource}`);
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
