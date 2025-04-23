@@ -17,7 +17,8 @@ import { CollaboratorsPanel } from './flow-panels/CollaboratorsPanel';
 import { NodeConfigDialog } from './node-editors/NodeConfigDialog';
 import { useNodeConfig } from '@/hooks/useNodeConfig';
 import { useFlowHandlers } from '@/hooks/useFlowHandlers';
-import { nodeTypes, flowConfig } from './flow-canvas/FlowConfig';
+import { ApiBuilderNode } from './ApiBuilderNode';
+import { nodeTypes as baseNodeTypes, flowConfig } from './flow-canvas/FlowConfig';
 
 // --- New: Props for controlling node duplicate/delete context actions
 interface FlowCanvasProps {
@@ -85,59 +86,19 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
     fitView: () => reactFlowInstanceRef.current?.fitView({ padding: 0.1, duration: 800 }),
   }));
 
-  // --- Compose custom nodeTypes to inject context actions
+  // --- Create a properly typed custom nodeTypes object that includes the handlers
   const customNodeTypes = {
-    ...nodeTypes,
-    default: (nodeProps: any) => nodeTypes.default({
-      ...nodeProps,
-      onDuplicate: onNodeDuplicate,
-      onDelete: onNodeDelete
-    }),
-    input: (nodeProps: any) => nodeTypes.input({
-      ...nodeProps,
-      onDuplicate: onNodeDuplicate,
-      onDelete: onNodeDelete
-    }),
-    endpoint: (nodeProps: any) => nodeTypes.endpoint({
-      ...nodeProps,
-      onDuplicate: onNodeDuplicate,
-      onDelete: onNodeDelete
-    }),
-    transform: (nodeProps: any) => nodeTypes.transform({
-      ...nodeProps,
-      onDuplicate: onNodeDuplicate,
-      onDelete: onNodeDelete
-    }),
-    auth: (nodeProps: any) => nodeTypes.auth({
-      ...nodeProps,
-      onDuplicate: onNodeDuplicate,
-      onDelete: onNodeDelete
-    }),
-    ratelimit: (nodeProps: any) => nodeTypes.ratelimit({
-      ...nodeProps,
-      onDuplicate: onNodeDuplicate,
-      onDelete: onNodeDelete
-    }),
-    cache: (nodeProps: any) => nodeTypes.cache({
-      ...nodeProps,
-      onDuplicate: onNodeDuplicate,
-      onDelete: onNodeDelete
-    }),
-    mock: (nodeProps: any) => nodeTypes.mock({
-      ...nodeProps,
-      onDuplicate: onNodeDuplicate,
-      onDelete: onNodeDelete
-    }),
-    validator: (nodeProps: any) => nodeTypes.validator({
-      ...nodeProps,
-      onDuplicate: onNodeDuplicate,
-      onDelete: onNodeDelete
-    }),
-    output: (nodeProps: any) => nodeTypes.output({
-      ...nodeProps,
-      onDuplicate: onNodeDuplicate,
-      onDelete: onNodeDelete
-    }),
+    input: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
+    endpoint: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
+    transform: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
+    auth: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
+    ratelimit: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
+    cache: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
+    mock: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
+    validator: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
+    output: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
+    // Add a default type for any future node types
+    default: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
   };
 
   return (
