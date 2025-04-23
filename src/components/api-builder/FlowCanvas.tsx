@@ -1,5 +1,5 @@
 
-import { useCallback, useImperativeHandle, useRef, forwardRef } from 'react';
+import { useCallback, useImperativeHandle, useRef, forwardRef, useMemo } from 'react';
 import ReactFlow, { 
   Background, 
   BackgroundVariant,
@@ -89,8 +89,11 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
     fitView: () => reactFlowInstanceRef.current?.fitView(flowConfig.fitViewOptions),
   }));
 
-  // Custom node types with proper memoization
-  const customNodeTypes = createCustomNodeTypes(onNodeDuplicate, onNodeDelete);
+  // IMPORTANT: Memoize the custom node types to prevent rerenders
+  const customNodeTypes = useMemo(() => 
+    createCustomNodeTypes(onNodeDuplicate, onNodeDelete),
+    [onNodeDuplicate, onNodeDelete]
+  );
 
   return (
     <div className="col-span-3 h-full border rounded-md bg-accent/5 relative" ref={reactFlowWrapper}>
@@ -108,7 +111,6 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
         proOptions={{ hideAttribution: true }}
         {...flowConfig}
         onInit={(instance) => { reactFlowInstanceRef.current = instance; }}
-        className="nodrag" // Make the background non-draggable by default
       >
         <Background 
           color="#aaa" 

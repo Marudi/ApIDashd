@@ -26,9 +26,9 @@ export const SettingsButton = memo(function SettingsButton({
   label = true
 }: SettingsButtonProps) {
   const handleClick = (e: React.MouseEvent) => {
-    // Prevent event from propagating to parent elements
+    // Ensure click stops propagation and reaches onClick handler
     e.stopPropagation();
-    // Call the onClick handler
+    e.preventDefault();
     onClick(e);
   };
 

@@ -1,6 +1,6 @@
 
 import { memo, useCallback } from 'react';
-import { NodeProps, Handle, Position } from 'reactflow';
+import { NodeProps } from 'reactflow';
 import { ApiNodeData, ApiNodeType } from '@/lib/api-builder-types';
 import { 
   ContextMenu,
@@ -58,10 +58,9 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
         <div
           className="rounded-md shadow-md relative"
           data-id={id}
-          onClick={(e) => e.stopPropagation()}
         >
-          {/* Make only the drag handle draggable */}
-          <div className="nodrag">
+          {/* Node content - do NOT apply nodrag here */}
+          <div>
             <DragHandle />
 
             <div className={`min-w-[180px] max-w-[280px] ${
