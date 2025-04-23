@@ -20,6 +20,7 @@ const ApiKeys = () => {
   const [keys, setKeys] = useState<ApiKey[]>(mockApiKeys);
   const [showNewKeyDialog, setShowNewKeyDialog] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
+  const [expirationDate, setExpirationDate] = useState<string | undefined>(undefined);
   const { toast } = useToast();
   const { persistentEnabled, getApiKeys, setApiKeys } = usePersistentStorage();
   const { showDemoData } = useDemoData();
@@ -60,13 +61,14 @@ const ApiKeys = () => {
       policyId: selectedPolicy,
       status: "active" as const,
       createdAt: new Date().toISOString(),
-      expires: undefined,
+      expires: expirationDate,
       lastUsed: undefined
     };
 
     setKeys([newKey, ...keys]);
     setShowNewKeyDialog(false);
     setSelectedPolicy(null);
+    setExpirationDate(undefined);
     
     toast({
       title: "Success",
@@ -93,6 +95,22 @@ const ApiKeys = () => {
     );
   };
 
+  // Handler for updating expiration date
+  const handleUpdateExpiration = (id: string, expirationDate: string | undefined) => {
+    setKeys(keys =>
+      keys.map(key =>
+        key.id === id ? { ...key, expires: expirationDate } : key
+      )
+    );
+    
+    toast({
+      title: "Expiration Updated",
+      description: expirationDate ? 
+        `API key will expire on ${new Date(expirationDate).toLocaleDateString()}` : 
+        "API key will never expire"
+    });
+  };
+
   return (
     <DashboardLayout>
       <div className="mb-6 flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center">
@@ -116,6 +134,7 @@ const ApiKeys = () => {
           keys={filteredKeys}
           onRevoke={handleRevokeKey}
           onToggleActive={handleToggleActive}
+          onUpdateExpiration={handleUpdateExpiration}
         />
 
         <NewKeyDialog
@@ -123,6 +142,8 @@ const ApiKeys = () => {
           onOpenChange={setShowNewKeyDialog}
           selectedPolicy={selectedPolicy}
           onPolicySelect={setSelectedPolicy}
+          expirationDate={expirationDate}
+          onExpirationChange={setExpirationDate}
           onGenerate={generateNewKey}
         />
       </>

@@ -8,9 +8,15 @@ interface ApiKeysTableProps {
   keys: ApiKey[];
   onRevoke: (id: string) => void;
   onToggleActive: (id: string, active: boolean) => void;
+  onUpdateExpiration: (id: string, expirationDate: string | undefined) => void;
 }
 
-export const ApiKeysTable = ({ keys, onRevoke, onToggleActive }: ApiKeysTableProps) => {
+export const ApiKeysTable = ({ 
+  keys, 
+  onRevoke, 
+  onToggleActive, 
+  onUpdateExpiration 
+}: ApiKeysTableProps) => {
   return (
     <Card>
       <CardContent className="p-0">
@@ -33,6 +39,7 @@ export const ApiKeysTable = ({ keys, onRevoke, onToggleActive }: ApiKeysTablePro
                 apiKey={key} 
                 onRevoke={onRevoke}
                 onToggleActive={onToggleActive}
+                onUpdateExpiration={onUpdateExpiration}
               />
             ))}
           </TableBody>
@@ -47,4 +54,3 @@ export const ApiKeysTable = ({ keys, onRevoke, onToggleActive }: ApiKeysTablePro
     </Card>
   );
 };
-
