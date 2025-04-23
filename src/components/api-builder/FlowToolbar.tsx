@@ -36,6 +36,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DeleteConfirmDialog } from './FlowToolbar/DeleteConfirmDialog';
+import { ShareDialog } from './FlowToolbar/ShareDialog';
+import { HistoryDialog } from './FlowToolbar/HistoryDialog';
 
 export interface FlowToolbarProps {
   flow: ApiFlow;
@@ -283,76 +286,26 @@ export function FlowToolbar({
         )}
       </div>
 
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete API Flow</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this API flow? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        onConfirm={confirmDelete}
+      />
 
-      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Share API Flow</DialogTitle>
-            <DialogDescription>
-              Share this link with your team members to collaborate on this API flow.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex items-center space-x-2 mt-4">
-            <Input value={shareUrl} readOnly />
-            <Button variant="outline" size="sm" onClick={handleCopyShareUrl}>
-              Copy
-            </Button>
-          </div>
-          <DialogFooter className="mt-4">
-            <Button onClick={() => setShowShareDialog(false)}>
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ShareDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        shareUrl={shareUrl}
+        onCopy={handleCopyShareUrl}
+      />
 
-      <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Flow History</DialogTitle>
-            <DialogDescription>
-              Previous 10 versions of this API flow (auto-saved on Save or Publish).
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-2 max-h-60 overflow-y-auto mt-2">
-            {historyLoading && <div className="text-muted-foreground text-xs">Loading...</div>}
-            {(!historyLoading && historyList.length === 0) && (
-              <div className="text-muted-foreground text-xs">No history found.</div>
-            )}
-            {historyList.map((v, idx) => (
-              <div key={v.lastUpdated} className="flex items-center justify-between bg-accent p-2 rounded">
-                <div>
-                  <span className="font-semibold">{new Date(v.lastUpdated).toLocaleString()}</span>
-                  <span className="block text-xs text-muted-foreground">{v.name}</span>
-                </div>
-                <Button variant="secondary" size="sm"
-                  onClick={() => handleRestoreVersion(v)}>
-                  Restore
-                </Button>
-              </div>
-            ))}
-          </div>
-          <DialogFooter className="mt-4">
-            <Button onClick={() => setShowHistoryDialog(false)}>Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <HistoryDialog
+        open={showHistoryDialog}
+        onOpenChange={setShowHistoryDialog}
+        historyList={historyList}
+        loading={historyLoading}
+        onRestore={handleRestoreVersion}
+      />
     </>
   );
 }
