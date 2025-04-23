@@ -9,11 +9,14 @@ const ApiBuilder = () => {
   const { 
     flow,
     saveFlow,
-    setFlow
+    setFlow,
+    unsavedChanges,
+    setUnsavedChanges
   } = useApiFlow("user-1", "My First API");
 
   const handleFlowUpdate = (updatedFlow: any) => {
     setFlow(updatedFlow);
+    setUnsavedChanges(true);
   };
 
   return (
@@ -21,7 +24,10 @@ const ApiBuilder = () => {
       <ReactFlowProvider>
         <ApiBuilderFlow />
         <div className="mt-4 mb-8">
-          <ApiBuilderJsonEditor flow={flow} updateFlow={handleFlowUpdate} />
+          <ApiBuilderJsonEditor 
+            flow={flow} 
+            updateFlow={handleFlowUpdate} 
+          />
         </div>
       </ReactFlowProvider>
     </DashboardLayout>

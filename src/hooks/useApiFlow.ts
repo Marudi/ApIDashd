@@ -1,6 +1,5 @@
-
 import { useCallback, useEffect, useState } from "react";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { ApiFlow } from "@/lib/api-builder-types";
 import { createEmptyFlow } from "@/lib/api-builder/flow-utils";
 import { usePersistentStorage } from "./usePersistentStorage";
@@ -8,7 +7,6 @@ import { useFlowStorage } from "./useFlowStorage";
 import { useFlowHistory } from "./useFlowHistory";
 import { useFlowNodes } from "./useFlowNodes";
 
-// Main compositional hook
 export function useApiFlow(initialUserId: string, initialFlowName?: string) {
   const [flow, setFlow] = useState<ApiFlow>(
     createEmptyFlow(initialUserId, initialFlowName)
@@ -173,10 +171,11 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
     publishFlow,
     updateFlowName,
     setNodes,
+    setFlow: updateFlow,
     unsavedChanges,
+    setUnsavedChanges,
     duplicateNode,
     deleteNode,
     getFlowHistory,
-    setFlow: updateFlow,
   };
 }

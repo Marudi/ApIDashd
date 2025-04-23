@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -65,8 +64,7 @@ export function ApiFlowJsonEditor({ flow, updateFlow }: ApiFlowJsonEditorProps) 
   }, [debouncedJsonValue, updateFlow]);
 
   const handleJsonChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    setJsonValue(newValue);
+    setJsonValue(e.target.value);
   };
 
   return (
