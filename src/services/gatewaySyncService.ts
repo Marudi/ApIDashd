@@ -1,4 +1,8 @@
+
 import { toast } from "sonner";
+import { gatewayConfigService } from "./GatewayConfigService";
+import { gatewayApiService } from "./GatewayApiService";
+import { gatewaySyncScheduler } from "./GatewaySyncScheduler";
 
 export type GatewayType = "tyk" | "kong";
 
@@ -16,190 +20,23 @@ export interface SyncStatus {
   error: string | null;
 }
 
-class GatewaySyncService {
-  private configs: Record<GatewayType, GatewayConfig> = {
-    tyk: {
-      type: "tyk",
-      url: "",
-      apiKey: "",
-      syncInterval: 5,
-      enabled: false,
-    },
-    kong: {
-      type: "kong",
-      url: "",
-      apiKey: "",
-      syncInterval: 5,
-      enabled: false,
-    },
-  };
+/**
+ * Exported singleton service to provide the same API as before.
+ */
+export const gatewaySyncService = {
+  getConfig: (type: GatewayType) => gatewayConfigService.getConfig(type),
+  updateConfig: (type: GatewayType, config: Partial<GatewayConfig>) => {
+    gatewayConfigService.updateConfig(type, config);
+    gatewaySyncScheduler.updateSyncSchedule(type);
+  },
 
-  private syncStatus: Record<GatewayType, SyncStatus> = {
-    tyk: {
-      lastSynced: null,
-      inProgress: false,
-      error: null,
-    },
-    kong: {
-      lastSynced: null,
-      inProgress: false,
-      error: null,
-    },
-  };
+  getSyncStatus: (type: GatewayType) => gatewaySyncScheduler.getSyncStatus(type),
 
-  private syncIntervals: Record<GatewayType, number | null> = {
-    tyk: null,
-    kong: null,
-  };
+  syncGateway: (type: GatewayType) => gatewaySyncScheduler.syncGateway(type),
 
-  constructor() {
-    this.loadConfig();
-    this.initSyncSchedules();
+  testConnection: async (type: GatewayType) => {
+    const config = gatewayConfigService.getConfig(type);
+    return gatewayApiService.testConnection(type, config);
   }
+};
 
-  private loadConfig() {
-    // Load from localStorage if available
-    const savedTykConfig = localStorage.getItem("tyk-gateway-config");
-    const savedKongConfig = localStorage.getItem("kong-gateway-config");
-
-    if (savedTykConfig) {
-      this.configs.tyk = JSON.parse(savedTykConfig);
-    }
-
-    if (savedKongConfig) {
-      this.configs.kong = JSON.parse(savedKongConfig);
-    }
-  }
-
-  private saveConfig(type: GatewayType) {
-    localStorage.setItem(
-      `${type}-gateway-config`,
-      JSON.stringify(this.configs[type])
-    );
-  }
-
-  public getConfig(type: GatewayType): GatewayConfig {
-    return this.configs[type];
-  }
-
-  public updateConfig(type: GatewayType, config: Partial<GatewayConfig>): void {
-    this.configs[type] = {
-      ...this.configs[type],
-      ...config,
-    };
-    this.saveConfig(type);
-    this.updateSyncSchedule(type);
-  }
-
-  public getSyncStatus(type: GatewayType): SyncStatus {
-    return this.syncStatus[type];
-  }
-
-  private initSyncSchedules() {
-    Object.keys(this.configs).forEach((type) => {
-      this.updateSyncSchedule(type as GatewayType);
-    });
-  }
-
-  private updateSyncSchedule(type: GatewayType) {
-    // Clear existing interval if any
-    if (this.syncIntervals[type] !== null) {
-      window.clearInterval(this.syncIntervals[type]!);
-      this.syncIntervals[type] = null;
-    }
-
-    const config = this.configs[type];
-    if (config.enabled && config.url && config.apiKey) {
-      // Set new interval
-      this.syncIntervals[type] = window.setInterval(() => {
-        this.syncGateway(type);
-      }, config.syncInterval * 60 * 1000);
-
-      // Initial sync
-      this.syncGateway(type);
-    }
-  }
-
-  public async syncGateway(type: GatewayType): Promise<boolean> {
-    const config = this.configs[type];
-    
-    if (!config.enabled || !config.url || !config.apiKey) {
-      return false;
-    }
-
-    this.syncStatus[type] = {
-      ...this.syncStatus[type],
-      inProgress: true,
-      error: null,
-    };
-
-    try {
-      console.log(`Syncing with ${type} gateway at ${config.url}`);
-      
-      // Simulate API call to gateway
-      const response = await this.fetchGatewayData(type, config);
-      
-      this.syncStatus[type] = {
-        lastSynced: new Date(),
-        inProgress: false,
-        error: null,
-      };
-      
-      toast.success(`Successfully synchronized with ${type.toUpperCase()} gateway`);
-      return true;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
-      this.syncStatus[type] = {
-        ...this.syncStatus[type],
-        inProgress: false,
-        error: errorMessage,
-      };
-      
-      toast.error(`Failed to sync with ${type.toUpperCase()} gateway: ${errorMessage}`);
-      return false;
-    }
-  }
-
-  private async fetchGatewayData(type: GatewayType, config: GatewayConfig) {
-    // This would be replaced with actual API calls to Tyk or Kong
-    return new Promise((resolve, reject) => {
-      // Simulate network delay
-      setTimeout(() => {
-        if (Math.random() > 0.2) { // 80% success rate for simulation
-          resolve({
-            apis: [],
-            status: "success"
-          });
-        } else {
-          reject(new Error("Gateway connection failed"));
-        }
-      }, 2000);
-    });
-  }
-
-  public async testConnection(type: GatewayType): Promise<boolean> {
-    const config = this.configs[type];
-    
-    if (!config.url || !config.apiKey) {
-      toast.error("Connection Test Failed", {
-        description: "Gateway URL and API Key must be provided"
-      });
-      return false;
-    }
-
-    try {
-      await this.fetchGatewayData(type, config);
-      return true;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown connection error';
-      toast.error("Connection Test Failed", {
-        description: errorMessage
-      });
-      return false;
-    }
-  }
-}
-
-// Create a singleton instance
-export const gatewaySyncService = new GatewaySyncService();
