@@ -1,16 +1,20 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Save } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 import { PostgresConfigSection } from "./PostgresConfigSection";
 import { usePersistentStorage } from "@/hooks/usePersistentStorage";
 import { StorageUsageCard } from "./StorageUsageCard";
 import { useToast } from "@/hooks/use-toast";
 import { useDemoData } from "@/contexts/DemoDataContext";
+import { DashboardNameInput } from "./DashboardNameInput";
+import { TimeZoneSelect } from "./TimeZoneSelect";
+import { DateFormatSelect } from "./DateFormatSelect";
+import { AutoRefreshToggle } from "./AutoRefreshToggle";
+import { ShowDemoDataToggle } from "./ShowDemoDataToggle";
+import { PersistenceToggle } from "./PersistenceToggle";
 
 // Default settings
 const DEFAULT_SETTINGS = {
@@ -32,7 +36,6 @@ export function GeneralSettingsSection() {
   const [autoRefresh, setAutoRefresh] = useState(DEFAULT_SETTINGS.autoRefresh);
   const [loading, setLoading] = useState(true);
 
-  // Load settings on mount or when persistence enabled changes
   useEffect(() => {
     setLoading(true);
     if (persistentEnabled) {
@@ -49,7 +52,6 @@ export function GeneralSettingsSection() {
         setAutoRefresh(DEFAULT_SETTINGS.autoRefresh);
       }
     } else {
-      // fallback to defaults
       setDashboardName(DEFAULT_SETTINGS.dashboardName);
       setTimeZone(DEFAULT_SETTINGS.timeZone);
       setDateFormat(DEFAULT_SETTINGS.dateFormat);
@@ -58,7 +60,6 @@ export function GeneralSettingsSection() {
     setLoading(false);
   }, [persistentEnabled, getPersistentItem]);
 
-  // Save handler
   const handleSave = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const settings = {
@@ -85,14 +86,12 @@ export function GeneralSettingsSection() {
     }
   };
 
-  // Reset handler
   const handleReset = () => {
     setDashboardName(DEFAULT_SETTINGS.dashboardName);
     setTimeZone(DEFAULT_SETTINGS.timeZone);
     setDateFormat(DEFAULT_SETTINGS.dateFormat);
     setAutoRefresh(DEFAULT_SETTINGS.autoRefresh);
     setShowDemoData(DEFAULT_SETTINGS.showDemoData);
-    // Optionally clear persisted settings
     if (persistentEnabled) {
       setPersistentItem("dashboard_settings", DEFAULT_SETTINGS);
     }
@@ -121,92 +120,49 @@ export function GeneralSettingsSection() {
             autoComplete="off"
           >
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Dashboard Name</Label>
-                <Input 
-                  type="text" 
-                  placeholder="Dashboard Name" 
-                  value={dashboardName}
-                  onChange={e => setDashboardName(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-              
+              <DashboardNameInput
+                value={dashboardName}
+                onChange={setDashboardName}
+                disabled={loading}
+              />
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Time Zone</Label>
-                  <select
-                    className="w-full h-10 px-3 py-2 border border-input rounded-md"
-                    value={timeZone}
-                    onChange={e => setTimeZone(e.target.value)}
-                    disabled={loading}
-                  >
-                    <option>(UTC+00:00) UTC</option>
-                    <option>(UTC-05:00) Eastern Time (US & Canada)</option>
-                    <option>(UTC-06:00) Central Time (US & Canada)</option>
-                    <option>(UTC-07:00) Mountain Time (US & Canada)</option>
-                    <option>(UTC-08:00) Pacific Time (US & Canada)</option>
-                    <option>(UTC+01:00) Central European Time</option>
-                  </select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Date Format</Label>
-                  <select
-                    className="w-full h-10 px-3 py-2 border border-input rounded-md"
-                    value={dateFormat}
-                    onChange={e => setDateFormat(e.target.value)}
-                    disabled={loading}
-                  >
-                    <option>MM/DD/YYYY</option>
-                    <option>DD/MM/YYYY</option>
-                    <option>YYYY-MM-DD</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Auto Refresh Dashboard</Label>
-                  <p className="text-sm text-muted-foreground">Automatically refresh data every 5 minutes</p>
-                </div>
-                <Switch
-                  checked={autoRefresh}
-                  onCheckedChange={val => setAutoRefresh(!!val)}
+                <TimeZoneSelect
+                  value={timeZone}
+                  onChange={setTimeZone}
+                  disabled={loading}
+                />
+                <DateFormatSelect
+                  value={dateFormat}
+                  onChange={setDateFormat}
                   disabled={loading}
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Show demo data in dashboard</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Enable or disable displaying demo/sample data in dashboard pages.
-                  </p>
-                </div>
-                <Switch
-                  checked={showDemoData}
-                  onCheckedChange={val => setShowDemoData(val)}
-                  disabled={loading}
-                  aria-label="Show demo data"
-                />
-              </div>
+              <AutoRefreshToggle
+                checked={autoRefresh}
+                onChange={val => setAutoRefresh(!!val)}
+                disabled={loading}
+              />
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Persist API &amp; Key Data locally</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Save API and key data in your browser for offline access and session restore.
-                  </p>
-                </div>
-                <Switch checked={persistentEnabled} onCheckedChange={setPersistentEnabled} />
-              </div>
+              <ShowDemoDataToggle
+                checked={showDemoData}
+                onChange={val => setShowDemoData(val)}
+                disabled={loading}
+              />
+
+              <PersistenceToggle
+                checked={persistentEnabled}
+                onChange={setPersistentEnabled}
+              />
             </div>
-            
+
             <Separator />
-            
+
             <div className="flex justify-end gap-2">
-              <Button variant="outline" type="button" onClick={handleReset}>Reset</Button>
+              <Button variant="outline" type="button" onClick={handleReset}>
+                Reset
+              </Button>
               <Button type="submit">
                 <Save className="mr-2 h-4 w-4" />
                 Save Changes
