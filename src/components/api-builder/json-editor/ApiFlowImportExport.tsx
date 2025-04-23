@@ -1,10 +1,11 @@
 
 import { Button } from '@/components/ui/button';
-import { Upload, Download } from 'lucide-react';
+import { Upload, Download, FileJson } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { ApiFlowJsonEditorProps, ImportResult, ExportResult } from './types';
+import { convertFlowToApiDefinition } from '@/lib/api-builder/flow-utils';
 
-export function ApiFlowImportExport({ flow, updateFlow }: ApiFlowJsonEditorProps) {
+export function ApiFlowImportExport({ flow, exportableFlow, updateFlow }: ApiFlowJsonEditorProps) {
   const importFlow = (file: File): Promise<ImportResult> => {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -33,15 +34,18 @@ export function ApiFlowImportExport({ flow, updateFlow }: ApiFlowJsonEditorProps
     });
   };
 
-  const exportFlow = (): ExportResult => {
+  const exportFlow = (format: 'internal' | 'api'): ExportResult => {
     try {
-      const jsonString = JSON.stringify(flow, null, 2);
+      const data = format === 'internal' ? flow : exportableFlow;
+      const jsonString = JSON.stringify(data, null, 2);
       const blob = new Blob([jsonString], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       
       const link = document.createElement('a');
       link.href = url;
-      link.download = `api-flow-${flow.id}.json`;
+      link.download = format === 'internal' 
+        ? `api-flow-${flow.id}.json` 
+        : `api-definition-${flow.id}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -78,13 +82,13 @@ export function ApiFlowImportExport({ flow, updateFlow }: ApiFlowJsonEditorProps
     event.target.value = '';
   };
 
-  const handleDownloadJson = () => {
-    const result = exportFlow();
+  const handleExportFlow = (format: 'internal' | 'api') => {
+    const result = exportFlow(format);
     
     if (result.success) {
       toast({
         title: "Flow Exported",
-        description: "Your API flow has been exported as JSON",
+        description: `Your API flow has been exported as ${format === 'internal' ? 'internal' : 'API'} format`,
       });
     } else {
       toast({
@@ -118,10 +122,19 @@ export function ApiFlowImportExport({ flow, updateFlow }: ApiFlowJsonEditorProps
       <Button 
         variant="outline" 
         className="w-full"
-        onClick={handleDownloadJson}
+        onClick={() => handleExportFlow('internal')}
       >
         <Download className="mr-2 h-4 w-4" />
         Export Flow
+      </Button>
+
+      <Button 
+        variant="outline" 
+        className="w-full"
+        onClick={() => handleExportFlow('api')}
+      >
+        <FileJson className="mr-2 h-4 w-4" />
+        Export API Format
       </Button>
     </div>
   );

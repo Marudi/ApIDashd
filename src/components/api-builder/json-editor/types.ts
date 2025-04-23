@@ -1,15 +1,12 @@
 
+import { ApiDefinition } from "@/lib/types";
 import { ApiFlow } from '@/lib/api-builder-types';
 
 export interface ApiFlowJsonEditorProps {
   flow: ApiFlow;
+  exportableFlow: ApiDefinition;
   updateFlow: (flow: ApiFlow) => void;
 }
-
-export type JsonValidationResult = {
-  isValid: boolean;
-  error?: string;
-};
 
 export interface ImportResult {
   success: boolean;
@@ -21,3 +18,6 @@ export interface ExportResult {
   success: boolean;
   error?: string;
 }
+
+export type ExportFormat = 'internal' | 'api';
+

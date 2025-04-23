@@ -5,6 +5,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { FileJson } from 'lucide-react';
 import { ApiFlowJsonEditor } from './json-editor/ApiFlowJsonEditor';
 import { ApiFlowImportExport } from './json-editor/ApiFlowImportExport';
+import { useCallback } from 'react';
+import { convertFlowToApiDefinition } from '@/lib/api-builder/flow-utils';
 
 interface ApiBuilderJsonEditorProps {
   flow: ApiFlow;
@@ -12,6 +14,12 @@ interface ApiBuilderJsonEditorProps {
 }
 
 export function ApiBuilderJsonEditor({ flow, updateFlow }: ApiBuilderJsonEditorProps) {
+  const handleFlowUpdate = useCallback((updatedFlow: ApiFlow) => {
+    updateFlow(updatedFlow);
+  }, [updateFlow]);
+
+  const exportableFlow = convertFlowToApiDefinition(flow);
+
   return (
     <Accordion type="single" collapsible className="w-full mt-4">
       <AccordionItem value="json-editor">
@@ -32,10 +40,18 @@ export function ApiBuilderJsonEditor({ flow, updateFlow }: ApiBuilderJsonEditorP
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="md:col-span-3">
-                  <ApiFlowJsonEditor flow={flow} updateFlow={updateFlow} />
+                  <ApiFlowJsonEditor 
+                    flow={flow} 
+                    exportableFlow={exportableFlow}
+                    updateFlow={handleFlowUpdate} 
+                  />
                 </div>
                 <div>
-                  <ApiFlowImportExport flow={flow} updateFlow={updateFlow} />
+                  <ApiFlowImportExport 
+                    flow={flow} 
+                    exportableFlow={exportableFlow}
+                    updateFlow={handleFlowUpdate} 
+                  />
                 </div>
               </div>
             </CardContent>
