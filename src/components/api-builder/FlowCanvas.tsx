@@ -104,11 +104,11 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
         onDragOver={onDragOver}
         onNodeClick={onNodeClick}
         nodeTypes={customNodeTypes}
-        draggable={true}
         deleteKeyCode={['Backspace', 'Delete']}
         proOptions={{ hideAttribution: true }}
         {...flowConfig}
         onInit={(instance) => { reactFlowInstanceRef.current = instance; }}
+        className="nodrag" // Make the background non-draggable by default
       >
         <Background 
           color="#aaa" 

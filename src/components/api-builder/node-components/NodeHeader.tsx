@@ -32,13 +32,14 @@ export const NodeHeader = memo(function NodeHeader({
   const handleSettingsClick = (e: React.MouseEvent) => {
     // Prevent the event from bubbling up to the node
     e.stopPropagation();
+    e.preventDefault(); 
     onSettings(e);
   };
 
   return (
     <div className={`${getNodeColor(type)} text-white p-2 rounded-t-md flex justify-between items-center`}>
-      <span className="font-medium capitalize">{type}</span>
-      <div>
+      <span className="font-medium capitalize pl-2">{type}</span>
+      <div className="mr-2">
         <SettingsButton 
           nodeType={nodeType} 
           onClick={handleSettingsClick} 

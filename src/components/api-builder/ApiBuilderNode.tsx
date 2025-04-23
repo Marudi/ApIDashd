@@ -1,5 +1,6 @@
+
 import { memo, useCallback } from 'react';
-import { NodeProps } from 'reactflow';
+import { NodeProps, Handle, Position } from 'reactflow';
 import { ApiNodeData, ApiNodeType } from '@/lib/api-builder-types';
 import { 
   ContextMenu,
@@ -55,27 +56,30 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
     <ContextMenu>
       <ContextMenuTrigger>
         <div
-          className={`nodrag rounded-md shadow-md relative ${
-            selected ? 'ring-2 ring-primary ring-offset-2' : ''
-          }`}
+          className="rounded-md shadow-md relative"
           data-id={id}
           onClick={(e) => e.stopPropagation()}
         >
-          <DragHandle />
+          {/* Make only the drag handle draggable */}
+          <div className="nodrag">
+            <DragHandle />
 
-          <div className="min-w-[180px] max-w-[280px]">
-            <NodeHeader 
-              type={type} 
-              nodeType={nodeType}
-              onSettings={handleSettings}
-            />
-            <NodeBody 
-              data={data} 
-              type={type}
-            />
+            <div className={`min-w-[180px] max-w-[280px] ${
+              selected ? 'ring-2 ring-primary ring-offset-2' : ''
+            }`}>
+              <NodeHeader 
+                type={type} 
+                nodeType={nodeType}
+                onSettings={handleSettings}
+              />
+              <NodeBody 
+                data={data} 
+                type={type}
+              />
+            </div>
+
+            <NodeHandles type={type} />
           </div>
-
-          <NodeHandles type={type} />
         </div>
       </ContextMenuTrigger>
       

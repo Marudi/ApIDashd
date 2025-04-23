@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -179,6 +180,7 @@
   /* Slight border for contrast */
   cursor: grab;
 }
+
 .drag-handle:active,
 .drag-handle:focus {
   cursor: grabbing;
@@ -186,6 +188,7 @@
   outline-offset: 1px;
   z-index: 20;
 }
+
 .drag-handle:hover {
   box-shadow: 0 4px 12px rgba(155,135,245,0.13);
   background: #f3f0fa;
@@ -204,4 +207,15 @@
 .react-flow__node > .drag-handle {
   /* This selector improves specificity for nodes */
   position: absolute;
+}
+
+/* Fix for making only the drag handle draggable */
+.react-flow .nodrag {
+  cursor: default;
+  pointer-events: all;
+}
+
+.react-flow .nodrag .drag-handle {
+  cursor: grab;
+  pointer-events: all;
 }
