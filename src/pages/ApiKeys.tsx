@@ -82,6 +82,17 @@ const ApiKeys = () => {
     });
   };
 
+  // Handler for toggle
+  const handleToggleActive = async (id: string, active: boolean) => {
+    setKeys(keys =>
+      keys.map(key =>
+        key.id === id && key.status !== "revoked"
+          ? { ...key, status: active ? "active" : "inactive" }
+          : key
+      )
+    );
+  };
+
   return (
     <DashboardLayout>
       <div className="mb-6 flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center">
@@ -101,7 +112,11 @@ const ApiKeys = () => {
         </Card>
       ) : (
       <>
-        <ApiKeysTable keys={filteredKeys} onRevoke={handleRevokeKey} />
+        <ApiKeysTable
+          keys={filteredKeys}
+          onRevoke={handleRevokeKey}
+          onToggleActive={handleToggleActive}
+        />
 
         <NewKeyDialog
           open={showNewKeyDialog}

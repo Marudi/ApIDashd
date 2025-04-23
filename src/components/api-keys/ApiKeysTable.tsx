@@ -7,9 +7,10 @@ import { ApiKeyTableRow } from "./ApiKeyTableRow";
 interface ApiKeysTableProps {
   keys: ApiKey[];
   onRevoke: (id: string) => void;
+  onToggleActive: (id: string, active: boolean) => void;
 }
 
-export const ApiKeysTable = ({ keys, onRevoke }: ApiKeysTableProps) => {
+export const ApiKeysTable = ({ keys, onRevoke, onToggleActive }: ApiKeysTableProps) => {
   return (
     <Card>
       <CardContent className="p-0">
@@ -31,6 +32,7 @@ export const ApiKeysTable = ({ keys, onRevoke }: ApiKeysTableProps) => {
                 key={key.id} 
                 apiKey={key} 
                 onRevoke={onRevoke}
+                onToggleActive={onToggleActive}
               />
             ))}
           </TableBody>

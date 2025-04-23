@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,10 +8,13 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from "@/components/ui/use-toast";
 import { ApiKey } from "@/lib/types";
 import { getPolicyName } from "@/lib/api-key-utils";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface ApiKeyTableRowProps {
   apiKey: ApiKey;
   onRevoke: (id: string) => void;
+  onToggleActive: (id: string, active: boolean) => void;
 }
 
 const formatDate = (dateString: string | undefined) => {
@@ -19,10 +23,11 @@ const formatDate = (dateString: string | undefined) => {
   return date.toLocaleDateString();
 };
 
-export const ApiKeyTableRow = ({ apiKey, onRevoke }: ApiKeyTableRowProps) => {
+export const ApiKeyTableRow = ({ apiKey, onRevoke, onToggleActive }: ApiKeyTableRowProps) => {
   const [showViewDialog, setShowViewDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { toast } = useToast();
+  const [switchLoading, setSwitchLoading] = useState(false);
 
   const maskedKey = apiKey.keyHash.slice(0, 8) + "..." + apiKey.keyHash.slice(-8);
 
@@ -31,6 +36,18 @@ export const ApiKeyTableRow = ({ apiKey, onRevoke }: ApiKeyTableRowProps) => {
     toast({
       title: "Key Copied",
       description: "API key has been copied to clipboard"
+    });
+  };
+
+  const handleToggle = async () => {
+    if (apiKey.status === "revoked") return;
+    setSwitchLoading(true);
+    const nextActive = apiKey.status !== "active";
+    await onToggleActive(apiKey.id, nextActive);
+    setSwitchLoading(false);
+    toast({
+      title: nextActive ? "Key Activated" : "Key Deactivated",
+      description: `API key has been marked as ${nextActive ? "active" : "inactive"}`,
     });
   };
 
@@ -66,17 +83,28 @@ export const ApiKeyTableRow = ({ apiKey, onRevoke }: ApiKeyTableRowProps) => {
           {apiKey.lastUsed ? formatDate(apiKey.lastUsed) : "Never"}
         </TableCell>
         <TableCell className="text-right">
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" size="sm" onClick={() => setShowViewDialog(true)}>View</Button>
-            {apiKey.status === "active" && (
-              <Button 
-                variant="destructive" 
-                size="sm" 
-                onClick={() => setShowConfirmDialog(true)}
-              >
-                Revoke
-              </Button>
-            )}
+          <div className="flex flex-col gap-2 items-end">
+            <div className="flex items-center gap-2">
+              <Label htmlFor={`active-toggle-${apiKey.id}`} className="text-xs mr-1">Active</Label>
+              <Switch
+                id={`active-toggle-${apiKey.id}`}
+                checked={apiKey.status === "active"}
+                onCheckedChange={() => handleToggle()}
+                disabled={apiKey.status === "revoked" || switchLoading}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setShowViewDialog(true)}>View</Button>
+              {apiKey.status === "active" && (
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  onClick={() => setShowConfirmDialog(true)}
+                >
+                  Revoke
+                </Button>
+              )}
+            </div>
           </div>
         </TableCell>
       </TableRow>
