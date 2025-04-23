@@ -40,7 +40,6 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
 
   const handleSettings = useCallback((e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent the event from bubbling to the node
-    console.log("Settings clicked for node:", id);
     
     // Open node config dialog using the hook
     openNodeConfig({

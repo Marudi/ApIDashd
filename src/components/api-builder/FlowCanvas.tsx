@@ -72,9 +72,9 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
     handleExport
   } = useFlowHandlers(reactFlowWrapper, setNodes, onSave);
 
-  // Fixed onNodeClick handler to properly open node config dialog
+  // We don't need a specific onNodeClick handler since the node itself handles opening the config dialog
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node<ApiNodeData>) => {
-    // We don't need to do anything here since the click is handled by the node itself
+    // Handled directly by the node's click handlers
     console.log("Node clicked:", node.id);
   }, []);
 
