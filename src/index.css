@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -116,7 +115,35 @@
 .react-flow__handle.custom-handle.connectionindicator:focus,
 .react-flow__handle.custom-handle.connectingfrom,
 .react-flow__handle.custom-handle.connectingto {
-  background-color: #33C3F0; /* Slightly lighter blue for hover state */
+  background-color: #9b87f5; /* Vivid Purple for handle hover */
+  /* Optional: border or shadow can be added for extra emphasis */
+}
+
+.react-flow__node {
+  cursor: grab;
+  transition: box-shadow 0.2s ease;
+  /* Removed box-shadow changes to keep only border highlight */
+}
+
+.react-flow__node.selected {
+  box-shadow: 0 0 0 2px #9b87f5 !important; /* Bright vivid purple */
+}
+
+.react-flow__node.dragging {
+  cursor: grabbing;
+  opacity: 0.8;
+  box-shadow: 0 0 0 4px #9b87f5 !important; /* Vivid purple ring for dragging */
+  border-color: #9b87f5 !important;
+}
+
+.react-flow__node:hover {
+  box-shadow: 0 0 0 1.5px #9b87f5; /* Slight purple outline on hover */
+  cursor: grab;
+}
+
+.react-flow__handle {
+  /* Optionally, add some focus effect for connection handles */
+  transition: background-color 0.12s;
 }
 
 /* Make sure nodes are draggable with visual cues */
