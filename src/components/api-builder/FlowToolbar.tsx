@@ -1,15 +1,14 @@
-
 import { useState } from "react";
 import { ApiFlow } from "@/lib/api-builder-types";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { AlertCircle, Check } from "lucide-react";
 import { ToolbarActions } from "./FlowToolbar/ToolbarActions";
 import { ToolbarViewControls } from "./FlowToolbar/ToolbarViewControls";
 import { ToolbarPublishButton } from "./FlowToolbar/ToolbarPublishButton";
 import { ShareDialog } from './FlowToolbar/ShareDialog';
 import { DeleteConfirmDialog } from './FlowToolbar/DeleteConfirmDialog';
 import { HistoryDialog } from './FlowToolbar/HistoryDialog';
-import { Progress } from "@/components/ui/progress";
+import { SaveStatusIndicator } from './FlowToolbar/SaveStatusIndicator';
+import { PublishProgress } from './FlowToolbar/PublishProgress';
 
 export interface FlowToolbarProps {
   flow: ApiFlow;
@@ -90,28 +89,12 @@ export function FlowToolbar({
             hasUnsavedChanges={hasUnsavedChanges}
             isMobile={isMobile}
           />
-          {hasUnsavedChanges ? (
-            <span className="text-xs flex items-center text-amber-500">
-              <AlertCircle className="h-3 w-3 mr-1" />
-              Unsaved changes
-            </span>
-          ) : (
-            <span className="text-xs flex items-center text-green-500">
-              <Check className="h-3 w-3 mr-1" />
-              Saved
-            </span>
-          )}
+          <SaveStatusIndicator hasUnsavedChanges={hasUnsavedChanges} />
         </div>
       </div>
-      {isPublishing && (
-        <div className="w-full mt-2">
-          <div className="flex justify-between items-center text-xs mb-1">
-            <span>Publishing API...</span>
-            <span>{progress}%</span>
-          </div>
-          <Progress value={progress} />
-        </div>
-      )}
+      
+      <PublishProgress isPublishing={isPublishing} progress={progress} />
+
       <DeleteConfirmDialog
         open={showDeleteConfirm}
         onOpenChange={setShowDeleteConfirm}
