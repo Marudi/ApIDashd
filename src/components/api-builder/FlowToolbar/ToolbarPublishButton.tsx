@@ -39,7 +39,7 @@ export function ToolbarPublishButton({
       if (progressValue >= 100) {
         clearInterval(interval);
         setIsPublishing(false);
-        onPublish();
+        onPublish(); // This should set unsavedChanges to false internally
         toast({
           title: "API Published",
           description: `${flow.name} has been published successfully`,
@@ -49,12 +49,12 @@ export function ToolbarPublishButton({
   };
 
   return flow.published ? (
-    <Button variant="default" size="sm" className="bg-green-600">
+    <Button variant="default" size="sm" className="bg-green-600" disabled={isPublishing}>
       Published
     </Button>
   ) : (
     <Button
-      disabled={isPublishing}
+      disabled={isPublishing || (hasUnsavedChanges === false && !flow.published)}
       onClick={handlePublish}
       variant="default"
       size="sm"

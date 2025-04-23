@@ -16,13 +16,20 @@ const ApiBuilder = () => {
 
   const handleFlowUpdate = (updatedFlow: any) => {
     setFlow(updatedFlow);
-    setUnsavedChanges(true);
+    setUnsavedChanges(true); // Explicitly set changes as unsaved when flow updates
+  };
+
+  const handleSaveFlow = () => {
+    saveFlow(); // This will set unsavedChanges to false internally
   };
 
   return (
     <DashboardLayout>
       <ReactFlowProvider>
-        <ApiBuilderFlow />
+        <ApiBuilderFlow 
+          onSave={handleSaveFlow} // Pass the wrapped save handler
+          hasUnsavedChanges={unsavedChanges} // Pass unsaved changes state
+        />
         <div className="mt-4 mb-8">
           <ApiBuilderJsonEditor 
             flow={flow} 

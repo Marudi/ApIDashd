@@ -42,7 +42,12 @@ const mockCollaborators = [
   },
 ];
 
-export function ApiBuilderFlow() {
+interface ApiBuilderFlowProps {
+  onSave?: () => void;
+  hasUnsavedChanges?: boolean;
+}
+
+export function ApiBuilderFlow({ onSave, hasUnsavedChanges: externalUnsavedChanges }: ApiBuilderFlowProps) {
   const isMobile = useIsMobile();
   const [isUnsavedModalOpen, setIsUnsavedModalOpen] = useState(false);
 
@@ -63,8 +68,20 @@ export function ApiBuilderFlow() {
     setNodes,
     duplicateNode,
     deleteNode,
-    unsavedChanges,
+    unsavedChanges: internalUnsavedChanges,
   } = useApiFlow(currentUser.id, "My First API");
+
+  // Use external unsaved changes state if provided, otherwise use internal state
+  const unsavedChanges = externalUnsavedChanges !== undefined ? externalUnsavedChanges : internalUnsavedChanges;
+
+  // Handle save with external handler if provided
+  const handleSave = useCallback(() => {
+    if (onSave) {
+      onSave();
+    } else {
+      saveFlow();
+    }
+  }, [onSave, saveFlow]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -105,11 +122,14 @@ export function ApiBuilderFlow() {
     deleteNode(nodeId);
   }, [deleteNode]);
 
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [progress, setProgress] = useState(0);
+
   return (
     <div className={`h-[calc(100vh-18rem)] w-full flex flex-col`}>
       <FlowToolbar 
         flow={flow}
-        onSave={saveFlow}
+        onSave={handleSave}
         onDelete={deleteFlow}
         onPublish={publishFlow}
         onNameChange={updateFlowName}
@@ -117,6 +137,10 @@ export function ApiBuilderFlow() {
         onZoomOut={handleZoomOut}
         onReset={handleReset}
         hasUnsavedChanges={unsavedChanges}
+        isPublishing={isPublishing}
+        setIsPublishing={setIsPublishing}
+        progress={progress}
+        setProgress={setProgress}
       />
 
       <div className={`${isMobile ? "space-y-2" : ""}`}>
@@ -178,7 +202,7 @@ export function ApiBuilderFlow() {
             setNodes={setNodes}
             collaborators={mockCollaborators}
             currentUserId={currentUser.id}
-            onSave={saveFlow}
+            onSave={handleSave}
             onNodeDuplicate={handleNodeDuplicate}
             onNodeDelete={handleNodeDelete}
           />

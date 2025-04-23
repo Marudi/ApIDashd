@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ApiFlow } from "@/lib/api-builder-types";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -20,6 +21,10 @@ export interface FlowToolbarProps {
   onZoomOut?: () => void;
   onReset?: () => void;
   hasUnsavedChanges?: boolean;
+  isPublishing?: boolean;
+  setIsPublishing?: (isPublishing: boolean) => void;
+  progress?: number;
+  setProgress?: (progress: number) => void;
 }
 
 export function FlowToolbar({
@@ -32,6 +37,10 @@ export function FlowToolbar({
   onZoomOut = () => {},
   onReset = () => {},
   hasUnsavedChanges = false,
+  isPublishing = false,
+  setIsPublishing = () => {},
+  progress = 0,
+  setProgress = () => {},
 }: FlowToolbarProps) {
   const isMobile = useIsMobile();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -41,10 +50,10 @@ export function FlowToolbar({
   const [historyList, setHistoryList] = useState<any[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
 
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [progress, setProgress] = useState(0);
-
   const handleSetShareUrl = (url: string) => setShareUrl(url);
+
+  // Console logs for debugging
+  console.log("FlowToolbar hasUnsavedChanges:", hasUnsavedChanges);
 
   return (
     <>

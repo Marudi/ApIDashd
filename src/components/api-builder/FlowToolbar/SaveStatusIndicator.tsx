@@ -6,6 +6,8 @@ interface SaveStatusIndicatorProps {
 }
 
 export function SaveStatusIndicator({ hasUnsavedChanges }: SaveStatusIndicatorProps) {
+  console.log("SaveStatusIndicator hasUnsavedChanges:", hasUnsavedChanges);
+  
   return hasUnsavedChanges ? (
     <span className="text-xs flex items-center text-amber-500">
       <AlertCircle className="h-3 w-3 mr-1" />
