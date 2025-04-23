@@ -89,11 +89,8 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
     fitView: () => reactFlowInstanceRef.current?.fitView(flowConfig.fitViewOptions),
   }));
 
-  // IMPORTANT: Memoize the custom node types to prevent rerenders
-  const customNodeTypes = useMemo(() => 
-    createCustomNodeTypes(onNodeDuplicate, onNodeDelete),
-    [onNodeDuplicate, onNodeDelete]
-  );
+  // Create custom node types OUTSIDE of useMemo to avoid React hook rules violation
+  const nodeTypes = createCustomNodeTypes(onNodeDuplicate, onNodeDelete);
 
   return (
     <div className="col-span-3 h-full border rounded-md bg-accent/5 relative" ref={reactFlowWrapper}>
@@ -106,7 +103,7 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
         onDrop={onDrop}
         onDragOver={onDragOver}
         onNodeClick={onNodeClick}
-        nodeTypes={customNodeTypes}
+        nodeTypes={nodeTypes}
         deleteKeyCode={['Backspace', 'Delete']}
         proOptions={{ hideAttribution: true }}
         {...flowConfig}

@@ -1,5 +1,5 @@
 
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { ApiBuilderNode } from '@/components/api-builder/ApiBuilderNode';
 import { NodeTypes } from 'reactflow';
 import { ApiNodeType } from '@/lib/api-builder-types';
@@ -12,7 +12,7 @@ const createMemoizedNode = (nodeType: ApiNodeType, onNodeDuplicate?: (nodeId: st
 };
 
 export const createCustomNodeTypes = (onNodeDuplicate?: (nodeId: string) => void, onNodeDelete?: (nodeId: string) => void): NodeTypes => {
-  return useMemo(() => ({
+  return {
     input: createMemoizedNode('input', onNodeDuplicate, onNodeDelete),
     endpoint: createMemoizedNode('endpoint', onNodeDuplicate, onNodeDelete),
     transform: createMemoizedNode('transform', onNodeDuplicate, onNodeDelete),
@@ -23,5 +23,5 @@ export const createCustomNodeTypes = (onNodeDuplicate?: (nodeId: string) => void
     validator: createMemoizedNode('validator', onNodeDuplicate, onNodeDelete),
     output: createMemoizedNode('output', onNodeDuplicate, onNodeDelete),
     default: createMemoizedNode('input', onNodeDuplicate, onNodeDelete),
-  }), [onNodeDuplicate, onNodeDelete]);
+  };
 };
