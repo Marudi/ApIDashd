@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import { PostgresConfigSection } from "./PostgresConfigSection";
 import { usePersistentStorage } from "@/hooks/usePersistentStorage";
 import { StorageUsageCard } from "./StorageUsageCard";
 import { useToast } from "@/hooks/use-toast";
+import { useDemoData } from "@/contexts/DemoDataContext";
 
 // Default settings
 const DEFAULT_SETTINGS = {
@@ -24,12 +24,12 @@ const DEFAULT_SETTINGS = {
 export function GeneralSettingsSection() {
   const { persistentEnabled, setPersistentEnabled, setPersistentItem, getPersistentItem } = usePersistentStorage();
   const { toast } = useToast();
+  const { showDemoData, setShowDemoData } = useDemoData();
 
   const [dashboardName, setDashboardName] = useState(DEFAULT_SETTINGS.dashboardName);
   const [timeZone, setTimeZone] = useState(DEFAULT_SETTINGS.timeZone);
   const [dateFormat, setDateFormat] = useState(DEFAULT_SETTINGS.dateFormat);
   const [autoRefresh, setAutoRefresh] = useState(DEFAULT_SETTINGS.autoRefresh);
-  const [showDemoData, setShowDemoData] = useState(DEFAULT_SETTINGS.showDemoData);
   const [loading, setLoading] = useState(true);
 
   // Load settings on mount or when persistence enabled changes
@@ -42,15 +42,11 @@ export function GeneralSettingsSection() {
         setTimeZone(loaded.timeZone ?? DEFAULT_SETTINGS.timeZone);
         setDateFormat(loaded.dateFormat ?? DEFAULT_SETTINGS.dateFormat);
         setAutoRefresh(loaded.autoRefresh ?? DEFAULT_SETTINGS.autoRefresh);
-        setShowDemoData(
-          loaded.showDemoData !== undefined ? loaded.showDemoData : DEFAULT_SETTINGS.showDemoData
-        );
       } else {
         setDashboardName(DEFAULT_SETTINGS.dashboardName);
         setTimeZone(DEFAULT_SETTINGS.timeZone);
         setDateFormat(DEFAULT_SETTINGS.dateFormat);
         setAutoRefresh(DEFAULT_SETTINGS.autoRefresh);
-        setShowDemoData(DEFAULT_SETTINGS.showDemoData);
       }
     } else {
       // fallback to defaults
@@ -58,7 +54,6 @@ export function GeneralSettingsSection() {
       setTimeZone(DEFAULT_SETTINGS.timeZone);
       setDateFormat(DEFAULT_SETTINGS.dateFormat);
       setAutoRefresh(DEFAULT_SETTINGS.autoRefresh);
-      setShowDemoData(DEFAULT_SETTINGS.showDemoData);
     }
     setLoading(false);
   }, [persistentEnabled, getPersistentItem]);
@@ -191,7 +186,7 @@ export function GeneralSettingsSection() {
                 </div>
                 <Switch
                   checked={showDemoData}
-                  onCheckedChange={val => setShowDemoData(!!val)}
+                  onCheckedChange={val => setShowDemoData(val)}
                   disabled={loading}
                   aria-label="Show demo data"
                 />
@@ -223,4 +218,3 @@ export function GeneralSettingsSection() {
     </>
   );
 }
-

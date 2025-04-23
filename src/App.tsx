@@ -17,6 +17,7 @@ import KongGatewayStatus from "./pages/KongGatewayStatus";
 import Settings from "./pages/Settings";
 import ApiBuilder from "./pages/ApiBuilder";
 import { gatewaySyncService } from "./services/gatewaySyncService";
+import { DemoDataProvider } from "./contexts/DemoDataContext";
 
 const queryClient = new QueryClient();
 
@@ -36,24 +37,26 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/apis" element={<ApisList />} />
-            <Route path="/apis/:id" element={<ApiDetail />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/policies" element={<Policies />} />
-            <Route path="/keys" element={<ApiKeys />} />
-            <Route path="/gateway" element={<GatewayStatus />} />
-            <Route path="/kong-gateway" element={<KongGatewayStatus />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/api-builder" element={<ApiBuilder />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <DemoDataProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/apis" element={<ApisList />} />
+              <Route path="/apis/:id" element={<ApiDetail />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/policies" element={<Policies />} />
+              <Route path="/keys" element={<ApiKeys />} />
+              <Route path="/gateway" element={<GatewayStatus />} />
+              <Route path="/kong-gateway" element={<KongGatewayStatus />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/api-builder" element={<ApiBuilder />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </DemoDataProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

@@ -6,8 +6,26 @@ import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
 import { ApiList } from "@/components/dashboard/ApiList";
 import { ErrorsTable } from "@/components/dashboard/ErrorsTable";
 import { mockAnalytics, mockApis, mockSystemHealth } from "@/lib/mock-data";
+import { useDemoData } from "@/contexts/DemoDataContext";
 
 const Index = () => {
+  const { showDemoData } = useDemoData();
+
+  // If demo data is disabled, show empty placeholders
+  if (!showDemoData) {
+    return (
+      <DashboardLayout>
+        <div className="text-center py-20">
+          <h2 className="text-2xl font-semibold mb-4">Demo Data Disabled</h2>
+          <p className="text-muted-foreground mb-6">
+            You've disabled demo data in settings. Connect to a real API gateway 
+            or enable demo data in Settings to view dashboard content.
+          </p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   // Format the hourly data for the chart
   const hourlyData = mockAnalytics.hourlyStats.map(stat => ({
     hour: `${stat.hour}:00`,
