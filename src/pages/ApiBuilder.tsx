@@ -9,12 +9,7 @@ const ApiBuilder = () => {
   const { 
     flow,
     saveFlow,
-    setFlow,
-    nodes,
-    edges,
-    onNodesChange,
-    onEdgesChange,
-    onConnect,
+    setFlow
   } = useApiFlow("user-1", "My First API");
 
   const handleFlowUpdate = (updatedFlow: any) => {
@@ -24,13 +19,7 @@ const ApiBuilder = () => {
   return (
     <DashboardLayout>
       <ReactFlowProvider>
-        <ApiBuilderFlow 
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-        />
+        <ApiBuilderFlow />
         <div className="mt-4 mb-8">
           <ApiBuilderJsonEditor flow={flow} updateFlow={handleFlowUpdate} />
         </div>
