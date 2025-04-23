@@ -31,25 +31,23 @@ export function ToolbarPublishButton({
     setIsPublishing(true);
     setProgress(0);
 
+    let progressValue = 0;
     const interval = setInterval(() => {
-      setProgress((prev) => {
-        const newProgress = prev + 10;
-        if (newProgress >= 100) {
-          clearInterval(interval);
-          setIsPublishing(false);
-          onPublish();
-          toast({
-            title: "API Published",
-            description: `${flow.name} has been published successfully`,
-          });
-          return 100;
-        }
-        return newProgress;
-      });
+      progressValue += 10;
+      setProgress(progressValue);
+
+      if (progressValue >= 100) {
+        clearInterval(interval);
+        setIsPublishing(false);
+        onPublish();
+        toast({
+          title: "API Published",
+          description: `${flow.name} has been published successfully`,
+        });
+      }
     }, 250);
   };
 
-  // Show status
   return flow.published ? (
     <Button variant="default" size="sm" className="bg-green-600">
       Published

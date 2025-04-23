@@ -1,16 +1,15 @@
+
 import { useState } from "react";
 import { ApiFlow } from "@/lib/api-builder-types";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { AlertCircle } from "lucide-react";
-
 import { ToolbarActions } from "./FlowToolbar/ToolbarActions";
 import { ToolbarViewControls } from "./FlowToolbar/ToolbarViewControls";
 import { ToolbarPublishButton } from "./FlowToolbar/ToolbarPublishButton";
 import { ShareDialog } from './FlowToolbar/ShareDialog';
 import { DeleteConfirmDialog } from './FlowToolbar/DeleteConfirmDialog';
 import { HistoryDialog } from './FlowToolbar/HistoryDialog';
+import { Progress } from "@/components/ui/progress";
 
 export interface FlowToolbarProps {
   flow: ApiFlow;
@@ -91,7 +90,6 @@ export function FlowToolbar({
             hasUnsavedChanges={hasUnsavedChanges}
             isMobile={isMobile}
           />
-
           {hasUnsavedChanges && !isMobile && (
             <span className="text-xs flex items-center text-amber-500">
               <AlertCircle className="h-3 w-3 mr-1" />
@@ -100,7 +98,6 @@ export function FlowToolbar({
           )}
         </div>
       </div>
-
       {isPublishing && (
         <div className="w-full mt-2">
           <div className="flex justify-between items-center text-xs mb-1">
@@ -110,7 +107,6 @@ export function FlowToolbar({
           <Progress value={progress} />
         </div>
       )}
-
       <DeleteConfirmDialog
         open={showDeleteConfirm}
         onOpenChange={setShowDeleteConfirm}
