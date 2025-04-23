@@ -1,56 +1,45 @@
-import { useCallback, useState, useEffect } from 'react';
-import { Connection, useEdgesState, useNodesState, addEdge } from 'reactflow';
-import { toast } from '@/components/ui/use-toast';
-import { ApiFlow } from '@/lib/api-builder-types';
-import { createEmptyFlow } from '@/lib/api-builder/flow-utils';
-import { createNode } from '@/lib/api-builder/node-utils';
-import { isValidConnection } from '@/lib/api-builder/node-utils';
+
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "@/components/ui/use-toast";
+import { ApiFlow } from "@/lib/api-builder-types";
+import { createEmptyFlow } from "@/lib/api-builder/flow-utils";
 import { usePersistentStorage } from "./usePersistentStorage";
+import { useFlowStorage } from "./useFlowStorage";
+import { useFlowHistory } from "./useFlowHistory";
+import { useFlowNodes } from "./useFlowNodes";
 
-// Utility: Save flow version history to persistent or local storage
-function getHistoryKey(flowId: string) {
-  return `api-flow-${flowId}-history`;
-}
-function getFlowKey(flowId: string) {
-  return `api-flow-${flowId}`;
-}
-
+// Main compositional hook
 export function useApiFlow(initialUserId: string, initialFlowName?: string) {
-  const [flow, setFlow] = useState<ApiFlow>(createEmptyFlow(initialUserId, initialFlowName));
-  const [nodes, setNodes, onNodesChange] = useNodesState(flow.nodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(flow.edges);
+  const [flow, setFlow] = useState<ApiFlow>(
+    createEmptyFlow(initialUserId, initialFlowName)
+  );
   const [unsavedChanges, setUnsavedChanges] = useState(false);
 
-  // Persistent storage hook for global persistence toggle
+  // Persistent storage
   const {
     persistentEnabled,
     setPersistentItem,
     getPersistentItem,
   } = usePersistentStorage();
 
-  // Save history utility, will use persistent storage if enabled
-  const pushFlowToHistory = useCallback((flowObj: ApiFlow) => {
-    try {
-      const key = getHistoryKey(flowObj.id);
-      let prev: any[] = [];
-      let raw: string | null = null;
-      if (persistentEnabled) {
-        raw = getPersistentItem(key);
-      } else {
-        raw = localStorage.getItem(key);
-      }
-      if (raw) prev = typeof raw === "string" ? JSON.parse(raw) : raw;
-      if (!Array.isArray(prev)) prev = [];
-      prev.push({ ...flowObj });
-      if (prev.length > 10) prev = prev.slice(-10);
-      if (persistentEnabled) {
-        setPersistentItem(key, prev);
-      } else {
-        localStorage.setItem(key, JSON.stringify(prev));
-      }
-    } catch (e) { /* silent */ }
-  }, [persistentEnabled, setPersistentItem, getPersistentItem]);
+  // Split hooks for storage/history/nodes
+  const { pushFlowToHistory, saveFlowToStorage, deleteFlowFromStorage } =
+    useFlowStorage(persistentEnabled, setPersistentItem, getPersistentItem);
+  const { getFlowHistory } = useFlowHistory(persistentEnabled, getPersistentItem);
 
+  const {
+    nodes,
+    setNodes,
+    onNodesChange,
+    edges,
+    setEdges,
+    onEdgesChange,
+    duplicateNode,
+    deleteNode,
+    onConnect,
+  } = useFlowNodes(flow.nodes, flow.edges);
+
+  // Save logic
   const saveFlow = useCallback(() => {
     const updatedFlow: ApiFlow = {
       ...flow,
@@ -65,18 +54,13 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
       description: "Your API flow has been saved successfully",
     });
     try {
-      const flowKey = getFlowKey(flow.id);
-      if (persistentEnabled) {
-        setPersistentItem(flowKey, updatedFlow);
-      } else {
-        localStorage.setItem(flowKey, JSON.stringify(updatedFlow));
-      }
-      pushFlowToHistory(updatedFlow);
+      saveFlowToStorage(updatedFlow);
     } catch (error) {
       console.error("Failed to save flow to storage", error);
     }
-  }, [flow, nodes, edges, persistentEnabled, setPersistentItem, pushFlowToHistory]);
+  }, [flow, nodes, edges, saveFlowToStorage]);
 
+  // Delete logic
   const deleteFlow = useCallback(() => {
     toast({
       title: "Flow Deleted",
@@ -84,7 +68,8 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
       variant: "destructive",
     });
     try {
-      const flowKey = getFlowKey(flow.id);
+      // Get previous version for history
+      const flowKey = `api-flow-${flow.id}`;
       let prev: any = null;
       if (persistentEnabled) {
         prev = getPersistentItem(flowKey);
@@ -93,11 +78,7 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
         prev = prevRaw ? JSON.parse(prevRaw) : null;
       }
       if (prev) pushFlowToHistory(prev);
-      if (persistentEnabled) {
-        setPersistentItem(flowKey, null);
-      } else {
-        localStorage.removeItem(flowKey);
-      }
+      deleteFlowFromStorage(flow.id);
     } catch (error) {
       console.error("Failed to delete flow from storage", error);
     }
@@ -106,8 +87,18 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
     setNodes(newFlow.nodes);
     setEdges(newFlow.edges);
     setUnsavedChanges(false);
-  }, [initialUserId, setNodes, setEdges, flow.id, persistentEnabled, setPersistentItem, getPersistentItem, pushFlowToHistory]);
+  }, [
+    initialUserId,
+    setNodes,
+    setEdges,
+    flow.id,
+    persistentEnabled,
+    getPersistentItem,
+    pushFlowToHistory,
+    deleteFlowFromStorage,
+  ]);
 
+  // Publish logic
   const publishFlow = useCallback(() => {
     setFlow((currentFlow) => {
       const publishedFlow = {
@@ -116,21 +107,16 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
         lastUpdated: new Date().toISOString(),
       };
       try {
-        const flowKey = getFlowKey(currentFlow.id);
-        if (persistentEnabled) {
-          setPersistentItem(flowKey, publishedFlow);
-        } else {
-          localStorage.setItem(flowKey, JSON.stringify(publishedFlow));
-        }
-        pushFlowToHistory(publishedFlow);
+        saveFlowToStorage(publishedFlow);
       } catch (error) {
         console.error("Failed to publish flow to storage", error);
       }
       return publishedFlow;
     });
     setUnsavedChanges(false);
-  }, [persistentEnabled, setPersistentItem, pushFlowToHistory]);
+  }, [saveFlowToStorage]);
 
+  // Name change
   const updateFlowName = useCallback((name: string) => {
     setFlow((currentFlow) => ({
       ...currentFlow,
@@ -139,55 +125,7 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
     setUnsavedChanges(true);
   }, []);
 
-  const duplicateNode = useCallback((nodeId: string) => {
-    const nodeToDuplicate = nodes.find((node) => node.id === nodeId);
-    if (!nodeToDuplicate) return;
-    
-    const newNode = {
-      ...nodeToDuplicate,
-      id: `${nodeToDuplicate.id}-copy`,
-      position: {
-        x: nodeToDuplicate.position.x + 50,
-        y: nodeToDuplicate.position.y + 50,
-      },
-    };
-    
-    setNodes((nds) => [...nds, newNode]);
-    setUnsavedChanges(true);
-  }, [nodes, setNodes]);
-
-  const deleteNode = useCallback((nodeId: string) => {
-    setNodes((nds) => nds.filter((node) => node.id !== nodeId));
-    setEdges((eds) => eds.filter(
-      (edge) => edge.source !== nodeId && edge.target !== nodeId
-    ));
-    setUnsavedChanges(true);
-  }, [setNodes, setEdges]);
-
-  const onConnect = useCallback(
-    (connection: Connection) => {
-      const sourceNode = nodes.find(node => node.id === connection.source);
-      const targetNode = nodes.find(node => node.id === connection.target);
-      
-      if (sourceNode && targetNode) {
-        if (isValidConnection(sourceNode.type, targetNode.type)) {
-          setEdges((eds) => addEdge({
-            ...connection,
-            animated: true,
-            id: `e${connection.source}-${connection.target}`,
-          }, eds));
-        } else {
-          toast({
-            title: "Invalid Connection",
-            description: `You cannot connect ${sourceNode.type} to ${targetNode.type}`,
-            variant: "destructive",
-          });
-        }
-      }
-    },
-    [nodes, setEdges]
-  );
-
+  // Track unsaved changes
   useEffect(() => {
     setUnsavedChanges(true);
   }, [nodes, edges]);
@@ -195,14 +133,14 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
   // Save on CMD/CTRL+S
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === 's') {
+      if ((event.metaKey || event.ctrlKey) && event.key === "s") {
         event.preventDefault();
         saveFlow();
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [saveFlow]);
 
@@ -221,5 +159,6 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
     unsavedChanges,
     duplicateNode,
     deleteNode,
+    getFlowHistory,
   };
 }
