@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 
 export type GatewayType = "tyk" | "kong";
@@ -179,25 +178,26 @@ class GatewaySyncService {
     });
   }
 
-  public testConnection(type: GatewayType): Promise<boolean> {
+  public async testConnection(type: GatewayType): Promise<boolean> {
     const config = this.configs[type];
     
     if (!config.url || !config.apiKey) {
-      toast.error("Gateway URL and API Key must be provided");
-      return Promise.resolve(false);
+      toast.error("Connection Test Failed", {
+        description: "Gateway URL and API Key must be provided"
+      });
+      return false;
     }
 
-    toast.info(`Testing connection to ${type.toUpperCase()} gateway...`);
-    
-    return this.fetchGatewayData(type, config)
-      .then(() => {
-        toast.success(`Successfully connected to ${type.toUpperCase()} gateway`);
-        return true;
-      })
-      .catch((error) => {
-        toast.error(`Connection test failed: ${error.message}`);
-        return false;
+    try {
+      await this.fetchGatewayData(type, config);
+      return true;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown connection error';
+      toast.error("Connection Test Failed", {
+        description: errorMessage
       });
+      return false;
+    }
   }
 }
 
