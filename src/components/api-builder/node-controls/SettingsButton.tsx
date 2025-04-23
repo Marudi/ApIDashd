@@ -40,7 +40,7 @@ export const SettingsButton = memo(function SettingsButton({
             size={size}
             onClick={handleClick}
             aria-label={`Configure ${nodeType} node`}
-            className="flex items-center"
+            className="flex items-center !p-0 !h-auto !w-auto hover:bg-transparent"
           >
             <Settings className="h-4 w-4" />
             {label && <span className="ml-1">Settings</span>}
