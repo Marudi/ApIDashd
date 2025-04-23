@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS = {
   timeZone: "(UTC+00:00) UTC",
   dateFormat: "MM/DD/YYYY",
   autoRefresh: true,
+  showDemoData: true,
 };
 
 export function GeneralSettingsSection() {
@@ -28,6 +29,7 @@ export function GeneralSettingsSection() {
   const [timeZone, setTimeZone] = useState(DEFAULT_SETTINGS.timeZone);
   const [dateFormat, setDateFormat] = useState(DEFAULT_SETTINGS.dateFormat);
   const [autoRefresh, setAutoRefresh] = useState(DEFAULT_SETTINGS.autoRefresh);
+  const [showDemoData, setShowDemoData] = useState(DEFAULT_SETTINGS.showDemoData);
   const [loading, setLoading] = useState(true);
 
   // Load settings on mount or when persistence enabled changes
@@ -40,11 +42,15 @@ export function GeneralSettingsSection() {
         setTimeZone(loaded.timeZone ?? DEFAULT_SETTINGS.timeZone);
         setDateFormat(loaded.dateFormat ?? DEFAULT_SETTINGS.dateFormat);
         setAutoRefresh(loaded.autoRefresh ?? DEFAULT_SETTINGS.autoRefresh);
+        setShowDemoData(
+          loaded.showDemoData !== undefined ? loaded.showDemoData : DEFAULT_SETTINGS.showDemoData
+        );
       } else {
         setDashboardName(DEFAULT_SETTINGS.dashboardName);
         setTimeZone(DEFAULT_SETTINGS.timeZone);
         setDateFormat(DEFAULT_SETTINGS.dateFormat);
         setAutoRefresh(DEFAULT_SETTINGS.autoRefresh);
+        setShowDemoData(DEFAULT_SETTINGS.showDemoData);
       }
     } else {
       // fallback to defaults
@@ -52,6 +58,7 @@ export function GeneralSettingsSection() {
       setTimeZone(DEFAULT_SETTINGS.timeZone);
       setDateFormat(DEFAULT_SETTINGS.dateFormat);
       setAutoRefresh(DEFAULT_SETTINGS.autoRefresh);
+      setShowDemoData(DEFAULT_SETTINGS.showDemoData);
     }
     setLoading(false);
   }, [persistentEnabled, getPersistentItem]);
@@ -64,6 +71,7 @@ export function GeneralSettingsSection() {
       timeZone,
       dateFormat,
       autoRefresh,
+      showDemoData,
     };
     if (persistentEnabled) {
       setPersistentItem("dashboard_settings", settings);
@@ -88,6 +96,7 @@ export function GeneralSettingsSection() {
     setTimeZone(DEFAULT_SETTINGS.timeZone);
     setDateFormat(DEFAULT_SETTINGS.dateFormat);
     setAutoRefresh(DEFAULT_SETTINGS.autoRefresh);
+    setShowDemoData(DEFAULT_SETTINGS.showDemoData);
     // Optionally clear persisted settings
     if (persistentEnabled) {
       setPersistentItem("dashboard_settings", DEFAULT_SETTINGS);
@@ -175,6 +184,21 @@ export function GeneralSettingsSection() {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
+                  <Label>Show demo data in dashboard</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Enable or disable displaying demo/sample data in dashboard pages.
+                  </p>
+                </div>
+                <Switch
+                  checked={showDemoData}
+                  onCheckedChange={val => setShowDemoData(!!val)}
+                  disabled={loading}
+                  aria-label="Show demo data"
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
                   <Label>Persist API &amp; Key Data locally</Label>
                   <p className="text-sm text-muted-foreground">
                     Save API and key data in your browser for offline access and session restore.
@@ -199,3 +223,4 @@ export function GeneralSettingsSection() {
     </>
   );
 }
+
