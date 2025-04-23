@@ -170,3 +170,38 @@
 .react-flow__node.dragging {
   opacity: 0.8;
 }
+
+/* ---- Drag Handle Styles ---- */
+.drag-handle {
+  /* Placed absolutely; visually distinct. Style below can be adjusted for theme: */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  transition: transform 0.15s, box-shadow 0.2s;
+  /* Slight border for contrast */
+  cursor: grab;
+}
+.drag-handle:active,
+.drag-handle:focus {
+  cursor: grabbing;
+  outline: 2px solid #9b87f5;
+  outline-offset: 1px;
+  z-index: 20;
+}
+.drag-handle:hover {
+  box-shadow: 0 4px 12px rgba(155,135,245,0.13);
+  background: #f3f0fa;
+  border-color: #9b87f5;
+  transform: scale(1.09);
+}
+
+/* Prevent drag handle from selecting text */
+.drag-handle, .drag-handle * {
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: auto;
+}
+
+/* Make sure the node container is relatively positioned for absolute children */
+.react-flow__node > .drag-handle {
+  /* This selector improves specificity for nodes */
+  position: absolute;
+}

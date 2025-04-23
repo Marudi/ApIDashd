@@ -1,4 +1,3 @@
-
 import { memo, useCallback } from 'react';
 import { NodeProps } from 'reactflow';
 import { ApiNodeData, ApiNodeType } from '@/lib/api-builder-types';
@@ -13,6 +12,7 @@ import { Copy, Trash, Settings } from 'lucide-react';
 import { NodeHeader } from './node-components/NodeHeader';
 import { NodeBody } from './node-components/NodeBody';
 import { NodeHandles } from './node-components/NodeHandles';
+import { DragHandle } from './node-components/DragHandle';
 import { useNodeConfig } from '@/hooks/useNodeConfig';
 
 interface ApiBuilderNodeComponentProps extends NodeProps<ApiNodeData> {
@@ -54,13 +54,15 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <div 
-          className={`nodrag rounded-md shadow-md ${
+        <div
+          className={`nodrag rounded-md shadow-md relative ${
             selected ? 'ring-2 ring-primary ring-offset-2' : ''
           }`}
           data-id={id}
           onClick={(e) => e.stopPropagation()}
         >
+          <DragHandle />
+
           <div className="min-w-[180px] max-w-[280px]">
             <NodeHeader 
               type={type} 
