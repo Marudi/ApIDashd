@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ApiFlow } from '@/lib/api-builder-types';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Upload, FileJson, FileUpload, FileDownload } from 'lucide-react';
+import { Upload, FileJson, Download } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 interface ApiBuilderJsonEditorProps {
@@ -19,7 +18,6 @@ export function ApiBuilderJsonEditor({ flow, updateFlow }: ApiBuilderJsonEditorP
   const [isValidJson, setIsValidJson] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   
-  // Update the JSON value when the flow changes
   useEffect(() => {
     try {
       const jsonString = JSON.stringify(flow, null, 2);
@@ -33,7 +31,6 @@ export function ApiBuilderJsonEditor({ flow, updateFlow }: ApiBuilderJsonEditorP
     }
   }, [flow]);
 
-  // Handle JSON text changes
   const handleJsonChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setJsonValue(newValue);
@@ -48,12 +45,10 @@ export function ApiBuilderJsonEditor({ flow, updateFlow }: ApiBuilderJsonEditorP
     }
   };
 
-  // Apply JSON changes to the flow
   const handleApplyJson = () => {
     try {
       const parsedFlow = JSON.parse(jsonValue) as ApiFlow;
       
-      // Basic validation to ensure the parsed object has required ApiFlow properties
       if (!parsedFlow.id || !parsedFlow.nodes || !parsedFlow.edges) {
         throw new Error('JSON does not contain valid API flow data');
       }
@@ -76,7 +71,6 @@ export function ApiBuilderJsonEditor({ flow, updateFlow }: ApiBuilderJsonEditorP
     }
   };
 
-  // Handle file upload
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -87,7 +81,6 @@ export function ApiBuilderJsonEditor({ flow, updateFlow }: ApiBuilderJsonEditorP
         const content = e.target?.result as string;
         const parsedFlow = JSON.parse(content) as ApiFlow;
         
-        // Validate the flow structure
         if (!parsedFlow.id || !parsedFlow.nodes || !parsedFlow.edges) {
           throw new Error('Uploaded file does not contain valid API flow data');
         }
@@ -110,11 +103,9 @@ export function ApiBuilderJsonEditor({ flow, updateFlow }: ApiBuilderJsonEditorP
     };
     reader.readAsText(file);
     
-    // Reset the input so the same file can be uploaded again if needed
     event.target.value = '';
   };
 
-  // Handle JSON download
   const handleDownloadJson = () => {
     try {
       const jsonString = JSON.stringify(flow, null, 2);
@@ -190,7 +181,7 @@ export function ApiBuilderJsonEditor({ flow, updateFlow }: ApiBuilderJsonEditorP
                       className="w-full"
                       onClick={() => document.getElementById('flow-upload')?.click()}
                     >
-                      <FileUpload className="mr-2 h-4 w-4" />
+                      <Upload className="mr-2 h-4 w-4" />
                       Import Flow
                     </Button>
                     <input
@@ -207,7 +198,7 @@ export function ApiBuilderJsonEditor({ flow, updateFlow }: ApiBuilderJsonEditorP
                     className="w-full"
                     onClick={handleDownloadJson}
                   >
-                    <FileDownload className="mr-2 h-4 w-4" />
+                    <Download className="mr-2 h-4 w-4" />
                     Export Flow
                   </Button>
                 </div>
