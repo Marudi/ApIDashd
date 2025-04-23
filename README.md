@@ -1,4 +1,3 @@
-
 # ApIDashd API Gateway Dashboard
 
 A modern, extensible dashboard to manage API Gateways (currently supports both Tyk and Kong) with full-featured UI for security, analytics, version control, and more.
@@ -94,6 +93,63 @@ You can deploy the application in a few ways:
 
 > **Note:** For backend/API functionality (e.g., storing data, authentication), connect to Supabase or your own backend server. See [Supabase integration guide](https://docs.ApIDash.dev/integrations/supabase/).
 
+## 🌐 Gateway Connectivity Requirements
+
+### Prerequisites for API Gateway Integration
+
+#### Tyk Gateway
+1. **Tyk Control Plane URL**
+   - Obtain your Tyk dashboard or control plane URL
+   - Typically follows the format: `https://your-tyk-domain.com` or `https://admin.tyk.com/org/your-org`
+
+2. **API Key / Access Token**
+   - Generate an API key from Tyk Dashboard
+   - Navigate to: Users > Edit Profile > API Access > Generate Key
+   - Ensure the key has read/write permissions for API management
+
+3. **Connection Types**
+   - **Direct API Connection**: Requires valid URL and API key
+   - **Redis Integration**: 
+     * Redis host details (host, port, credentials)
+     * Ensure Redis is configured in your Tyk setup
+     * Recommended for distributed gateway configurations
+
+#### Kong Gateway
+1. **Kong Admin API URL**
+   - Locate your Kong Admin API endpoint
+   - Default format: `https://your-kong-domain.com:8444` or `https://admin.kongprovider.com/admin`
+
+2. **Kong Admin API Key**
+   - Generate an admin API key in Kong
+   - Methods vary:
+     * Kong Enterprise: Admin Portal > API Keys
+     * Kong Open Source: Use Kong Manager or Admin API
+
+3. **Connection Variants**
+   - **Standard Connection**: Requires Admin API URL and key
+   - **Redis Backing Store**:
+     * Configure Redis connection for distributed setups
+     * Obtain Redis host, port, and authentication details
+
+### 🔒 Security Recommendations
+- Use environment-specific API keys
+- Rotate keys regularly
+- Limit key permissions to minimum required access
+- Use HTTPS for all gateway connections
+- Store sensitive credentials securely (recommended: Supabase secrets)
+
+### 📡 Supported Gateway Versions
+- Tyk: v3.x, v4.x
+- Kong: v2.x, v3.x
+
+### 💡 Troubleshooting
+- Verify network connectivity
+- Check firewall and security group settings
+- Ensure correct API key permissions
+- Validate Redis configuration if using distributed mode
+
+> **Note:** For seamless integration, consider using [Supabase Secrets](https://supabase.com/docs/guides/platform/secrets) to manage your gateway credentials securely.
+
 ## 🛠️ Local Development
 
 - Modify components, pages, or logic under the `src/` folder
@@ -151,4 +207,3 @@ MIT License (see [`LICENSE`](LICENSE) file if present).
 ---
 
 _This is an open source community dashboard project. See the issues tab or To-Do section above for ways to get involved!_
-
