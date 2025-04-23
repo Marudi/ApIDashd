@@ -1,5 +1,4 @@
 
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ReactFlowProvider } from 'reactflow';
 import { ApiBuilderFlow } from "@/components/api-builder/ApiBuilderFlow";
 import { ApiBuilderJsonEditor } from "@/components/api-builder/ApiBuilderJsonEditor";
@@ -10,17 +9,27 @@ const ApiBuilder = () => {
     flow,
     saveFlow,
     setFlow,
+    nodes,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
   } = useApiFlow("user-1", "My First API");
 
   const handleFlowUpdate = (updatedFlow: any) => {
     setFlow(updatedFlow);
-    saveFlow();
   };
 
   return (
     <DashboardLayout>
       <ReactFlowProvider>
-        <ApiBuilderFlow />
+        <ApiBuilderFlow 
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+        />
         <div className="mt-4 mb-8">
           <ApiBuilderJsonEditor flow={flow} updateFlow={handleFlowUpdate} />
         </div>

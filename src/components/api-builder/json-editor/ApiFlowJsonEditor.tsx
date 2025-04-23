@@ -6,16 +6,21 @@ import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import { ApiFlowJsonEditorProps, JsonValidationResult } from './types';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export function ApiFlowJsonEditor({ flow, updateFlow }: ApiFlowJsonEditorProps) {
   const [jsonValue, setJsonValue] = useState<string>('');
   const [validation, setValidation] = useState<JsonValidationResult>({ isValid: true });
+  const debouncedJsonValue = useDebounce(jsonValue, 500);
 
   useEffect(() => {
     try {
       const jsonString = JSON.stringify(flow, null, 2);
-      setJsonValue(jsonString);
-      setValidation({ isValid: true });
+      // Only update if the new value is different to avoid infinite loops
+      if (jsonString !== jsonValue) {
+        setJsonValue(jsonString);
+        setValidation({ isValid: true });
+      }
     } catch (error) {
       console.error('Error converting flow to JSON:', error);
       setValidation({ 
@@ -43,39 +48,25 @@ export function ApiFlowJsonEditor({ flow, updateFlow }: ApiFlowJsonEditorProps) 
     }
   };
 
+  useEffect(() => {
+    const validationResult = validateJson(debouncedJsonValue);
+    setValidation(validationResult);
+
+    if (validationResult.isValid) {
+      try {
+        const parsedFlow = JSON.parse(debouncedJsonValue);
+        if (JSON.stringify(parsedFlow) !== JSON.stringify(flow)) {
+          updateFlow(parsedFlow);
+        }
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+      }
+    }
+  }, [debouncedJsonValue, updateFlow]);
+
   const handleJsonChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setJsonValue(newValue);
-    setValidation(validateJson(newValue));
-  };
-
-  const handleApplyJson = () => {
-    const validationResult = validateJson(jsonValue);
-    if (!validationResult.isValid) {
-      setValidation(validationResult);
-      toast({
-        title: "Error Updating Flow",
-        description: validationResult.error,
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const parsedFlow = JSON.parse(jsonValue);
-      updateFlow(parsedFlow);
-      toast({
-        title: "Flow Updated",
-        description: "The API flow has been updated from JSON",
-      });
-    } catch (error) {
-      console.error('Error parsing JSON:', error);
-      toast({
-        title: "Error Updating Flow",
-        description: "Failed to update the flow",
-        variant: "destructive"
-      });
-    }
   };
 
   return (
@@ -95,7 +86,7 @@ export function ApiFlowJsonEditor({ flow, updateFlow }: ApiFlowJsonEditorProps) 
       </div>
       <div>
         <Button 
-          onClick={handleApplyJson} 
+          onClick={() => updateFlow(JSON.parse(jsonValue))} 
           className="w-full"
           disabled={!validation.isValid}
         >
