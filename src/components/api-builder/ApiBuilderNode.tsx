@@ -1,4 +1,3 @@
-
 import { memo, useCallback } from 'react';
 import { NodeProps } from 'reactflow';
 import { ApiNodeData, ApiNodeType } from '@/lib/api-builder-types';
@@ -14,7 +13,7 @@ import { NodeHeader } from './node-components/NodeHeader';
 import { NodeBody } from './node-components/NodeBody';
 import { NodeHandles } from './node-components/NodeHandles';
 import { DragHandle } from './node-components/DragHandle';
-import { SettingsButton } from './node-controls/SettingsButton';
+import { NodeSettings } from './node-components/NodeSettings';
 import { useNodeConfig } from '@/hooks/useNodeConfig';
 
 interface ApiBuilderNodeComponentProps extends NodeProps<ApiNodeData> {
@@ -40,9 +39,7 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
   }, [id, onDuplicate]);
 
   const handleSettings = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent the event from bubbling to the node
-    
-    // Open node config dialog using the hook
+    e.stopPropagation(); 
     openNodeConfig({
       id,
       type: nodeType,
@@ -59,27 +56,13 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
           className="rounded-md shadow-md relative"
           data-id={id}
         >
-          {/* Node content */}
           <div>
             <div className="drag-handle-wrapper">
               <DragHandle />
-              <div
-                className="settings-handle absolute z-10 flex items-center justify-center bg-white/80 dark:bg-background rounded shadow border border-border hover:scale-110 transition-transform"
-                style={{ 
-                  width: 26, 
-                  height: 26,
-                  bottom: -13,  // Position at bottom
-                  right: -13,   // Position at right
-                }}
-              >
-                <SettingsButton 
-                  nodeType={nodeType} 
-                  onClick={handleSettings}
-                  size="icon"
-                  variant="ghost"
-                  label={false}
-                />
-              </div>
+              <NodeSettings 
+                nodeType={nodeType}
+                onSettings={handleSettings}
+              />
             </div>
 
             <div className={`min-w-[180px] max-w-[280px] ${
