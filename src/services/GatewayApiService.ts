@@ -4,8 +4,15 @@ import { ExtendedGatewayConfig, gatewayConfigService } from "./GatewayConfigServ
 import { redisService } from "./RedisService";
 import { toast } from "sonner";
 
+// Define an interface for the gateway data response
+interface GatewayDataResponse {
+  apis: any[];
+  status: string;
+  source: "direct" | "redis";
+}
+
 export class GatewayApiService {
-  public async fetchGatewayData(type: GatewayType, config: ExtendedGatewayConfig) {
+  public async fetchGatewayData(type: GatewayType, config: ExtendedGatewayConfig): Promise<GatewayDataResponse> {
     // Check if Redis integration is enabled
     if (config.useRedis) {
       try {
@@ -27,7 +34,7 @@ export class GatewayApiService {
     return this.fetchGatewayDataDirect(type, config);
   }
 
-  private async fetchGatewayDataDirect(type: GatewayType, config: ExtendedGatewayConfig) {
+  private async fetchGatewayDataDirect(type: GatewayType, config: ExtendedGatewayConfig): Promise<GatewayDataResponse> {
     console.log(`Fetching ${type} gateway data directly`);
     
     // Validate configuration
@@ -36,7 +43,7 @@ export class GatewayApiService {
     }
     
     // Simulated direct API call to the gateway
-    return new Promise((resolve, reject) => {
+    return new Promise<GatewayDataResponse>((resolve, reject) => {
       setTimeout(() => {
         if (Math.random() > 0.2) {
           resolve({ 
@@ -51,7 +58,7 @@ export class GatewayApiService {
     });
   }
 
-  private async fetchGatewayDataFromRedis(type: GatewayType, config: ExtendedGatewayConfig) {
+  private async fetchGatewayDataFromRedis(type: GatewayType, config: ExtendedGatewayConfig): Promise<GatewayDataResponse> {
     try {
       console.log(`Fetching ${type} gateway data from Redis`);
       
@@ -100,7 +107,7 @@ export class GatewayApiService {
       }
 
       // Then test gateway connection
-      await this.fetchGatewayData(type, config);
+      const result = await this.fetchGatewayData(type, config);
       toast.success("Gateway Connection Test Successful", {
         description: `Successfully connected to ${type.toUpperCase()} gateway${config.useRedis ? " via Redis" : ""}`
       });
