@@ -1,49 +1,39 @@
 
-import { ApiFlow } from '@/lib/api-builder-types';
 import { Button } from '@/components/ui/button';
 import { Upload, Download } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { ApiFlowJsonEditorProps, ImportResult, ExportResult } from './types';
 
-interface ApiFlowImportExportProps {
-  flow: ApiFlow;
-  updateFlow: (flow: ApiFlow) => void;
-}
-
-export function ApiFlowImportExport({ flow, updateFlow }: ApiFlowImportExportProps) {
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        const parsedFlow = JSON.parse(content) as ApiFlow;
-        
-        if (!parsedFlow.id || !parsedFlow.nodes || !parsedFlow.edges) {
-          throw new Error('Uploaded file does not contain valid API flow data');
+export function ApiFlowImportExport({ flow, updateFlow }: ApiFlowJsonEditorProps) {
+  const importFlow = (file: File): Promise<ImportResult> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const parsedFlow = JSON.parse(content);
+          
+          if (!parsedFlow.id || !parsedFlow.nodes || !parsedFlow.edges) {
+            resolve({ 
+              success: false, 
+              error: 'Uploaded file does not contain valid API flow data' 
+            });
+            return;
+          }
+          
+          resolve({ success: true, flow: parsedFlow });
+        } catch (error) {
+          resolve({ 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Invalid flow definition' 
+          });
         }
-        
-        updateFlow(parsedFlow);
-        
-        toast({
-          title: "Flow Imported",
-          description: "The API flow has been imported successfully",
-        });
-      } catch (error) {
-        console.error('Error parsing uploaded file:', error);
-        toast({
-          title: "Import Error",
-          description: error instanceof Error ? error.message : 'Invalid flow definition in uploaded file',
-          variant: "destructive"
-        });
-      }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
+      };
+      reader.readAsText(file);
+    });
   };
 
-  const handleDownloadJson = () => {
+  const exportFlow = (): ExportResult => {
     try {
       const jsonString = JSON.stringify(flow, null, 2);
       const blob = new Blob([jsonString], { type: 'application/json' });
@@ -56,15 +46,50 @@ export function ApiFlowImportExport({ flow, updateFlow }: ApiFlowImportExportPro
       link.click();
       document.body.removeChild(link);
       
+      return { success: true };
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to export flow' 
+      };
+    }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const result = await importFlow(file);
+    
+    if (result.success && result.flow) {
+      updateFlow(result.flow);
+      toast({
+        title: "Flow Imported",
+        description: "The API flow has been imported successfully",
+      });
+    } else {
+      toast({
+        title: "Import Error",
+        description: result.error,
+        variant: "destructive"
+      });
+    }
+    
+    event.target.value = '';
+  };
+
+  const handleDownloadJson = () => {
+    const result = exportFlow();
+    
+    if (result.success) {
       toast({
         title: "Flow Exported",
         description: "Your API flow has been exported as JSON",
       });
-    } catch (error) {
-      console.error('Error downloading JSON:', error);
+    } else {
       toast({
         title: "Export Error",
-        description: "Failed to export API flow",
+        description: result.error,
         variant: "destructive"
       });
     }
