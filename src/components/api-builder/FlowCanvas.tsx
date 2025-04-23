@@ -18,7 +18,8 @@ import { NodeConfigDialog } from './node-editors/NodeConfigDialog';
 import { useNodeConfig } from '@/hooks/useNodeConfig';
 import { useFlowHandlers } from '@/hooks/useFlowHandlers';
 import { ApiBuilderNode } from './ApiBuilderNode';
-import { nodeTypes as baseNodeTypes, flowConfig } from './flow-canvas/FlowConfig';
+import { flowConfig } from './flow-canvas/FlowConfig';
+import { useToast } from '@/components/ui/use-toast';
 
 // --- New: Props for controlling node duplicate/delete context actions
 interface FlowCanvasProps {
@@ -53,6 +54,7 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
 ) {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstanceRef = useRef<ReactFlowInstance>();
+  const { toast } = useToast();
 
   const isMobile = useIsMobile();
   
@@ -71,9 +73,17 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
     handleExport
   } = useFlowHandlers(reactFlowWrapper, setNodes, onSave);
 
-  const onNodeClick = useCallback((_: React.MouseEvent, node: Node<ApiNodeData>) => {
+  // Fixed onNodeClick handler to properly open node config dialog
+  const onNodeClick = useCallback((event: React.MouseEvent, node: Node<ApiNodeData>) => {
+    // Prevent click event from bubbling to canvas
+    event.stopPropagation();
     openNodeConfig(node);
-  }, [openNodeConfig]);
+    toast({
+      title: "Editing node",
+      description: `Editing ${node.type} node settings`,
+      duration: 1500,
+    });
+  }, [openNodeConfig, toast]);
 
   const handleSaveNodeData = useCallback((updatedData: ApiNodeData) => {
     handleSaveNodeConfig(updatedData, nodes, setNodes);

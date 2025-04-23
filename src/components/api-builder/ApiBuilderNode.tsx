@@ -50,7 +50,8 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
     }
   };
 
-  const handleSettings = () => {
+  const handleSettings = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the event from bubbling to the node
     openNodeConfig({
       id,
       type: nodeType,
@@ -83,7 +84,7 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
             </div>
             <div className="bg-card p-3 rounded-b-md">
               <div className="text-sm">
-                {data.name || `${type} Node`}
+                {data.name || data.label || `${type} Node`}
               </div>
               {data.description && (
                 <div className="text-xs text-muted-foreground mt-1">
