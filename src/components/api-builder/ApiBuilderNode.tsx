@@ -56,14 +56,17 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
     <ContextMenu>
       <ContextMenuTrigger>
         <div
-          className="rounded-md shadow-md relative"
+          className="nodrag rounded-md shadow-md relative"
           data-id={id}
         >
-          {/* Node content - do NOT apply nodrag here */}
-          <div>
-            <DragHandle />
+          {/* Node content - apply nodrag class to make the entire node non-draggable by default */}
+          <div className="nodrag">
+            {/* Only the drag handle should be draggable */}
+            <div className="drag-handle-wrapper">
+              <DragHandle />
+            </div>
 
-            <div className={`min-w-[180px] max-w-[280px] ${
+            <div className={`nodrag min-w-[180px] max-w-[280px] ${
               selected ? 'ring-2 ring-primary ring-offset-2' : ''
             }`}>
               <NodeHeader 

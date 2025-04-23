@@ -1,5 +1,5 @@
 
-import { useCallback, useImperativeHandle, useRef, forwardRef, useMemo } from 'react';
+import { useCallback, useImperativeHandle, useRef, forwardRef } from 'react';
 import ReactFlow, { 
   Background, 
   BackgroundVariant,
@@ -106,6 +106,7 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
         nodeTypes={nodeTypes}
         deleteKeyCode={['Backspace', 'Delete']}
         proOptions={{ hideAttribution: true }}
+        noDragClassName="nodrag"
         {...flowConfig}
         onInit={(instance) => { reactFlowInstanceRef.current = instance; }}
       >

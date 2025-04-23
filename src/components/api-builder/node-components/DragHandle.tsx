@@ -9,7 +9,7 @@ import { memo } from "react";
 export const DragHandle = memo(function DragHandle() {
   return (
     <div
-      className="drag-handle absolute z-10 flex items-center justify-center bg-white/80 dark:bg-background rounded shadow border border-border hover:scale-110 transition-transform"
+      className="drag-handle nodrag absolute z-10 flex items-center justify-center bg-white/80 dark:bg-background rounded shadow border border-border hover:scale-110 transition-transform"
       style={{ 
         width: 26, 
         height: 26,
@@ -17,7 +17,6 @@ export const DragHandle = memo(function DragHandle() {
         right: -13,  // Half the width to center at corner
         cursor: "grab", // Enforce grab cursor for better UX
       }}
-      draggable={true} // Important: Make this explicitly draggable
     >
       <GripVertical className="text-gray-400 dark:text-gray-500" size={16} />
     </div>
