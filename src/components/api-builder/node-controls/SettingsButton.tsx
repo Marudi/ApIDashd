@@ -8,15 +8,16 @@ import {
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { ApiNodeType } from "@/lib/api-builder-types";
+import { memo } from "react";
 
 interface SettingsButtonProps {
   nodeType: ApiNodeType;
-  onClick: (e: React.MouseEvent) => void;  // Updated to accept a MouseEvent parameter
+  onClick: (e: React.MouseEvent) => void;  // Accept a MouseEvent parameter
   size?: "default" | "sm" | "lg" | "icon";
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
 }
 
-export function SettingsButton({ 
+export const SettingsButton = memo(function SettingsButton({ 
   nodeType, 
   onClick, 
   size = "sm", 
@@ -42,4 +43,4 @@ export function SettingsButton({
       </Tooltip>
     </TooltipProvider>
   );
-}
+});

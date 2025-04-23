@@ -1,5 +1,5 @@
 
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { ApiNodeData, ApiNodeType } from '@/lib/api-builder-types';
 import { 
@@ -38,28 +38,28 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
     return colors[nodeType] || 'bg-gray-500';
   };
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (onDelete) {
       onDelete(id);
     }
-  };
+  }, [id, onDelete]);
 
-  const handleDuplicate = () => {
+  const handleDuplicate = useCallback(() => {
     if (onDuplicate) {
       onDuplicate(id);
     }
-  };
+  }, [id, onDuplicate]);
 
-  const handleSettings = (e: React.MouseEvent) => {
+  const handleSettings = useCallback((e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent the event from bubbling to the node
     openNodeConfig({
       id,
       type: nodeType,
       data,
       position: { x: 0, y: 0 },
-      selected: selected,
+      selected,
     });
-  };
+  }, [id, nodeType, data, openNodeConfig, selected]);
 
   return (
     <ContextMenu>

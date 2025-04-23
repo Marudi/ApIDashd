@@ -1,5 +1,5 @@
 
-import { useCallback, useImperativeHandle, useRef, forwardRef } from 'react';
+import { useCallback, useImperativeHandle, useRef, forwardRef, useMemo } from 'react';
 import ReactFlow, { 
   Background, 
   BackgroundVariant,
@@ -17,11 +17,10 @@ import { CollaboratorsPanel } from './flow-panels/CollaboratorsPanel';
 import { NodeConfigDialog } from './node-editors/NodeConfigDialog';
 import { useNodeConfig } from '@/hooks/useNodeConfig';
 import { useFlowHandlers } from '@/hooks/useFlowHandlers';
-import { ApiBuilderNode } from './ApiBuilderNode';
+import { createCustomNodeTypes } from './flow-canvas/CustomNodeTypes';
 import { flowConfig } from './flow-canvas/FlowConfig';
 import { useToast } from '@/components/ui/use-toast';
 
-// --- New: Props for controlling node duplicate/delete context actions
 interface FlowCanvasProps {
   nodes: Node<ApiNodeData>[];
   edges: Edge[];
@@ -89,27 +88,18 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
     handleSaveNodeConfig(updatedData, nodes, setNodes);
   }, [handleSaveNodeConfig, nodes, setNodes]);
 
-  // --- New: Expose zoom/fitView controls to parent via ref
+  // Expose zoom/fitView controls to parent via ref
   useImperativeHandle(ref, () => ({
     zoomIn: () => reactFlowInstanceRef.current?.zoomIn(),
     zoomOut: () => reactFlowInstanceRef.current?.zoomOut(),
     fitView: () => reactFlowInstanceRef.current?.fitView({ padding: 0.1, duration: 800 }),
   }));
 
-  // --- Create a properly typed custom nodeTypes object that includes the handlers
-  const customNodeTypes = {
-    input: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
-    endpoint: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
-    transform: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
-    auth: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
-    ratelimit: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
-    cache: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
-    mock: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
-    validator: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
-    output: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
-    // Add a default type for any future node types
-    default: (props: any) => <ApiBuilderNode {...props} onDuplicate={onNodeDuplicate} onDelete={onNodeDelete} />,
-  };
+  // Memoized nodeTypes to prevent recreation on each render
+  const customNodeTypes = useMemo(
+    () => createCustomNodeTypes(onNodeDuplicate, onNodeDelete),
+    [onNodeDuplicate, onNodeDelete]
+  );
 
   return (
     <div className="col-span-3 h-full border rounded-md bg-accent/5 relative" ref={reactFlowWrapper}>
