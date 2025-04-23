@@ -10,7 +10,7 @@ import { ApiNodeData } from "@/lib/api-builder-types";
 
 const authNodeSchema = z.object({
   label: z.string().min(1, "Label is required"),
-  authType: z.enum(["none", "basic", "jwt", "apikey", "oauth2"]),
+  authType: z.enum(["none", "basic", "jwt", "apikey", "oauth", "token", "oauth2"]),
   authConfig: z.object({
     apiKeyName: z.string().optional(),
     apiKeyLocation: z.enum(["header", "query"]).optional(),
@@ -69,6 +69,8 @@ export function AuthNodeConfig({ data, onSave, onCancel }: AuthNodeConfigProps) 
                   <SelectItem value="basic">Basic Auth</SelectItem>
                   <SelectItem value="jwt">JWT</SelectItem>
                   <SelectItem value="apikey">API Key</SelectItem>
+                  <SelectItem value="token">Token</SelectItem>
+                  <SelectItem value="oauth">OAuth</SelectItem>
                   <SelectItem value="oauth2">OAuth 2.0</SelectItem>
                 </SelectContent>
               </Select>

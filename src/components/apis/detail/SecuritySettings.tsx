@@ -39,7 +39,8 @@ const SecuritySettings = ({
     max: api.quota?.max || 10000,
     per: api.quota?.per || 86400 // 24 hours in seconds
   });
-  const [tempAuthType, setTempAuthType] = useState<"none" | "token" | "jwt" | "oauth">(api.authType);
+  // Updated to use the complete authType from ApiDefinition
+  const [tempAuthType, setTempAuthType] = useState<ApiDefinition["authType"]>(api.authType);
   const [applyingChanges, setApplyingChanges] = useState(false);
 
   const handleAuthTypeChange = () => {
@@ -132,6 +133,12 @@ const SecuritySettings = ({
         return "API Key";
       case "oauth":
         return "OAuth 2.0";
+      case "oauth2":
+        return "OAuth 2.0";
+      case "basic":
+        return "Basic Auth";
+      case "apikey":
+        return "API Key";
       case "none":
         return "None";
       default:
@@ -325,16 +332,19 @@ const SecuritySettings = ({
               <Label>Authentication Type</Label>
               <Select 
                 value={tempAuthType} 
-                onValueChange={(value: "none" | "token" | "jwt" | "oauth") => setTempAuthType(value)}
+                onValueChange={(value: ApiDefinition["authType"]) => setTempAuthType(value)}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">No Authentication</SelectItem>
-                  <SelectItem value="token">API Key</SelectItem>
+                  <SelectItem value="token">API Key (Token)</SelectItem>
+                  <SelectItem value="apikey">API Key</SelectItem>
                   <SelectItem value="jwt">JWT</SelectItem>
-                  <SelectItem value="oauth">OAuth 2.0</SelectItem>
+                  <SelectItem value="oauth">OAuth</SelectItem>
+                  <SelectItem value="oauth2">OAuth 2.0</SelectItem>
+                  <SelectItem value="basic">Basic Auth</SelectItem>
                 </SelectContent>
               </Select>
             </div>

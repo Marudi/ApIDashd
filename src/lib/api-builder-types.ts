@@ -1,5 +1,6 @@
 
 import { Node, Edge } from 'reactflow';
+import { ApiDefinition } from './types';
 
 // API Builder Types
 export type ApiNodeType = 'input' | 'endpoint' | 'transform' | 'auth' | 'ratelimit' | 'cache' | 'mock' | 'validator' | 'output';
@@ -9,7 +10,8 @@ export interface ApiNodeData {
   method?: string;
   path?: string;
   url?: string;
-  authType?: 'none' | 'basic' | 'jwt' | 'apikey' | 'oauth2';
+  // Updated to match ApiDefinition's authType
+  authType?: ApiDefinition['authType'];
   authConfig?: {
     apiKeyName?: string;
     apiKeyLocation?: 'header' | 'query';
