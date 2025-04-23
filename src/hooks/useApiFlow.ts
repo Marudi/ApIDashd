@@ -39,6 +39,23 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
     onConnect,
   } = useFlowNodes(flow.nodes, flow.edges);
 
+  // Update flow when nodes or edges change
+  useEffect(() => {
+    setFlow(prevFlow => ({
+      ...prevFlow,
+      nodes,
+      edges
+    }));
+  }, [nodes, edges]);
+
+  // Set complete flow
+  const updateFlow = useCallback((newFlow: ApiFlow) => {
+    setFlow(newFlow);
+    setNodes(newFlow.nodes);
+    setEdges(newFlow.edges);
+    setUnsavedChanges(true);
+  }, [setNodes, setEdges]);
+
   // Save logic
   const saveFlow = useCallback(() => {
     const updatedFlow: ApiFlow = {
@@ -160,5 +177,6 @@ export function useApiFlow(initialUserId: string, initialFlowName?: string) {
     duplicateNode,
     deleteNode,
     getFlowHistory,
+    setFlow: updateFlow,
   };
 }

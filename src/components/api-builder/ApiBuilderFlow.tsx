@@ -106,7 +106,7 @@ export function ApiBuilderFlow() {
   }, [deleteNode]);
 
   return (
-    <div className={`h-[calc(100vh-12rem)] w-full flex flex-col`}>
+    <div className={`h-[calc(100vh-18rem)] w-full flex flex-col`}>
       <FlowToolbar 
         flow={flow}
         onSave={saveFlow}
