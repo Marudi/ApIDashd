@@ -16,6 +16,7 @@ import { SecuritySettingsSection } from "@/components/settings/SecuritySettingsS
 import { GatewaySettingsSection } from "@/components/settings/GatewaySettingsSection";
 import { NotificationsSettingsSection } from "@/components/settings/NotificationsSettingsSection";
 import { WebhookSettingsSection } from "@/components/settings/WebhookSettingsSection";
+import { RedisConfigSection } from "@/components/settings/RedisConfigSection";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const Settings = () => {
@@ -29,6 +30,10 @@ const Settings = () => {
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="gateway">Gateway</TabsTrigger>
+            <TabsTrigger value="redis" className="flex items-center">
+              <Database className="mr-2 h-4 w-4" />
+              Redis
+            </TabsTrigger>
             <TabsTrigger value="sync" className="flex items-center">
               <SettingsIcon className="mr-2 h-4 w-4" />
               Live Sync
@@ -50,6 +55,10 @@ const Settings = () => {
           
           <TabsContent value="gateway" className="mt-6">
             <GatewaySettingsSection />
+          </TabsContent>
+          
+          <TabsContent value="redis" className="mt-6">
+            <RedisConfigSection />
           </TabsContent>
           
           <TabsContent value="sync" className="mt-6">

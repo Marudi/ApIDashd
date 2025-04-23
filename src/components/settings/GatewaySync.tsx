@@ -6,15 +6,18 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, RefreshCw, Check, AlertCircle } from "lucide-react";
-import { gatewaySyncService, GatewayType, GatewayConfig, SyncStatus } from "@/services/gatewaySyncService";
+import { Loader2, RefreshCw, Check, AlertCircle, Database } from "lucide-react";
+import { gatewaySyncService, GatewayType, SyncStatus } from "@/services/gatewaySyncService";
+import { ExtendedGatewayConfig, gatewayConfigService } from "@/services/GatewayConfigService";
+import { redisService } from "@/services/RedisService";
+import { Separator } from "@/components/ui/separator";
 
 interface GatewaySyncProps {
   type: GatewayType;
 }
 
 export function GatewaySync({ type }: GatewaySyncProps) {
-  const [config, setConfig] = useState<GatewayConfig>(gatewaySyncService.getConfig(type));
+  const [config, setConfig] = useState<ExtendedGatewayConfig>(gatewayConfigService.getConfig(type));
   const [syncStatus, setSyncStatus] = useState<SyncStatus>(gatewaySyncService.getSyncStatus(type));
   const [isTestingConnection, setIsTestingConnection] = useState(false);
 
@@ -29,10 +32,10 @@ export function GatewaySync({ type }: GatewaySyncProps) {
     return () => clearInterval(interval);
   }, [type]);
 
-  const handleConfigChange = (field: keyof GatewayConfig, value: any) => {
+  const handleConfigChange = (field: keyof ExtendedGatewayConfig, value: any) => {
     const updatedConfig = { ...config, [field]: value };
     setConfig(updatedConfig);
-    gatewaySyncService.updateConfig(type, { [field]: value });
+    gatewayConfigService.updateConfig(type, { [field]: value });
   };
 
   const handleTestConnection = async () => {
@@ -103,6 +106,37 @@ export function GatewaySync({ type }: GatewaySyncProps) {
             </SelectContent>
           </Select>
         </div>
+
+        <Separator />
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              Redis Integration
+            </Label>
+            <p className="text-sm text-muted-foreground">Use Redis to sync API definitions</p>
+          </div>
+          <Switch 
+            checked={config.useRedis} 
+            onCheckedChange={(checked) => handleConfigChange("useRedis", checked)} 
+          />
+        </div>
+
+        {config.useRedis && (
+          <div className="space-y-2 pl-6 border-l-2 border-muted">
+            <Label htmlFor={`${type}-redis-prefix`}>Redis Key Prefix</Label>
+            <Input 
+              id={`${type}-redis-prefix`} 
+              placeholder={`${type}:apis:`} 
+              value={config.redisKeyPrefix}
+              onChange={(e) => handleConfigChange("redisKeyPrefix", e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Specify the key prefix used to store API definitions in Redis
+            </p>
+          </div>
+        )}
 
         <div className="flex items-center justify-between pt-4">
           <Button 

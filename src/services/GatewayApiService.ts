@@ -1,10 +1,22 @@
 
 import { GatewayType, GatewayConfig, SyncStatus } from "./gatewaySyncService";
+import { ExtendedGatewayConfig, gatewayConfigService } from "./GatewayConfigService";
+import { redisService } from "./RedisService";
 import { toast } from "sonner";
 
 export class GatewayApiService {
-  public async fetchGatewayData(type: GatewayType, config: GatewayConfig) {
-    // Simulated API call
+  public async fetchGatewayData(type: GatewayType, config: ExtendedGatewayConfig) {
+    // Check if Redis integration is enabled
+    if (config.useRedis) {
+      return this.fetchGatewayDataFromRedis(type, config);
+    }
+    
+    // Fall back to direct API call if Redis isn't enabled
+    return this.fetchGatewayDataDirect(type, config);
+  }
+
+  private async fetchGatewayDataDirect(type: GatewayType, config: ExtendedGatewayConfig) {
+    // Simulated direct API call to the gateway
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (Math.random() > 0.2) {
@@ -16,15 +28,47 @@ export class GatewayApiService {
     });
   }
 
-  public async testConnection(type: GatewayType, config: GatewayConfig): Promise<boolean> {
+  private async fetchGatewayDataFromRedis(type: GatewayType, config: ExtendedGatewayConfig) {
+    try {
+      // Ensure Redis is connected
+      if (!redisService.getConnectionStatus().connected) {
+        await redisService.connect();
+      }
+
+      // Use the Redis service to fetch Tyk APIs
+      const apiDefs = await redisService.getTykApis();
+      return { apis: apiDefs, status: "success" };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Redis error: ${errorMessage}`);
+    }
+  }
+
+  public async testConnection(type: GatewayType, config: ExtendedGatewayConfig): Promise<boolean> {
     if (!config.url || !config.apiKey) {
       toast.error("Connection Test Failed", {
         description: "Gateway URL and API Key must be provided"
       });
       return false;
     }
+
     try {
+      // If Redis integration is enabled, test Redis connection first
+      if (config.useRedis) {
+        const redisConnected = await redisService.testConnection();
+        if (!redisConnected) {
+          toast.error("Redis Connection Failed", {
+            description: "Cannot connect to Redis. Please check Redis configuration."
+          });
+          return false;
+        }
+      }
+
+      // Then test gateway connection
       await this.fetchGatewayData(type, config);
+      toast.success("Gateway Connection Test Successful", {
+        description: `Successfully connected to ${type.toUpperCase()} gateway${config.useRedis ? " via Redis" : ""}`
+      });
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown connection error';
@@ -37,7 +81,7 @@ export class GatewayApiService {
 
   public async syncGateway(
     type: GatewayType,
-    config: GatewayConfig,
+    config: ExtendedGatewayConfig,
     status: SyncStatus,
     setStatus: (status: SyncStatus) => void
   ): Promise<boolean> {
@@ -59,7 +103,7 @@ export class GatewayApiService {
         inProgress: false,
         error: null
       });
-      toast.success(`Successfully synchronized with ${type.toUpperCase()} gateway`);
+      toast.success(`Successfully synchronized with ${type.toUpperCase()} gateway${config.useRedis ? " via Redis" : ""}`);
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';

@@ -1,14 +1,21 @@
 
 import { GatewayType, GatewayConfig } from "./gatewaySyncService";
 
+export interface ExtendedGatewayConfig extends GatewayConfig {
+  useRedis?: boolean;
+  redisKeyPrefix?: string;
+}
+
 export class GatewayConfigService {
-  private configs: Record<GatewayType, GatewayConfig> = {
+  private configs: Record<GatewayType, ExtendedGatewayConfig> = {
     tyk: {
       type: "tyk",
       url: "",
       apiKey: "",
       syncInterval: 5,
       enabled: false,
+      useRedis: false,
+      redisKeyPrefix: "tyk:apis:"
     },
     kong: {
       type: "kong",
@@ -16,6 +23,8 @@ export class GatewayConfigService {
       apiKey: "",
       syncInterval: 5,
       enabled: false,
+      useRedis: false,
+      redisKeyPrefix: "kong:apis:"
     },
   };
 
@@ -41,11 +50,11 @@ export class GatewayConfigService {
     );
   }
 
-  public getConfig(type: GatewayType): GatewayConfig {
+  public getConfig(type: GatewayType): ExtendedGatewayConfig {
     return this.configs[type];
   }
 
-  public updateConfig(type: GatewayType, config: Partial<GatewayConfig>): void {
+  public updateConfig(type: GatewayType, config: Partial<ExtendedGatewayConfig>): void {
     this.configs[type] = {
       ...this.configs[type],
       ...config,
