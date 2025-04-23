@@ -1,26 +1,20 @@
 
-import { ApiNodeData } from '@/lib/api-builder-types';
-import { ApiBuilderNode } from '@/components/api-builder/ApiBuilderNode';
-import { NodeTypes, ConnectionLineType } from 'reactflow';
-
-export const nodeTypes: NodeTypes = {
-  input: ApiBuilderNode,
-  endpoint: ApiBuilderNode,
-  transform: ApiBuilderNode,
-  auth: ApiBuilderNode,
-  ratelimit: ApiBuilderNode,
-  cache: ApiBuilderNode,
-  mock: ApiBuilderNode,
-  validator: ApiBuilderNode,
-  output: ApiBuilderNode,
-};
+import { ConnectionLineType } from 'reactflow';
 
 export const flowConfig = {
   snapToGrid: true,
-  snapGrid: [15, 15] as [number, number], // Fixed type error by explicitly typing as tuple
+  snapGrid: [15, 15] as [number, number],
   connectionLineType: ConnectionLineType.SmoothStep,
   proOptions: { hideAttribution: true },
   deleteKeyCode: "Delete",
   minZoom: 0.2,
   maxZoom: 4,
+  fitViewOptions: {
+    padding: 0.1,
+    duration: 800,
+  },
+  defaultEdgeOptions: { 
+    type: 'smoothstep',
+    animated: false,
+  },
 };

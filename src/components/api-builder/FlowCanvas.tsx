@@ -92,14 +92,11 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
   useImperativeHandle(ref, () => ({
     zoomIn: () => reactFlowInstanceRef.current?.zoomIn(),
     zoomOut: () => reactFlowInstanceRef.current?.zoomOut(),
-    fitView: () => reactFlowInstanceRef.current?.fitView({ padding: 0.1, duration: 800 }),
+    fitView: () => reactFlowInstanceRef.current?.fitView(flowConfig.fitViewOptions),
   }));
 
-  // Memoized nodeTypes to prevent recreation on each render
-  const customNodeTypes = useMemo(
-    () => createCustomNodeTypes(onNodeDuplicate, onNodeDelete),
-    [onNodeDuplicate, onNodeDelete]
-  );
+  // Custom node types with proper memoization
+  const customNodeTypes = createCustomNodeTypes(onNodeDuplicate, onNodeDelete);
 
   return (
     <div className="col-span-3 h-full border rounded-md bg-accent/5 relative" ref={reactFlowWrapper}>
@@ -114,9 +111,6 @@ export const FlowCanvas = forwardRef(function FlowCanvas(
         onNodeClick={onNodeClick}
         nodeTypes={customNodeTypes}
         draggable={true}
-        defaultEdgeOptions={{ type: 'smoothstep' }}
-        fitView
-        proOptions={{ hideAttribution: true }}
         {...flowConfig}
         onInit={(instance) => { reactFlowInstanceRef.current = instance; }}
       >

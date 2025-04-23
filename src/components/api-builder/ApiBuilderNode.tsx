@@ -12,6 +12,9 @@ import {
 import { Copy, Trash, Settings } from 'lucide-react';
 import { SettingsButton } from './node-controls/SettingsButton';
 import { useNodeConfig } from '@/hooks/useNodeConfig';
+import { NodeHeader } from './node-components/NodeHeader';
+import { NodeBody } from './node-components/NodeBody';
+import { NodeHandles } from './node-components/NodeHandles';
 
 interface ApiBuilderNodeComponentProps extends NodeProps<ApiNodeData> {
   onDuplicate?: (nodeId: string) => void;
@@ -22,21 +25,6 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
   const { id, type, data, selected, onDuplicate, onDelete } = props;
   const { openNodeConfig } = useNodeConfig();
   const nodeType = type as ApiNodeType;
-
-  const getNodeColor = (nodeType: string) => {
-    const colors: Record<string, string> = {
-      input: 'bg-blue-500',
-      endpoint: 'bg-green-500',
-      transform: 'bg-purple-500',
-      auth: 'bg-amber-500',
-      ratelimit: 'bg-rose-500',
-      cache: 'bg-cyan-500',
-      mock: 'bg-indigo-500',
-      validator: 'bg-orange-500',
-      output: 'bg-emerald-500',
-    };
-    return colors[nodeType] || 'bg-gray-500';
-  };
 
   const handleDelete = useCallback(() => {
     if (onDelete) {
@@ -71,48 +59,18 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
           data-id={id}
         >
           <div className="min-w-[180px] max-w-[280px]">
-            <div className={`${getNodeColor(type)} text-white p-2 rounded-t-md flex justify-between items-center`}>
-              <span className="font-medium capitalize">{type}</span>
-              <div>
-                <SettingsButton 
-                  nodeType={nodeType} 
-                  onClick={handleSettings} 
-                  size="sm" 
-                  variant="ghost" 
-                />
-              </div>
-            </div>
-            <div className="bg-card p-3 rounded-b-md">
-              <div className="text-sm">
-                {data.name || data.label || `${type} Node`}
-              </div>
-              {data.description && (
-                <div className="text-xs text-muted-foreground mt-1">
-                  {data.description}
-                </div>
-              )}
-            </div>
+            <NodeHeader 
+              type={type} 
+              nodeType={nodeType}
+              onSettings={handleSettings}
+            />
+            <NodeBody 
+              data={data} 
+              type={type}
+            />
           </div>
 
-          {/* Input handle (not for input nodes) */}
-          {type !== 'input' && (
-            <Handle
-              type="target"
-              position={Position.Left}
-              style={{ background: '#555', width: 10, height: 10 }}
-              className="!border-2 !border-background"
-            />
-          )}
-
-          {/* Output handle (not for output nodes) */}
-          {type !== 'output' && (
-            <Handle
-              type="source"
-              position={Position.Right}
-              style={{ background: '#555', width: 10, height: 10 }}
-              className="!border-2 !border-background"
-            />
-          )}
+          <NodeHandles type={type} />
         </div>
       </ContextMenuTrigger>
       

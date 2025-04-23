@@ -12,16 +12,18 @@ import { memo } from "react";
 
 interface SettingsButtonProps {
   nodeType: ApiNodeType;
-  onClick: (e: React.MouseEvent) => void;  // Accept a MouseEvent parameter
+  onClick: (e: React.MouseEvent) => void;
   size?: "default" | "sm" | "lg" | "icon";
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  label?: boolean;
 }
 
 export const SettingsButton = memo(function SettingsButton({ 
   nodeType, 
   onClick, 
   size = "sm", 
-  variant = "outline" 
+  variant = "outline",
+  label = true
 }: SettingsButtonProps) {
   return (
     <TooltipProvider>
@@ -32,9 +34,10 @@ export const SettingsButton = memo(function SettingsButton({
             size={size}
             onClick={onClick}
             aria-label={`Configure ${nodeType} node`}
+            className="flex items-center"
           >
             <Settings className="h-4 w-4" />
-            <span className="ml-1">Settings</span>
+            {label && <span className="ml-1">Settings</span>}
           </Button>
         </TooltipTrigger>
         <TooltipContent>
