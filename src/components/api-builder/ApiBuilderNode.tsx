@@ -13,13 +13,16 @@ import { Copy, Trash, Settings } from 'lucide-react';
 import { SettingsButton } from './node-controls/SettingsButton';
 import { useNodeConfig } from '@/hooks/useNodeConfig';
 
-// Use ReactFlow's NodeProps with our ApiNodeData
-function ApiBuilderNodeComponent({ id, type, data, selected }: NodeProps<ApiNodeData>) {
+interface ApiBuilderNodeComponentProps extends NodeProps<ApiNodeData> {
+  onDuplicate?: (nodeId: string) => void;
+  onDelete?: (nodeId: string) => void;
+}
+
+function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
+  const { id, type, data, selected, onDuplicate, onDelete } = props;
   const { openNodeConfig } = useNodeConfig();
-  
-  // Cast type to ApiNodeType since we know it's valid
   const nodeType = type as ApiNodeType;
-  
+
   const getNodeColor = (nodeType: string) => {
     const colors: Record<string, string> = {
       input: 'bg-blue-500',
@@ -32,18 +35,19 @@ function ApiBuilderNodeComponent({ id, type, data, selected }: NodeProps<ApiNode
       validator: 'bg-orange-500',
       output: 'bg-emerald-500',
     };
-    
     return colors[nodeType] || 'bg-gray-500';
   };
 
   const handleDelete = () => {
-    // This would be implemented in a real application
-    console.log('Delete node:', id);
+    if (onDelete) {
+      onDelete(id);
+    }
   };
 
   const handleDuplicate = () => {
-    // This would be implemented in a real application
-    console.log('Duplicate node:', id);
+    if (onDuplicate) {
+      onDuplicate(id);
+    }
   };
 
   const handleSettings = () => {
@@ -60,7 +64,7 @@ function ApiBuilderNodeComponent({ id, type, data, selected }: NodeProps<ApiNode
     <ContextMenu>
       <ContextMenuTrigger>
         <div 
-          className={`nodrag rounded-md shadow-md transition-all ${
+          className={`nodrag rounded-md shadow-md ${
             selected ? 'ring-2 ring-primary ring-offset-2' : ''
           }`}
           data-id={id}
@@ -130,6 +134,5 @@ function ApiBuilderNodeComponent({ id, type, data, selected }: NodeProps<ApiNode
   );
 }
 
-// Memoize to prevent unnecessary re-renders
 const ApiBuilderNode = memo(ApiBuilderNodeComponent);
 export { ApiBuilderNode };

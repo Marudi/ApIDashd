@@ -7,13 +7,12 @@ import { CollaboratorsList } from "@/components/api-builder/CollaboratorsList";
 import { FlowCanvas } from "@/components/api-builder/FlowCanvas";
 import { useApiFlow } from "@/hooks/useApiFlow";
 import { getRandomColor } from '@/lib/api-builder/collaboration-utils';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-// These would typically be passed in from props/context or fetched
 const currentUser = {
   id: "user-1",
   name: "John Smith",
@@ -47,6 +46,9 @@ export function ApiBuilderFlow() {
   const isMobile = useIsMobile();
   const [isUnsavedModalOpen, setIsUnsavedModalOpen] = useState(false);
 
+  // --- New: Ref for controlling canvas actions globally
+  const flowCanvasRef = useRef<{ zoomIn: () => void; zoomOut: () => void; fitView: () => void; }>(null);
+
   const { 
     flow,
     nodes,
@@ -59,6 +61,8 @@ export function ApiBuilderFlow() {
     publishFlow,
     updateFlowName,
     setNodes,
+    duplicateNode,
+    deleteNode,
     unsavedChanges,
   } = useApiFlow(currentUser.id, "My First API");
 
@@ -82,17 +86,24 @@ export function ApiBuilderFlow() {
     event.dataTransfer.effectAllowed = 'move';
   };
 
+  // --- New: Canvas controls handlers
   const handleZoomIn = useCallback(() => {
-    console.log('Zoom in');
+    flowCanvasRef.current?.zoomIn();
   }, []);
-
   const handleZoomOut = useCallback(() => {
-    console.log('Zoom out');
+    flowCanvasRef.current?.zoomOut();
+  }, []);
+  const handleReset = useCallback(() => {
+    flowCanvasRef.current?.fitView();
   }, []);
 
-  const handleReset = useCallback(() => {
-    console.log('Reset view');
-  }, []);
+  // --- New: Handler passed to nodes for duplicate/delete
+  const handleNodeDuplicate = useCallback((nodeId: string) => {
+    duplicateNode(nodeId);
+  }, [duplicateNode]);
+  const handleNodeDelete = useCallback((nodeId: string) => {
+    deleteNode(nodeId);
+  }, [deleteNode]);
 
   return (
     <div className={`h-[calc(100vh-12rem)] w-full flex flex-col`}>
@@ -158,6 +169,7 @@ export function ApiBuilderFlow() {
           style={isMobile ? { overflow: "hidden", padding: "0 0.25rem" } : {}}
         >
           <FlowCanvas
+            ref={flowCanvasRef}
             nodes={nodes}
             edges={edges}
             onNodesChange={onNodesChange}
@@ -167,10 +179,11 @@ export function ApiBuilderFlow() {
             collaborators={mockCollaborators}
             currentUserId={currentUser.id}
             onSave={saveFlow}
+            onNodeDuplicate={handleNodeDuplicate}
+            onNodeDelete={handleNodeDelete}
           />
         </div>
       </div>
     </div>
   );
 }
-
