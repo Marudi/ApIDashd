@@ -62,6 +62,7 @@ function ApiBuilderNodeComponent(props: ApiBuilderNodeComponentProps) {
               <NodeSettings 
                 nodeType={nodeType}
                 onSettings={handleSettings}
+                data={data}
               />
             </div>
 
